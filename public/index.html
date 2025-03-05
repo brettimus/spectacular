@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Spec Generator</title>
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2ecc71;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--light);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      color: var(--primary-dark);
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 150px);
+    }
+
+    .input-section {
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      margin-bottom: 15px;
+    }
+
+    #app-idea {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--gray);
+      border-radius: 4px 0 0 4px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    #start-button {
+      border-radius: 0 4px 4px 0;
+    }
+
+    #conversation-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--gray);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    #conversation-history {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: white;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      padding: 10px 15px;
+      border-radius: 4px;
+      max-width: 80%;
+    }
+
+    .user-message {
+      background-color: var(--light-gray);
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .assistant-message {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .response-section {
+      display: flex;
+      border-top: 1px solid var(--gray);
+    }
+
+    #user-response {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      font-size: 16px;
+      resize: none;
+    }
+
+    #send-button {
+      border-radius: 0;
+    }
+
+    #final-spec {
+      margin-top: 20px;
+      padding: 25px;
+      background-color: white;
+      border: 1px solid var(--gray);
+      border-radius: 4px;
+      display: none;
+    }
+
+    #generate-spec-button {
+      background-color: var(--secondary);
+      margin: 20px 0;
+      border-radius: 4px;
+      display: none;
+    }
+
+    #copy-spec-button {
+      background-color: var(--gray);
+      margin-top: 15px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>App Specification Generator</h1>
+    <p>Turn your app idea into a detailed developer specification through guided conversation</p>
+  </header>
+
+  <div class="container">
+    <div class="input-section">
+      <div class="input-group">
+        <input type="text" id="app-idea"
+          placeholder="Enter your app idea (e.g., 'I want to build a recipe sharing API')">
+        <button id="start-button">Start</button>
+      </div>
+    </div>
+
+    <div id="conversation-area">
+      <div id="conversation-history"></div>
+
+      <div class="response-section">
+        <textarea id="user-response" placeholder="Type your response here..." disabled></textarea>
+        <button id="send-button" disabled>Send</button>
+      </div>
+    </div>
+
+    <button id="generate-spec-button">Generate Final Specification</button>
+
+    <div id="final-spec">
+      <h2>Final Specification</h2>
+      <div id="spec-content"></div>
+      <button id="copy-spec-button">Copy to Clipboard</button>
+    </div>
+  </div>
+
+  <script>
+    // DOM elements
+    const appIdeaInput = document.getElementById('app-idea');
+    const startButton = document.getElementById('start-button');
+    const conversationHistory = document.getElementById('conversation-history');
+    const userResponseInput = document.getElementById('user-response');
+    const sendButton = document.getElementById('send-button');
+    const generateSpecButton = document.getElementById('generate-spec-button');
+    const finalSpecSection = document.getElementById('final-spec');
+    const specContent = document.getElementById('spec-content');
+    const copySpecButton = document.getElementById('copy-spec-button');
+
+    // State variables
+    let projectId = null;
+    let conversationActive = false;
+    let conversationComplete = false;
+
+    // API URLs
+    const API_BASE_URL = '/api';
+
+    // Event listeners
+    startButton.addEventListener('click', startConversation);
+    sendButton.addEventListener('click', sendResponse);
+    userResponseInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendResponse();
+      }
+    });
+    generateSpecButton.addEventListener('click', generateFinalSpec);
+    copySpecButton.addEventListener('click', copySpecToClipboard);
+
+    // Mock data for testing without the backend
+    const mockQuestions = [
+      "What specific features do you want in your recipe sharing API?",
+      "Who are the primary users of this API?",
+      "What types of data will users be able to store and retrieve?",
+      "Do you want users to be able to rate or comment on recipes?",
+      "Should there be user authentication? If so, what level of permissions do you need?",
+      "Do you need any integration with external services or APIs?",
+      "What are your scalability requirements?",
+      "Do you have any specific performance requirements?",
+      "What error handling strategies should be implemented?",
+      "Do you want to support multiple languages or internationalization?"
+    ];
+
+    let mockQuestionIndex = 0;
+
+    // Helper functions
+    function addMessageToConversation(content, isUser) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      messageDiv.classList.add(isUser ? 'user-message' : 'assistant-message');
+      messageDiv.textContent = content;
+      conversationHistory.appendChild(messageDiv);
+      conversationHistory.scrollTop = conversationHistory.scrollHeight;
+    }
+
+    function setLoadingState(loading) {
+      if (loading) {
+        sendButton.innerHTML = 'Sending <span class="loading"></span>';
+        sendButton.disabled = true;
+        userResponseInput.disabled = true;
+      } else {
+        sendButton.innerHTML = 'Send';
+        sendButton.disabled = false;
+        userResponseInput.disabled = false;
+        userResponseInput.focus();
+      }
+    }
+
+    // API interaction functions
+    async function startConversation() {
+      const appIdea = appIdeaInput.value.trim();
+      if (!appIdea) {
+        alert('Please enter an app idea first');
+        return;
+      }
+
+      try {
+        // Create a new project
+        const projectResponse = await fetch(`${API_BASE_URL}/projects`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: appIdea.substring(0, 50), // Take first 50 chars as name
+            description: appIdea,
+          }),
+        });
+
+        if (!projectResponse.ok) {
+          throw new Error('Failed to create project');
+        }
+
+        const project = await projectResponse.json();
+        projectId = project.id;
+        conversationActive = true;
+
+        // Add initial messages
+        addMessageToConversation(`Here's the idea: ${appIdea}`, true);
+
+        // Create initial conversation
+        const initialPrompt = `Ask me one question at a time so we can develop a thorough, step-by-step spec for this idea. Each question should build on my previous answers, and our end goal is to have a detailed specification I can hand off to a developer. Let's do this iteratively and dig into every relevant detail. Remember, only one question at a time.`;
+
+        const conversationResponse = await fetch(`${API_BASE_URL}/conversations`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            projectId: projectId,
+            question: "What would you like me to help you specify?",
+            answer: appIdea,
+            context: "Initial project description",
+          }),
+        });
+
+        if (!conversationResponse.ok) {
+          throw new Error('Failed to create conversation');
+        }
+
+        addMessageToConversation(initialPrompt, false);
+
+        // Get first question
+        const firstQuestion = "What specific features or functionality do you want in your app? Let's start with the core requirements.";
+        const firstQuestionResponse = await fetch(`${API_BASE_URL}/conversations`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            projectId: projectId,
+            question: firstQuestion,
+            answer: "",
+            context: "Core features question",
+          }),
+        });
+
+        if (!firstQuestionResponse.ok) {
+          throw new Error('Failed to create first question');
+        }
+
+        addMessageToConversation(firstQuestion, false);
+
+        // Enable response input
+        userResponseInput.disabled = false;
+        sendButton.disabled = false;
+        userResponseInput.focus();
+
+        // Disable the start section
+        appIdeaInput.disabled = true;
+        startButton.disabled = true;
+
+      } catch (error) {
+        console.error('Error starting conversation:', error);
+        alert('Failed to start conversation. Please try again.');
+      }
+    }
+
+    async function sendResponse() {
+      const response = userResponseInput.value.trim();
+      if (!response) return;
+
+      addMessageToConversation(response, true);
+      userResponseInput.value = '';
+      setLoadingState(true);
+
+      try {
+        // Get the last conversation to update its answer
+        const conversationsResponse = await fetch(`${API_BASE_URL}/conversations/project/${projectId}`);
+        if (!conversationsResponse.ok) {
+          throw new Error('Failed to fetch conversations');
+        }
+
+        const conversations = await conversationsResponse.json();
+        const lastConversation = conversations[conversations.length - 1];
+
+        // Update the last conversation with the user's answer
+        const updateResponse = await fetch(`${API_BASE_URL}/conversations/${lastConversation.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            projectId: projectId,
+            question: lastConversation.question,
+            answer: response,
+            context: lastConversation.context,
+          }),
+        });
+
+        if (!updateResponse.ok) {
+          throw new Error('Failed to update conversation');
+        }
+
+        // Generate next question based on context
+        let nextQuestion;
+        let context;
+        if (conversations.length < 3) {
+          nextQuestion = "What are the main user roles or types of users in your application?";
+          context = "User roles question";
+        } else if (conversations.length < 5) {
+          nextQuestion = "What kind of data will you need to store and manage in your application?";
+          context = "Data model question";
+        } else if (conversations.length < 7) {
+          nextQuestion = "Are there any specific technical requirements or constraints we should consider?";
+          context = "Technical requirements question";
+        } else if (conversations.length < 9) {
+          nextQuestion = "Do you have any specific security requirements or concerns?";
+          context = "Security requirements question";
+        } else {
+          // End the conversation after enough questions
+          addMessageToConversation("I think we have enough information to generate a comprehensive specification now. Would you like to see the final spec?", false);
+          conversationComplete = true;
+          generateSpecButton.style.display = 'block';
+          setLoadingState(false);
+          return;
+        }
+
+        // Create next conversation entry
+        const nextConversationResponse = await fetch(`${API_BASE_URL}/conversations`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            projectId: projectId,
+            question: nextQuestion,
+            answer: "",
+            context: context,
+          }),
+        });
+
+        if (!nextConversationResponse.ok) {
+          throw new Error('Failed to create next question');
+        }
+
+        addMessageToConversation(nextQuestion, false);
+        setLoadingState(false);
+
+      } catch (error) {
+        console.error('Error sending response:', error);
+        alert('Failed to send response. Please try again.');
+        setLoadingState(false);
+      }
+    }
+
+    async function generateFinalSpec() {
+      generateSpecButton.innerHTML = 'Generating Specification <span class="loading"></span>';
+      generateSpecButton.disabled = true;
+
+      try {
+        // Get all conversations for the project
+        const conversationsResponse = await fetch(`${API_BASE_URL}/conversations/project/${projectId}`);
+        if (!conversationsResponse.ok) {
+          throw new Error('Failed to fetch conversations');
+        }
+
+        const conversations = await conversationsResponse.json();
+
+        // Generate the specification content
+        const specificationContent = generateSpecificationFromConversations(conversations);
+
+        // Create the specification
+        const specResponse = await fetch(`${API_BASE_URL}/specifications`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            projectId: projectId,
+            content: JSON.stringify(specificationContent),
+          }),
+        });
+
+        if (!specResponse.ok) {
+          throw new Error('Failed to create specification');
+        }
+
+        const specification = await specResponse.json();
+
+        // Display the specification
+        specContent.innerHTML = formatSpecification(specificationContent);
+        finalSpecSection.style.display = 'block';
+        copySpecButton.style.display = 'block';
+        generateSpecButton.style.display = 'none';
+
+        // Scroll to show the spec
+        finalSpecSection.scrollIntoView({ behavior: 'smooth' });
+
+      } catch (error) {
+        console.error('Error generating spec:', error);
+        alert('Failed to generate specification. Please try again.');
+        generateSpecButton.innerHTML = 'Generate Final Specification';
+        generateSpecButton.disabled = false;
+      }
+    }
+
+    // ... rest of the existing code ...
+  </script>
+</body>
+
+</html>
