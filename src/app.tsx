@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-
+import { ApiTester } from "./components/ApiTester";
 
 export default function App() {
   const [theme, setTheme] = useState<"dark" | "light">(() => {
@@ -40,8 +40,18 @@ export default function App() {
   };
 
   return (
-    <div className="h-[100vh] flex flex-col items-center justify-center">
-      <h1>Hello World</h1>
+    <div className="min-h-screen bg-background">
+      <div className="fixed top-4 right-4">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-2 rounded-full bg-gray-200 dark:bg-gray-800"
+          aria-label="Toggle theme"
+        >
+          {theme === "dark" ? "🌙" : "☀️"}
+        </button>
+      </div>
+      <ApiTester />
     </div>
   );
 }

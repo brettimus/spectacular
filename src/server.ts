@@ -5,6 +5,7 @@ import type { DrizzleD1Database } from "drizzle-orm/d1";
 import projectsRouter from "./routes/projects";
 import conversationsRouter from "./routes/conversations";
 import specificationsRouter from "./routes/specifications";
+import chatRouter from "./routes/chat";
 
 // Create a typed Hono app
 type Bindings = {
@@ -31,6 +32,7 @@ app.use("*", async (c, next) => {
 app.route("/api/projects", projectsRouter);
 app.route("/api/conversations", conversationsRouter);
 app.route("/api/specifications", specificationsRouter);
+app.route("/api/chat", chatRouter);
 
 // Health check endpoint
 app.get("/health", (c) => c.json({ status: "ok" }));
