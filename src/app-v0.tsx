@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { ChatInterface } from "./components/agent-ui/AIAgent";
+import { ApiTester } from "./components/ApiTester";
 
 export default function App() {
   const [theme, setTheme] = useState<"dark" | "light">(() => {
@@ -51,7 +51,7 @@ export default function App() {
           {theme === "dark" ? "🌙" : "☀️"}
         </button>
       </div>
-      <ChatInterface />
+      <ApiTester />
     </div>
   );
 }
