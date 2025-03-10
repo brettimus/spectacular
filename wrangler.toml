@@ -30,3 +30,12 @@ enabled = true
 
 # [ai]
 # binding = "AI"
+
+[durable_objects]
+bindings = [
+  { name = "DialogueAgent", class_name = "DialogueAgent" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DialogueAgent"]

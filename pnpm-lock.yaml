@@ -35,6 +35,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.1.8
         version: 1.1.8(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      agents-sdk:
+        specifier: ^0.0.27
+        version: 0.0.27(@cloudflare/workers-types@4.20250303.0)
       ai:
         specifier: ^4.1.53
         version: 4.1.53(react@19.0.0)(zod@3.24.2)
@@ -53,6 +56,9 @@ importers:
       hono:
         specifier: ^4.7.0
         version: 4.7.4
+      hono-agents:
+        specifier: ^0.0.17
+        version: 0.0.17(agents-sdk@0.0.27(@cloudflare/workers-types@4.20250303.0))(hono@4.7.4)
       lucide-react:
         specifier: ^0.477.0
         version: 0.477.0(react@19.0.0)
@@ -62,6 +68,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
+      react-markdown:
+        specifier: ^10.1.0
+        version: 10.1.0(@types/react@19.0.10)(react@19.0.0)
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
@@ -1892,6 +1901,9 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  agents-sdk@0.0.27:
+    resolution: {integrity: sha512-9utR0g4nBld2ksuDCqxFmCZtAvmFbccrQ4nEF3LQgsJDVjUZoSte43IrdEOul49PwF5XU/Mu/Yq2s/3uCuxOTQ==}
+
   ai@4.1.53:
     resolution: {integrity: sha512-krLPk+OKLmVGRmsxI+FhbwETiuHFPESVI/Fl8ao/AAYjF2TYr0QFdPSQ8Fk9gWHUi47H+ZDnvJx05Xp/z4UccA==}
     engines: {node: '>=18'}
@@ -2012,6 +2024,10 @@ packages:
   cookie@0.5.0:
     resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
     engines: {node: '>= 0.6'}
+
+  cron-schedule@5.0.4:
+    resolution: {integrity: sha512-nH0a49E/kSVk6BeFgKZy4uUsy6D2A16p120h5bYD9ILBhQu7o2sJFH+WI4R731TSBQ0dB1Ik7inB/dRAB4C8QQ==}
+    engines: {node: '>=18'}
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
@@ -2233,6 +2249,10 @@ packages:
   estree-walker@3.0.3:
     resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
 
+  event-target-shim@6.0.2:
+    resolution: {integrity: sha512-8q3LsZjRezbFZ2PN+uP+Q7pnHUMmAOziU2vA2OwoFaKIXxlxl38IylhSSgUorWu/rf4er67w0ikBqjBFk/pomA==}
+    engines: {node: '>=10.13.0'}
+
   eventsource-parser@3.0.0:
     resolution: {integrity: sha512-T1C0XCUimhxVQzW4zFipdx0SficT651NnkR0ZSH3yQwh+mFMdLfgjABVi4YtMTtaL4s168593DaoaRLMqryavA==}
     engines: {node: '>=18.0.0'}
@@ -2301,6 +2321,12 @@ packages:
 
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
+
+  hono-agents@0.0.17:
+    resolution: {integrity: sha512-l5+9XwqVS82QfOH0LwcjpieqjCR06ccVqUNTu4Po3R9aeOfmoabPJepvEjgd6Rn9bFRTn4DbdQSNeZ6B4UFplg==}
+    peerDependencies:
+      agents-sdk: ^0.0.27
+      hono: ^4.6.17
 
   hono@4.7.4:
     resolution: {integrity: sha512-Pst8FuGqz3L7tFF+u9Pu70eI0xa5S3LPUmrNd5Jm8nTHze9FxLTK9Kaj5g/k4UcwuJSXTP65SyHOPLrffpcAJg==}
@@ -2640,6 +2666,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nanoid@5.1.3:
+    resolution: {integrity: sha512-zAbEOEr7u2CbxwoMRlz/pNSpRP0FdAU4pRaYunCdEezWohXFs+a0Xw7RfkKaezMsmSM1vttcLthJtwRnVtOfHQ==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
@@ -2662,6 +2693,14 @@ packages:
 
   parse-entities@4.0.2:
     resolution: {integrity: sha512-GG2AQYWoLgL877gQIKeRPGO1xF9+eG1ujIb5soS5gPvLQ1y2o8FL90w2QWNdf9I361Mpp7726c+lj3U0qK1uGw==}
+
+  partyserver@0.0.65:
+    resolution: {integrity: sha512-7Kuwm1vX+p1wSL6gW0/nnehZOXYQWNp7Ywushh6n+90tRjtK303unyonQuWlDvZBM3s9GBaVpQA5x3LZ0CLUHw==}
+    peerDependencies:
+      '@cloudflare/workers-types': ^4.20240729.0
+
+  partysocket@0.0.0-548c226:
+    resolution: {integrity: sha512-sPY8fFu+Y6um9E2K9Hf2s1UFm9JD+sg5bawJZGX/NZG8ZW/ZkQ6XP1uDlfXqdCFg8FwTM4BojKuIZfKHf31n3g==}
 
   path-to-regexp@6.3.0:
     resolution: {integrity: sha512-Yhpw4T9C6hPpgPeA28us07OJeqZ5EzQTkbfwuhsUg0c237RomFoETJgmp2sa3F/41gfLE6G5cqcYwznmeEeOlQ==}
@@ -2706,6 +2745,12 @@ packages:
     resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
     peerDependencies:
       react: ^19.0.0
+
+  react-markdown@10.1.0:
+    resolution: {integrity: sha512-qKxVopLT/TyA6BX3Ue5NwabOsAzm0Q7kAPwq6L+wWDwisYs7R8vZ0nRXqq6rkueboxpkjvLGU9fWifiX/ZZFxQ==}
+    peerDependencies:
+      '@types/react': '>=18'
+      react: '>=18'
 
   react-markdown@9.1.0:
     resolution: {integrity: sha512-xaijuJB0kzGiUdG7nc2MOMDUDBWPyGAjZtUrow9XxUeua8IqeP+VlIfAZ3bphpcLTnSZXz6z9jcVC/TCwbfgdw==}
@@ -4663,6 +4708,15 @@ snapshots:
 
   acorn@8.14.1: {}
 
+  agents-sdk@0.0.27(@cloudflare/workers-types@4.20250303.0):
+    dependencies:
+      cron-schedule: 5.0.4
+      nanoid: 5.1.3
+      partyserver: 0.0.65(@cloudflare/workers-types@4.20250303.0)
+      partysocket: 0.0.0-548c226
+    transitivePeerDependencies:
+      - '@cloudflare/workers-types'
+
   ai@4.1.53(react@19.0.0)(zod@3.24.2):
     dependencies:
       '@ai-sdk/provider': 1.0.10
@@ -4772,6 +4826,8 @@ snapshots:
   convert-source-map@2.0.0: {}
 
   cookie@0.5.0: {}
+
+  cron-schedule@5.0.4: {}
 
   csstype@3.1.3: {}
 
@@ -4970,6 +5026,8 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.6
 
+  event-target-shim@6.0.2: {}
+
   eventsource-parser@3.0.0: {}
 
   exit-hook@2.2.1: {}
@@ -5049,6 +5107,11 @@ snapshots:
   hast-util-whitespace@3.0.0:
     dependencies:
       '@types/hast': 3.0.4
+
+  hono-agents@0.0.17(agents-sdk@0.0.27(@cloudflare/workers-types@4.20250303.0))(hono@4.7.4):
+    dependencies:
+      agents-sdk: 0.0.27(@cloudflare/workers-types@4.20250303.0)
+      hono: 4.7.4
 
   hono@4.7.4: {}
 
@@ -5585,6 +5648,8 @@ snapshots:
 
   nanoid@3.3.8: {}
 
+  nanoid@5.1.3: {}
+
   node-domexception@1.0.0: {}
 
   node-fetch-native@1.6.6: {}
@@ -5612,6 +5677,15 @@ snapshots:
       is-alphanumerical: 2.0.1
       is-decimal: 2.0.1
       is-hexadecimal: 2.0.1
+
+  partyserver@0.0.65(@cloudflare/workers-types@4.20250303.0):
+    dependencies:
+      '@cloudflare/workers-types': 4.20250303.0
+      nanoid: 5.1.3
+
+  partysocket@0.0.0-548c226:
+    dependencies:
+      event-target-shim: 6.0.2
 
   path-to-regexp@6.3.0: {}
 
@@ -5662,6 +5736,24 @@ snapshots:
     dependencies:
       react: 19.0.0
       scheduler: 0.25.0
+
+  react-markdown@10.1.0(@types/react@19.0.10)(react@19.0.0):
+    dependencies:
+      '@types/hast': 3.0.4
+      '@types/mdast': 4.0.4
+      '@types/react': 19.0.10
+      devlop: 1.1.0
+      hast-util-to-jsx-runtime: 2.3.6
+      html-url-attributes: 3.0.1
+      mdast-util-to-hast: 13.2.0
+      react: 19.0.0
+      remark-parse: 11.0.0
+      remark-rehype: 11.1.1
+      unified: 11.0.5
+      unist-util-visit: 5.0.0
+      vfile: 6.0.3
+    transitivePeerDependencies:
+      - supports-color
 
   react-markdown@9.1.0(@types/react@19.0.10)(react@19.0.0):
     dependencies:
