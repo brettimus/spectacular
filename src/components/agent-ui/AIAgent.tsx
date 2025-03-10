@@ -3,6 +3,8 @@ import { useAgentChat } from "agents-sdk/ai-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Send, Trash2 } from "lucide-react";
+import { AIMarkdown } from "./AIMarkdown";
+import remarkGfm from "remark-gfm";
 
 export function ChatInterface() {
   // Connect to the agent
@@ -35,7 +37,9 @@ export function ChatInterface() {
                   : "bg-transparent border border-gray-700 text-white rounded-tl-none"
               }`}
             >
-              <p className="whitespace-pre-wrap">{message.content}</p>
+              <div className="whitespace-pre-wrap markdown-content">
+                <AIMarkdown content={message.content} />
+              </div>
             </div>
           </div>
         ))}
