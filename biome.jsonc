@@ -1,0 +1,72 @@
+{
+  "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
+  "css": {
+    "linter": {
+      "enabled": true
+    }
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space"
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "style": {
+        "useBlockStatements": {
+          "level": "error"
+        }
+      }
+    }
+  },
+  "overrides": [
+    {
+      "include": ["service/src/components"],
+      "linter": {
+        "enabled": true,
+        "rules": {
+          "suspicious": {
+            "noArrayIndexKey": {
+              "level": "off"
+            }
+          }
+        }
+      }
+    },
+    {
+      "include": ["cli", "service"],
+      "linter": {
+        "enabled": true,
+        "rules": {
+          "recommended": true,
+          "correctness": {
+            "noUnusedImports": {
+              "level": "error"
+            },
+            "noUnusedVariables": {
+              "level": "error"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "files": {
+    "ignore": [
+      // API related
+      "meta/*.json",
+      // CLI related
+      "dist",
+      // ignore all tsconfig.json files
+      "tsconfig*.json"
+    ]
+  }
+}
