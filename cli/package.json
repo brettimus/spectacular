@@ -1,0 +1,53 @@
+{
+  "name": "spectacular-cli",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "An interactive CLI to iterate on project specifications with AI",
+  "scripts": {
+    "build": "pnpm clean && tsup",
+    "dev": "tsup --watch && node dist/index.js",
+    "dev:hatch": "tsup --watch --onSuccess 'node dist/index.js --hatch'",
+    "format": "biome format . --write",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist",
+    "clean:test-apps": "rimraf test-apps/* && touch test-apps/.gitkeep"
+  },
+  "exports": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    ".gitignore"
+  ],
+  "bin": {
+    "spectacular": "dist/index.js"
+  },
+  "author": "Fiberplane<info@fiberplane.com>",
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/brettimus/spectacular",
+    "type": "git"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^1.1.15",
+    "@clack/core": "^0.3.4",
+    "@clack/prompts": "^0.10.0",
+    "ai": "^4.1.53",
+    "dotenv": "^16.4.5",
+    "giget": "^1.2.3",
+    "open": "^10.1.0",
+    "oslo": "^1.2.1",
+    "picocolors": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.2.0",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.2.3"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

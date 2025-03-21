@@ -1,4 +1,12 @@
-you are in a typescript fullstack project that runs on cloudflare using
+you are in a typescript pnpm monorepo with two projects, `cli` and `service`.
+
+## `cli`
+
+a cli tool that connects to the `service`
+
+## `service`
+
+fullstack project that runs on cloudflare using:
 
 - cloudflare workers for the runtime
 - hono.js as the api framework
@@ -6,5 +14,3 @@ you are in a typescript fullstack project that runs on cloudflare using
 - durable objects to manage state of ai agents and expose realtime streaming
 
 the project uses modern typescript
-
-pnpm for dependency mangement
