@@ -10,7 +10,8 @@
     "format": "biome format . --write",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
-    "clean:test-apps": "rimraf test-apps/* && touch test-apps/.gitkeep"
+    "clean:test-apps": "rimraf test-apps/* && touch test-apps/.gitkeep",
+    "prepublishOnly": "pnpm build"
   },
   "exports": "./dist/index.js",
   "files": ["dist", "README.md", "LICENSE", ".gitignore"],
