@@ -4,6 +4,13 @@ import { cancel, log } from "@clack/prompts";
 import { CANCEL_MESSAGE, HATCH_LOG_LEVEL } from "./const";
 import { CodeGenError } from "./types";
 
+/**
+ * Converts a spec name to a path, replacing spaces with dashes and converting to lowercase.
+ */
+export function convertSpecNameToPath(specName: string) {
+  return specName.replace(/\s+/g, "-").toLowerCase();
+}
+
 export function getPackageManager() {
   return process.env.npm_config_user_agent?.split("/").at(0);
 }
@@ -40,7 +47,7 @@ export function handleError(error: Error | CodeGenError) {
     log.info("Continuing...");
   } else {
     log.error(`exiting with an error: ${error.message}`);
-    // HACK - Allow us to log the error in more depth if `CHA_LOG_LEVEL` is set to `debug`
+    // HACK - Allow us to log the error in more depth if `HATCH_LOG_LEVEL` is set to `debug`
     if (HATCH_LOG_LEVEL === "debug") {
       console.error("\n\n*********LOGGING VERBOSE ERROR*********\n");
       console.error(error);

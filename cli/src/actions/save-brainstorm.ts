@@ -2,11 +2,11 @@ import { writeFileSync } from "node:fs";
 import path from "node:path";
 import type { Context } from "@/context";
 import { text } from "@clack/prompts";
+import { convertSpecNameToPath } from "@/utils";
 
-// TODO: validate path
 export async function actionSaveBrainstorm(ctx: Context) {
   try {
-    const placeholder = ctx.specName ?? "./brainstorm.md";
+    const placeholder = convertSpecNameToPath(ctx.specName ?? "brainstorm");
     const result = await text({
       message: "Where should we save your brainstorm? (./relative-path)",
       placeholder,
@@ -18,13 +18,14 @@ export async function actionSaveBrainstorm(ctx: Context) {
         ctx.specPath = placeholder;
       } else {
         // Check if it's a bare filename (no directory separators and no relative path markers)
+        // Use path.dirname for cross-platform compatibility
         const dirname = path.dirname(result);
         if (
           dirname === "." &&
           !result.startsWith("./") &&
           !result.startsWith("../")
         ) {
-          // It's a bare filename add it to the current working directory
+          // It's a bare filename, so add it to the current working directory
           ctx.specPath = path.join(ctx.cwd, result);
         } else {
           ctx.specPath = result;
