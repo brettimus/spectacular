@@ -7,6 +7,7 @@
     "build": "pnpm clean && tsup",
     "dev": "tsup --watch && node dist/index.js",
     "dev:hatch": "tsup --watch --onSuccess 'node dist/index.js --hatch'",
+    "eval:dev": "evalite watch",
     "format": "biome format . --write",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
@@ -38,8 +39,12 @@
   },
   "devDependencies": {
     "@types/node": "^22.2.0",
+    "autoevals": "^0.0.124",
+    "evalite": "^0.9.1",
     "rimraf": "^6.0.1",
-    "tsup": "^8.2.3"
+    "tsup": "^8.2.3",
+    "vite": "^6.2.0",
+    "vitest": "3.0.7"
   },
   "engines": {
     "node": ">=18.17.0"

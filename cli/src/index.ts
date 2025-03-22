@@ -8,9 +8,9 @@ import { actionSaveHistory } from "./actions/save-history";
 import { SPECTACULAR_TITLE } from "./const";
 import { initContext } from "./context";
 import { promptDescription } from "./description";
+import { promptOpenAiKey } from "./openai-api-key";
 import { isError } from "./types";
 import { handleCancel, handleError } from "./utils";
-import { promptOpenAiKey } from "./openai-api-key";
 
 // For local development, to quickly configure env vars from a .env file
 config();

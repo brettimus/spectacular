@@ -61,6 +61,10 @@
   ],
   "files": {
     "ignore": [
+      // CLI evals
+      "cli/evals/data/*.json",
+      // CLI outputs of test runs
+      "cli/test-specs/**/*",
       // API related
       "meta/*.json",
       // CLI related

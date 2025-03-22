@@ -24,7 +24,7 @@ export async function actionSaveHistory(ctx: Context) {
       specContent: ctx.specContent,
 
       sessionId: ctx.sessionId,
-    }
+    };
 
     writeFileSync(historyFileName, JSON.stringify(history, null, 2));
 
