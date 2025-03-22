@@ -1,9 +1,10 @@
 import type { Context } from "@/context";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from '@ai-sdk/openai';
 import { generateObject, streamText } from "ai";
 import { z } from "zod";
 
 export async function routerAgent(ctx: Context) {
+  const openai = createOpenAI({ apiKey: ctx.apiKey });
   const model = openai("gpt-4o-mini");
 
   // First step: Classify the query type
@@ -33,7 +34,7 @@ export async function routerAgent(ctx: Context) {
     Consider the user's intent, as well as the following checklist:
 
     - Do we have a clear idea of the domain of the project?
-    - Do we have an idea of features like auth, email, etc?
+    - Do we have an idea of features like auth, email, realtime, etc?
     `,
   });
 
@@ -43,7 +44,7 @@ export async function routerAgent(ctx: Context) {
 }
 
 // https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
-export const IDEATING_SYSTEM_PROMPT = `
+const IDEATING_SYSTEM_PROMPT = `
 You are an expert AI assistant that helps iterate on coding ideas in order to inform an _eventual_ software specification to implement a software project.
 
 You only develop data APIs. YOU DO NOT DEVELOP UI.
@@ -60,6 +61,7 @@ Be sure to determine if the project needs:
 - Email
 - Relational Database
 - File Storage
+- Realtime updates (websockets, etc)
 
 Remember, only one question at a time.
 
@@ -67,6 +69,8 @@ Here's the idea:
 `;
 
 export async function askFollowUpQuestion(ctx: Context) {
+  const openai = createOpenAI({ apiKey: ctx.apiKey });
+
   return streamText({
     model: openai("gpt-4o"),
     system: IDEATING_SYSTEM_PROMPT,
@@ -88,15 +92,30 @@ The implementation plan should read like a handoff document for a developer.
 
 It should be detailed and include all the information needed to implement the project.
 
-Certain technology choices are already made:
+Unless otherwise specified, make the following technology choices are already made:
 
-- Hono for the API
-- Cloudflare Workers for the runtime
+- Hono - A lightweight TypeScript API framework with syntax similar to Express.js
+- Cloudflare Workers - Edge runtime platform from Cloudflare
+
+If we need a relational database, specify:
+
+- Cloudflare D1 - Serverless sqlite edge database from Cloudflare
+- Drizzle - Type-safe SQL query builder and ORM, used to define database schema and craft queries
+
+If we need authentication, specify Clerk.
+
+If we need email, suggest Resend.
+
+If we need blob storage, suggest Cloudflare R2.
+
+If we need realtime updates, suggest Cloudflare Durable Objects.
 
 This is important to my career.
 `;
 
 export async function generateImplementationPlan(ctx: Context) {
+  const openai = createOpenAI({ apiKey: ctx.apiKey });
+
   return generateObject({
     model: openai("o3-mini"),
     system: IMPLEMENTATION_PLAN_SYSTEM_PROMPT,

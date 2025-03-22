@@ -2,11 +2,11 @@ import { writeFileSync } from "node:fs";
 import path from "node:path";
 import type { Context } from "@/context";
 import { text } from "@clack/prompts";
-import { convertSpecNameToPath } from "@/utils";
+import { convertSpecNameToFilename } from "@/utils";
 
 export async function actionSaveBrainstorm(ctx: Context) {
   try {
-    const placeholder = convertSpecNameToPath(ctx.specName ?? "brainstorm");
+    const placeholder = convertSpecNameToFilename(ctx.specName ?? "brainstorm");
     const result = await text({
       message: "Where should we save your brainstorm? (./relative-path)",
       placeholder,

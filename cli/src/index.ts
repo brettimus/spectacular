@@ -9,6 +9,7 @@ import { initContext } from "./context";
 import { promptDescription } from "./description";
 import { isError } from "./types";
 import { handleCancel, handleError } from "./utils";
+import { promptOpenAiKey } from "./openai-api-key";
 
 // For local development, to quickly configure env vars from a .env file
 config();
@@ -21,6 +22,23 @@ async function main() {
   intro("😮 spectacular");
 
   const context = initContext();
+
+  // If there wasn't an API key in the environment, prompt the user for one
+  if (!context.apiKey) {
+    const result = await promptOpenAiKey(context);
+
+    if (isCancel(result)) {
+      handleCancel();
+    }
+
+    if (result instanceof Error) {
+      handleError(result);
+    }
+  }
+
+  if (!context.apiKey) {
+    throw new Error("OPENAI_API_KEY is not set");
+  }
 
   // INIT: Get a description of the api from the user
   const descriptionResult = await promptDescription(context);

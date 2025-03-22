@@ -2,6 +2,8 @@ import type { Message } from "ai";
 import { getPackageManager } from "./utils";
 
 export interface Context {
+  apiKey?: string;
+
   cwd: string;
   packageManager: string;
 
@@ -39,6 +41,7 @@ export interface Context {
 
 export function initContext(): Context {
   return {
+    apiKey: process.env.OPENAI_API_KEY,
     cwd: process.cwd(),
     packageManager: getPackageManager() ?? "npm",
 

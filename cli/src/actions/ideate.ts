@@ -13,23 +13,6 @@ import pico from "picocolors";
 
 type Spinner = ReturnType<typeof spinner>;
 
-// https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
-export const IDEATING_SYSTEM_PROMPT = `
-You are an expert AI assistant that helps iterate on coding ideas in order to inform an _eventual_ software specification to implement a software project.
-
-The user will approach you with an idea for a software project.
-
-Ask the user one question at a time so we can develop a thorough, step-by-step spec for this idea. Each question should build on previous answers,
-and our end goal is to have a detailed specification that the user can hand off to a developer. 
-Let's do this iteratively and dig into every relevant detail.
-
-Remember, only one question at a time.
-
-All your responses should also contain a message to the user, even when you're also doing tool use.
-
-Here's the idea:
-`;
-
 export async function actionIdeate(ctx: Context) {
   const description = ctx.description;
 

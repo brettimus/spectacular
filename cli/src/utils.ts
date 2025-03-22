@@ -7,8 +7,9 @@ import { CodeGenError } from "./types";
 /**
  * Converts a spec name to a path, replacing spaces with dashes and converting to lowercase.
  */
-export function convertSpecNameToPath(specName: string) {
-  return specName.replace(/\s+/g, "-").toLowerCase();
+export function convertSpecNameToFilename(specName: string) {
+  const filename = specName.replace(/\s+/g, "-").toLowerCase();
+  return filename.endsWith(".md") ? filename : `${filename}.md`;
 }
 
 export function getPackageManager() {
