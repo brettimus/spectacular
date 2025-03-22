@@ -4,6 +4,7 @@ import { config } from "dotenv";
 import pico from "picocolors";
 import { actionIdeate } from "./actions/ideate";
 import { actionSaveBrainstorm } from "./actions/save-brainstorm";
+import { actionSaveHistory } from "./actions/save-history";
 import { SPECTACULAR_TITLE } from "./const";
 import { initContext } from "./context";
 import { promptDescription } from "./description";
@@ -73,6 +74,9 @@ async function main() {
   if (saveBrainstormResult instanceof Error) {
     handleError(saveBrainstormResult);
   }
+
+  // Save the history to a file
+  await actionSaveHistory(context);
 
   outro(`🦉 saved spec in ${context.specPath}!
 `);
