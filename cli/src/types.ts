@@ -1,4 +1,3 @@
-
 export class CodeGenError extends Error {
   constructor(message: string) {
     super(message);

@@ -1,5 +1,5 @@
 {
-  "name": "spectacular-cli",
+  "name": "@fiberplane/spectacular-cli",
   "type": "module",
   "version": "0.0.1",
   "description": "An interactive CLI to iterate on project specifications with AI",
@@ -13,12 +13,7 @@
     "clean:test-apps": "rimraf test-apps/* && touch test-apps/.gitkeep"
   },
   "exports": "./dist/index.js",
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE",
-    ".gitignore"
-  ],
+  "files": ["dist", "README.md", "LICENSE", ".gitignore"],
   "bin": {
     "spectacular": "dist/index.js"
   },
@@ -37,7 +32,8 @@
     "giget": "^1.2.3",
     "open": "^10.1.0",
     "oslo": "^1.2.1",
-    "picocolors": "^1.0.1"
+    "picocolors": "^1.0.1",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/node": "^22.2.0",

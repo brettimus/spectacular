@@ -1,13 +1,35 @@
 import type { ScaffoldedFiles } from "@/integrations/code-gen";
-import { getPackageManager } from "./utils";
 import type { Message } from "ai";
+import { getPackageManager } from "./utils";
 
 export interface Context {
   cwd: string;
-  messages: Message[];
   packageManager: string;
-  path?: string;
+
+  /**
+   * The messages from the current chat
+   */
+  messages: Message[];
+
+  /**
+   * The initial description of the project from the user
+   */
   description?: string;
+
+  /**
+   * The spec of the project
+   */
+  specContent?: string;
+
+  /**
+   * The name of the spec file
+   */
+  specName?: string;
+
+  /**
+   * Where we should write the spec file
+   */
+  specPath?: string;
 
   /**
    * A random id for the current session.
@@ -40,6 +62,7 @@ export function initContext(): Context {
   return {
     cwd: process.cwd(),
     packageManager: getPackageManager() ?? "npm",
+
     messages: [],
 
     // TODO - Improve this random id and concatenate with project name somehow
@@ -75,7 +98,7 @@ export function initContext(): Context {
  * parseHatchFlag(["--hatch"]) // Returns true
  * parseHatchFlag(["--other-flag"]) // Returns false
  */
-function parseHatchFlag(args: string[]): string | boolean {
+export function parseHatchFlag(args: string[]): string | boolean {
   const hatchIndex = args.findIndex((arg) => arg.startsWith("--hatch"));
 
   if (hatchIndex === -1) {

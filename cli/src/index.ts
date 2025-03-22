@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-import { config } from "dotenv";
 import { intro, isCancel, outro } from "@clack/prompts";
+import { config } from "dotenv";
 import pico from "picocolors";
-import { promptDescription } from "./actions/description";
+import { actionIdeate } from "./actions/ideate";
+import { actionSaveBrainstorm } from "./actions/save-brainstorm";
 import { SPECTACULAR_TITLE } from "./const";
 import { initContext } from "./context";
+import { promptDescription } from "./description";
 import { isError } from "./types";
 import { handleCancel, handleError } from "./utils";
-import { actionIdeate } from "./actions/ideate";
 
+// For local development, to quickly configure env vars from a .env file
 config();
 
 async function main() {
@@ -43,7 +45,18 @@ async function main() {
     handleError(result);
   }
 
-  outro(`🦉 saved brainstorm.md in ${context.path}!
+  // Save the brainstorm to a file
+  const saveBrainstormResult = await actionSaveBrainstorm(context);
+
+  if (isCancel(saveBrainstormResult)) {
+    handleCancel();
+  }
+
+  if (saveBrainstormResult instanceof Error) {
+    handleError(saveBrainstormResult);
+  }
+
+  outro(`🦉 saved spec in ${context.specPath}!
 `);
   process.exit(0);
 }

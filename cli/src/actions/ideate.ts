@@ -1,8 +1,16 @@
 import type { Context } from "@/context";
-import { log, spinner, stream } from "@clack/prompts";
-import { appendResponseMessages, streamText } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import {
+  askFollowUpQuestion,
+  generateImplementationPlan,
+  routerAgent,
+} from "@/integrations/agent";
+import { isError } from "@/types";
+import { handleCancel, handleError } from "@/utils";
+import { stream, isCancel, log, spinner, text } from "@clack/prompts";
+import { type Message, appendResponseMessages } from "ai";
 import pico from "picocolors";
+
+type Spinner = ReturnType<typeof spinner>;
 
 // https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
 export const IDEATING_SYSTEM_PROMPT = `
@@ -16,6 +24,8 @@ Let's do this iteratively and dig into every relevant detail.
 
 Remember, only one question at a time.
 
+All your responses should also contain a message to the user, even when you're also doing tool use.
+
 Here's the idea:
 `;
 
@@ -28,110 +38,99 @@ export async function actionIdeate(ctx: Context) {
     process.exit(1);
   }
 
+  // Fudge the first message from the user
+  ctx.messages.push(createUserMessage(description));
+
   const s = spinner();
-  s.start("Getting ready to ideate...");
+  s.start("Getting ready to speculate...");
 
-  ctx.messages.push({
-    id: randomMessageId(),
-    content: description,
-    role: "user",
-    parts: [{
-      type: "text",
-      text: description,
-    }],
-  })
+  let routerResponse = await routerAgent(ctx);
+  let nextStep = routerResponse.nextStep;
 
-  const streamResponse = streamText({
-    model: openai('gpt-4o-mini'),
-    system: IDEATING_SYSTEM_PROMPT,
-    messages: ctx.messages,
+  while (nextStep === "ask_follow_up_question") {
+    log.info("Asking follow up question");
+    await streamFollowUpQuestion(ctx, s);
+    await promptUserAnswer(ctx);
+    routerResponse = await routerAgent(ctx);
+    nextStep = routerResponse.nextStep;
+  }
+
+  const secondSpinner = spinner();
+  secondSpinner.start("Generating a spectacular plan...");
+
+  const implementationPlan = await generateImplementationPlan(ctx);
+  ctx.specName = implementationPlan.object.title;
+  ctx.specContent = implementationPlan.object.plan;
+
+  secondSpinner.stop(pico.italic("voilà! a plan!"));
+  return;
+}
+
+async function promptUserAnswer(ctx: Context) {
+  const userAnswer = await text({
+    message: pico.italic("Your response:"),
+    defaultValue: "",
+    validate: (value) => {
+      if (value === "") {
+        return pico.italic("Give me something to work with here!");
+      }
+      return undefined;
+    },
   });
 
-  await stream.info((async function* () {
-    let hasStarted = false;
-    // Yield content from the AI SDK stream
-    for await (const chunk of streamResponse.textStream) {
-      if (!hasStarted) {
-        hasStarted = true;
-        s.stop(pico.italic("ándale"));
-        log.info("");
-        yield `  ${chunk}`;
-      } else {
-        yield chunk;
-      }
-    }
-  })());
+  if (isCancel(userAnswer)) {
+    handleCancel();
+  }
 
-  const response = await streamResponse.response;
+  if (isError(userAnswer)) {
+    handleError(userAnswer);
+  }
+
+  ctx.messages.push(createUserMessage(userAnswer as string));
+}
+
+async function streamFollowUpQuestion(ctx: Context, spinner: Spinner) {
+  const followUpQuestionStream = await askFollowUpQuestion(ctx);
+
+  await stream.info(
+    (async function* () {
+      let hasStarted = false;
+      // Yield content from the AI SDK stream
+      for await (const chunk of followUpQuestionStream.textStream) {
+        if (!hasStarted) {
+          hasStarted = true;
+          spinner.stop(pico.italic("Spectacular:"));
+          log.info("");
+          yield `  ${chunk}`;
+        } else {
+          yield chunk;
+        }
+      }
+    })(),
+  );
+
+  const response = await followUpQuestionStream.response;
 
   ctx.messages = appendResponseMessages({
     messages: ctx.messages,
     responseMessages: response.messages,
   });
-
-  
-  // const followOn = await askLLM(description);
-
-  // s.stop();
-
-  // Move cursor up one line to remove the extra newline
-  // process.stdout.write("\x1B[1A");
-  
-  return;
 }
 
-// async function askLLM(prompt: string): Promise<string> {
-//   try {
-//     const openai = new OpenAI({
-//       apiKey: process.env.OPENAI_API_KEY,
-//     });
+function createUserMessage(content: string): Message {
+  return {
+    id: randomMessageId(),
+    content,
+    role: "user",
+    parts: [
+      {
+        type: "text",
+        text: content,
+      },
+    ],
+  };
+}
 
-//     const response = await openai.chat.completions.create({
-//       model: "gpt-4o",
-//       messages: [
-//         { role: "system", content: "You are a helpful assistant." },
-//         { role: "user", content: prompt },
-//       ],
-//       temperature: 0.7,
-//       max_tokens: 500,
-//     });
-
-//     return response.choices[0]?.message.content || "No response generated";
-//   } catch (error) {
-//     console.error("Error querying OpenAI:", error);
-//     return "Failed to get a response from the AI";
-//   }
-// }
-
-// async function* generateLLMResponse(prompt: string) {
-//   try {
-//     const openai = new OpenAI({
-//       apiKey: process.env.OPENAI_API_KEY,
-//     });
-
-//     const stream = await openai.chat.completions.create({
-//       model: "gpt-4o",
-//       messages: [
-//         { role: "system", content: "You are a helpful assistant specialized in programming. Provide clear and concise responses." },
-//         { role: "user", content: prompt },
-//       ],
-//       temperature: 0.7,
-//       max_tokens: 1000,
-//       stream: true,
-//     });
-
-//     for await (const chunk of stream) {
-//       const content = chunk.choices[0]?.delta?.content || "";
-//       if (content) {
-//         yield content;
-//       }
-//     }
-//   } catch (error) {
-//     yield `Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`;
-//   }
-// }
-
-
-function randomMessageId() {
+function randomMessageId(): string {
   return Math.random().toString(36).substring(2);
 }
