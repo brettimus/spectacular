@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
     "clean:test-apps": "rimraf test-apps/* && touch test-apps/.gitkeep",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "test": "vitest"
   },
   "exports": "./dist/index.js",
   "files": ["dist", "README.md", "LICENSE", ".gitignore"],

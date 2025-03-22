@@ -3,12 +3,15 @@ import { readFileSync } from "node:fs";
 import { cancel, log } from "@clack/prompts";
 import { CANCEL_MESSAGE, HATCH_LOG_LEVEL } from "./const";
 import { CodeGenError } from "./types";
+import path from "node:path";
 
 /**
  * Converts a spec name to a path, replacing spaces with dashes and converting to lowercase.
  */
 export function convertSpecNameToFilename(specName: string) {
-  const filename = specName.replace(/\s+/g, "-").toLowerCase();
+  const filename = specName
+    .replace(new RegExp(`[\\s${path.sep}]+`, "g"), "-")
+    .toLowerCase();
   return filename.endsWith(".md") ? filename : `${filename}.md`;
 }
 
