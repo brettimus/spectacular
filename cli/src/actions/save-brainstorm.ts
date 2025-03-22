@@ -15,7 +15,7 @@ export async function actionSaveBrainstorm(ctx: Context) {
 
     if (typeof result === "string") {
       if (result === "") {
-        ctx.path = placeholder;
+        ctx.specPath = placeholder;
       } else {
         // Check if it's a bare filename (no directory separators and no relative path markers)
         const dirname = path.dirname(result);
@@ -25,24 +25,24 @@ export async function actionSaveBrainstorm(ctx: Context) {
           !result.startsWith("../")
         ) {
           // It's a bare filename add it to the current working directory
-          ctx.path = path.join(ctx.cwd, result);
+          ctx.specPath = path.join(ctx.cwd, result);
         } else {
-          ctx.path = result;
+          ctx.specPath = result;
         }
       }
     }
 
     // Appease typescript
-    if (!ctx.path) {
-      throw new Error("Path is required");
+    if (!ctx.specPath) {
+      throw new Error("Path to save spec is required");
     }
 
-    if (!ctx.brainstorm) {
+    if (!ctx.specContent) {
       throw new Error("Brainstorm is required");
     }
 
     // Write the brainstorm to the file
-    writeFileSync(ctx.path, ctx.brainstorm);
+    writeFileSync(ctx.specPath, ctx.specContent);
 
     return result;
   } catch (error) {

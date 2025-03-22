@@ -3,11 +3,12 @@ import {
   askFollowUpQuestion,
   generateImplementationPlan,
   routerAgent,
-} from "@/integrations/agent";
+  createUserMessage,
+} from "@/integrations/ideation-agent";
 import { isError } from "@/types";
 import { handleCancel, handleError } from "@/utils";
 import { stream, isCancel, log, spinner, text } from "@clack/prompts";
-import { type Message, appendResponseMessages } from "ai";
+import { appendResponseMessages } from "ai";
 import pico from "picocolors";
 
 type Spinner = ReturnType<typeof spinner>;
@@ -32,7 +33,7 @@ Here's the idea:
 export async function actionIdeate(ctx: Context) {
   const description = ctx.description;
 
-  // This shouldn't happen, i just want to appease typescript
+  // This shouldn't happen, just want to appease typescript
   if (!description) {
     log.error("Description is required");
     process.exit(1);
@@ -41,32 +42,36 @@ export async function actionIdeate(ctx: Context) {
   // Fudge the first message from the user
   ctx.messages.push(createUserMessage(description));
 
-  const s = spinner();
-  s.start("Getting ready to speculate...");
+  const followUpSpinner = spinner();
+  followUpSpinner.start("Getting ready to speculate...");
 
   let routerResponse = await routerAgent(ctx);
   let nextStep = routerResponse.nextStep;
 
   while (nextStep === "ask_follow_up_question") {
     log.info("Asking follow up question");
-    await streamFollowUpQuestion(ctx, s);
-    await promptUserAnswer(ctx);
+    await streamFollowUpQuestion(ctx, followUpSpinner);
+    await promptUserClarification(ctx);
     routerResponse = await routerAgent(ctx);
     nextStep = routerResponse.nextStep;
   }
 
-  const secondSpinner = spinner();
-  secondSpinner.start("Generating a spectacular plan...");
+  const implementationSpinner = spinner();
+  implementationSpinner.start("Generating a spectacular plan...");
 
   const implementationPlan = await generateImplementationPlan(ctx);
+
   ctx.specName = implementationPlan.object.title;
   ctx.specContent = implementationPlan.object.plan;
 
-  secondSpinner.stop(pico.italic("voilà! a plan!"));
+  implementationSpinner.stop(pico.italic("voilà! a plan!"));
   return;
 }
 
-async function promptUserAnswer(ctx: Context) {
+/**
+ * Prompts the user for clarification on the last question.
+ */
+async function promptUserClarification(ctx: Context) {
   const userAnswer = await text({
     message: pico.italic("Your response:"),
     defaultValue: "",
@@ -89,6 +94,9 @@ async function promptUserAnswer(ctx: Context) {
   ctx.messages.push(createUserMessage(userAnswer as string));
 }
 
+/**
+ * Streams a follow up question to the user.
+ */
 async function streamFollowUpQuestion(ctx: Context, spinner: Spinner) {
   const followUpQuestionStream = await askFollowUpQuestion(ctx);
 
@@ -96,7 +104,11 @@ async function streamFollowUpQuestion(ctx: Context, spinner: Spinner) {
     (async function* () {
       let hasStarted = false;
       // Yield content from the AI SDK stream
+      // NOTE - This uses a textStream instead of a dataStream,
+      //        which means it will not receive information from tool calls.
+      //        That's why the askFollowUpQuestion function does not have tool calls.
       for await (const chunk of followUpQuestionStream.textStream) {
+        // HACK - Stop the spinner once we've started streaming the response
         if (!hasStarted) {
           hasStarted = true;
           spinner.stop(pico.italic("Spectacular:"));
@@ -115,22 +127,4 @@ async function streamFollowUpQuestion(ctx: Context, spinner: Spinner) {
     messages: ctx.messages,
     responseMessages: response.messages,
   });
-}
-
-function createUserMessage(content: string): Message {
-  return {
-    id: randomMessageId(),
-    content,
-    role: "user",
-    parts: [
-      {
-        type: "text",
-        text: content,
-      },
-    ],
-  };
-}
-
-function randomMessageId(): string {
-  return Math.random().toString(36).substring(2);
 }
