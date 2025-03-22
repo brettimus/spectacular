@@ -86,7 +86,7 @@ const askedOneQuestion = async (opts: {
    */
   const scores = {
     A: 1,
-    B: 0.8,
+    B: 0.9,
     C: 0.2,
     D: 0,
   };
