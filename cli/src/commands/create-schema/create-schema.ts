@@ -1,9 +1,19 @@
 #!/usr/bin/env node
-import { intro, outro } from "@clack/prompts";
+import { intro, isCancel, outro } from "@clack/prompts";
 import pico from "picocolors";
 import { SPECTACULAR_TITLE } from "../../const";
 import { actionDownloadTemplate } from "../../actions/download-template";
 import { initContext } from "../../context";
+import { actionCreateSchema } from "../../actions/create-schema";
+import path, { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { isError } from "@/types";
+import { handleCancel, handleError } from "@/utils/utils";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const rulesDir = path.join(__dirname, "rules");
 
 export async function commandCreateSchema() {
   console.log("");
@@ -14,23 +24,25 @@ export async function commandCreateSchema() {
 
   const ctx = initContext();
 
-  // TODO - Load context from `.spectacular` folder
+  try {
+    // First, ensure we have a template downloaded
+    const downloadTemplateResult = await actionDownloadTemplate(ctx);
 
-  await actionDownloadTemplate(ctx);
+    if (isCancel(downloadTemplateResult)) {
+      handleCancel();
+    }
 
-  // TODO: Implement create-schema functionality
-  //
-  // 1. Read the spec file
-  // 2. Determine database tables from the spec
-  // 3. Break down each operation that we want to perform to create the schema
-  // 4. Select relevant RULES to implement the proposed operations
-  // 5. For each operation:
-  //    - Search for relevant RULES from 4 to implement the operation
-  //    - Generate a schema for each table
-  // 6. Verify the generated schema with a thinking model
-  // 7. Save the schema to `db/schema.ts`
-  // 8. Run `tsc` to compile the code
-  //    - Feed errors back into a fixer
-  //
-  outro("Schema creation still being implemented");
+    if (isError(downloadTemplateResult)) {
+      handleError(downloadTemplateResult);
+    }
+    
+    // Then generate the schema
+    ctx.rulesDir = rulesDir;
+    await actionCreateSchema(ctx);
+    
+    outro("Schema creation completed successfully! 🎉");
+  } catch (error) {
+    outro(`Schema creation failed: ${(error as Error).message} 😢`);
+    process.exit(1);
+  }
 }

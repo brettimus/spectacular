@@ -44,6 +44,11 @@ export interface Context {
   schemaFile?: string;
 
   /**
+   * The path to the rules directory
+   */
+  rulesDir?: string;
+
+  /**
    * A random id for the current session.
    * Can be useful for saving log files or other metadata.
    */
