@@ -1,4 +1,5 @@
 import type { Context } from "@/context";
+import { confirm } from "@clack/prompts";
 import type { SchemaGenerationStep } from "../types";
 import { analyzeTables } from "./analyze-tables";
 import { compileSchema } from "./compile-schema";
@@ -57,6 +58,19 @@ export async function executeStep(
 
     // Compile the schema file with tsc
     case "compile_schema": {
+      const confirmation = await confirm({
+        message:
+          "Are you sure you want to compile the schema? This part is broken right now",
+        initialValue: false,
+      });
+      if (typeof confirmation !== "boolean" || !confirmation) {
+        return {
+          ...step,
+          step: "error",
+          status: "error",
+          message: "Compilation cancelled",
+        };
+      }
       return await compileSchema(ctx, step);
     }
 

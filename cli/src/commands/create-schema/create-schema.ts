@@ -3,9 +3,9 @@ import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isError } from "@/types";
 import { handleCancel, handleError } from "@/utils/utils";
-import { intro, isCancel, outro } from "@clack/prompts";
+import { confirm, intro, isCancel, outro } from "@clack/prompts";
 import pico from "picocolors";
-import { actionCreateSchema } from "../../actions/create-schema/create-schema";
+import { actionCreateSchema } from "../../actions/create-schema";
 import { actionDownloadTemplate } from "../../actions/download-template";
 import { SPECTACULAR_TITLE } from "../../const";
 import { initContext } from "../../context";
@@ -25,15 +25,31 @@ export async function commandCreateSchema() {
   const ctx = initContext();
 
   try {
-    // First, ensure we have a template downloaded
-    const downloadTemplateResult = await actionDownloadTemplate(ctx);
+    const shouldDownloadTemplate = await confirm({
+      message:
+        "Do you want to download a HONC template? (will overwrite existing template files)",
+      initialValue: true,
+    });
 
-    if (isCancel(downloadTemplateResult)) {
+    if (isCancel(shouldDownloadTemplate)) {
       handleCancel();
     }
 
-    if (isError(downloadTemplateResult)) {
-      handleError(downloadTemplateResult);
+    if (isError(shouldDownloadTemplate)) {
+      handleError(shouldDownloadTemplate);
+    }
+
+    if (typeof shouldDownloadTemplate === "boolean" && shouldDownloadTemplate) {
+      // First, ensure we have a template downloaded
+      const downloadTemplateResult = await actionDownloadTemplate(ctx);
+
+      if (isCancel(downloadTemplateResult)) {
+        handleCancel();
+      }
+
+      if (isError(downloadTemplateResult)) {
+        handleError(downloadTemplateResult);
+      }
     }
 
     // Then generate the schema

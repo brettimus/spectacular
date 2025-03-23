@@ -12,7 +12,6 @@ config();
 main();
 
 async function main() {
-  console.log(process.argv);
   const command = process.argv[2] || "init";
 
   try {
