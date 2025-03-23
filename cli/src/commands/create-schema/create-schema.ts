@@ -9,6 +9,8 @@ import { actionCreateSchema } from "../../actions/create-schema";
 import { actionDownloadTemplate } from "../../actions/download-template";
 import { SPECTACULAR_TITLE } from "../../const";
 import { initContext } from "../../context";
+import { promptOpenAiKey } from "../../openai-api-key";
+import { saveGlobalDebugInfo, appendToLog } from "../../utils/credentials";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,7 +26,32 @@ export async function commandCreateSchema() {
 
   const ctx = initContext();
 
+  // Log the action start
+  appendToLog("commands", {
+    command: "create-schema",
+    sessionId: ctx.sessionId,
+    status: "started",
+    timestamp: new Date().toISOString(),
+  });
+
   try {
+    // If there wasn't an API key in the environment or credentials, prompt the user for one
+    if (!ctx.apiKey) {
+      const result = await promptOpenAiKey(ctx);
+
+      if (isCancel(result)) {
+        handleCancel();
+      }
+
+      if (result instanceof Error) {
+        handleError(result);
+      }
+    }
+
+    if (!ctx.apiKey) {
+      throw new Error("OPENAI_API_KEY is not set");
+    }
+
     const shouldDownloadTemplate = await confirm({
       message:
         "Do you want to download a HONC template? (will overwrite existing template files)",
@@ -56,8 +83,28 @@ export async function commandCreateSchema() {
     ctx.rulesDir = rulesDir;
     await actionCreateSchema(ctx);
 
+    // Save debug info to the global directory
+    saveGlobalDebugInfo(ctx);
+
+    // Log the successful completion
+    appendToLog("commands", {
+      command: "create-schema",
+      sessionId: ctx.sessionId,
+      status: "completed",
+      timestamp: new Date().toISOString(),
+    });
+
     outro("Schema creation completed successfully! 🎉");
   } catch (error) {
+    // Log the error
+    appendToLog("commands", {
+      command: "create-schema",
+      sessionId: ctx.sessionId,
+      status: "error",
+      error: (error as Error).message,
+      timestamp: new Date().toISOString(),
+    });
+
     outro(`Schema creation failed: ${(error as Error).message} 😢`);
     process.exit(1);
   }
