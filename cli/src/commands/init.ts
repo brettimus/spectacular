@@ -2,7 +2,7 @@
 import { intro, isCancel, outro, note } from "@clack/prompts";
 import pico from "picocolors";
 import { actionIdeate } from "../actions/ideate";
-import { actionSaveBrainstorm } from "../actions/save-brainstorm";
+import { actionSaveSpec } from "../actions/save-spec";
 import { saveSpectacularFolder } from "../actions/save-spectacular-folder";
 import { promptProjectFolder, actionCreateProjectFolder } from "../actions/project-folder";
 import { SPECTACULAR_TITLE } from "../const";
@@ -92,15 +92,15 @@ export async function commandInit() {
     handleError(result);
   }
 
-  // Save the brainstorm to a file
-  const saveBrainstormResult = await actionSaveBrainstorm(context);
+  // Save the spec to a file
+  const saveSpecResult = await actionSaveSpec(context);
 
-  if (isCancel(saveBrainstormResult)) {
+  if (isCancel(saveSpecResult)) {
     handleCancel();
   }
 
-  if (saveBrainstormResult instanceof Error) {
-    handleError(saveBrainstormResult);
+  if (saveSpecResult instanceof Error) {
+    handleError(saveSpecResult);
   }
 
   // Save the history to a file

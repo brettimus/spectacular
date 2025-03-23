@@ -3,11 +3,11 @@ import type { Context } from "@/context";
 import { convertSpecNameToFilename, pathFromInput } from "@/utils/utils";
 import { text } from "@clack/prompts";
 
-export async function actionSaveBrainstorm(ctx: Context) {
+export async function actionSaveSpec(ctx: Context) {
   try {
-    const placeholder = convertSpecNameToFilename(ctx.specName ?? "brainstorm");
+    const placeholder = convertSpecNameToFilename(ctx.specName ?? "spec");
     const result = await text({
-      message: "Where should we save your brainstorm? (./relative-path)",
+      message: "Where should we save your spec? (./relative-path)",
       placeholder,
       defaultValue: placeholder,
     });
@@ -26,10 +26,10 @@ export async function actionSaveBrainstorm(ctx: Context) {
     }
 
     if (!ctx.specContent) {
-      throw new Error("Brainstorm is required");
+      throw new Error("A spec is required");
     }
 
-    // Write the brainstorm to the file
+    // Write the spec to the file
     writeFileSync(ctx.specPath, ctx.specContent);
 
     return result;
