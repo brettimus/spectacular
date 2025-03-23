@@ -1,9 +1,9 @@
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
+import path from "node:path";
 import { cancel, log } from "@clack/prompts";
 import { CANCEL_MESSAGE, HATCH_LOG_LEVEL } from "../const";
 import { CodeGenError } from "../types";
-import path from "node:path";
 
 /**
  * Converts a spec name to a path, replacing spaces with dashes and converting to lowercase.
@@ -34,7 +34,10 @@ export function getPackageManager() {
   return process.env.npm_config_user_agent?.split("/").at(0);
 }
 
-export async function runShell(cwd: string, commands: string[]): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+export async function runShell(
+  cwd: string,
+  commands: string[],
+): Promise<{ exitCode: number; stdout: string; stderr: string }> {
   const commandStr = commands.join(" ");
   const stdoutChunks: Buffer[] = [];
   const stderrChunks: Buffer[] = [];
@@ -43,7 +46,11 @@ export async function runShell(cwd: string, commands: string[]): Promise<{ exitC
     const child = spawn(commandStr, [], { cwd, shell: true, timeout: 60000 });
 
     child.on("error", (error) => {
-      reject({ exitCode: 1, stdout: Buffer.concat(stdoutChunks).toString(), stderr: error.message });
+      reject({
+        exitCode: 1,
+        stdout: Buffer.concat(stdoutChunks).toString(),
+        stderr: error.message,
+      });
     });
 
     child.stdout.on("data", (chunk) => {
@@ -57,11 +64,11 @@ export async function runShell(cwd: string, commands: string[]): Promise<{ exitC
     child.on("exit", (code) => {
       const stdout = Buffer.concat(stdoutChunks).toString();
       const stderr = Buffer.concat(stderrChunks).toString();
-      
-      resolve({ 
-        exitCode: code || 0, 
-        stdout, 
-        stderr 
+
+      resolve({
+        exitCode: code || 0,
+        stdout,
+        stderr,
       });
     });
   });

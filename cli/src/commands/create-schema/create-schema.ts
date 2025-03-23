@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-import { intro, isCancel, outro } from "@clack/prompts";
-import pico from "picocolors";
-import { SPECTACULAR_TITLE } from "../../const";
-import { actionDownloadTemplate } from "../../actions/download-template";
-import { initContext } from "../../context";
-import { actionCreateSchema } from "../../actions/create-schema";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isError } from "@/types";
 import { handleCancel, handleError } from "@/utils/utils";
+import { intro, isCancel, outro } from "@clack/prompts";
+import pico from "picocolors";
+import { actionCreateSchema } from "../../actions/create-schema/create-schema";
+import { actionDownloadTemplate } from "../../actions/download-template";
+import { SPECTACULAR_TITLE } from "../../const";
+import { initContext } from "../../context";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,11 +35,11 @@ export async function commandCreateSchema() {
     if (isError(downloadTemplateResult)) {
       handleError(downloadTemplateResult);
     }
-    
+
     // Then generate the schema
     ctx.rulesDir = rulesDir;
     await actionCreateSchema(ctx);
-    
+
     outro("Schema creation completed successfully! 🎉");
   } catch (error) {
     outro(`Schema creation failed: ${(error as Error).message} 😢`);

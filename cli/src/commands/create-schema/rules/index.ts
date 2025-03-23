@@ -1,2 +1,2 @@
-export { authRule } from './auth';
-export { realtimeRule } from './realtime'; 
+export { authRule } from "./auth";
+export { realtimeRule } from "./realtime";

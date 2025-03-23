@@ -2,9 +2,9 @@
 import { intro, outro } from "@clack/prompts";
 import { config } from "dotenv";
 import pico from "picocolors";
-import { SPECTACULAR_TITLE } from "./const";
-import { commandInit } from "./commands/init";
 import { commandCreateSchema } from "./commands/create-schema";
+import { commandInit } from "./commands/init";
+import { SPECTACULAR_TITLE } from "./const";
 
 // For local development, to quickly configure env vars from a .env file
 config();

@@ -1,20 +1,20 @@
 #!/usr/bin/env node
-import { intro, isCancel, outro, note } from "@clack/prompts";
+import { intro, isCancel, note, outro } from "@clack/prompts";
 import pico from "picocolors";
 import { actionIdeate } from "../actions/ideate";
+import {
+  actionCreateProjectFolder,
+  promptProjectFolder,
+} from "../actions/project-folder";
 import { actionSaveSpec } from "../actions/save-spec";
 import { saveSpectacularFolder } from "../actions/save-spectacular-folder";
-import {
-  promptProjectFolder,
-  actionCreateProjectFolder,
-} from "../actions/project-folder";
 import { SPECTACULAR_TITLE } from "../const";
 import { initContext } from "../context";
 import { promptDescription } from "../description";
 import { promptOpenAiKey } from "../openai-api-key";
 import { isError } from "../types";
-import { handleCancel, handleError } from "../utils/utils";
 import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
+import { handleCancel, handleError } from "../utils/utils";
 
 export async function commandInit() {
   console.log("");

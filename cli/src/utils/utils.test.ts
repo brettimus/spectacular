@@ -1,6 +1,6 @@
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { convertSpecNameToFilename, pathFromInput } from "./utils";
-import path from "node:path";
 
 describe("convertSpecNameToFilename", () => {
   it("should convert spec name to filename", () => {

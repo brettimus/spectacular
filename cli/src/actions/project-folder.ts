@@ -1,9 +1,9 @@
-import { mkdirSync, existsSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import type { Context } from "@/context";
 import { text } from "@clack/prompts";
-import { pathFromInput } from "../utils/utils";
-import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
 import pico from "picocolors";
+import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
+import { pathFromInput } from "../utils/utils";
 
 const DEFAULT_PROJECT_FOLDER = "./spectacular-honc";
 
