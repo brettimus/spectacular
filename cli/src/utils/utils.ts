@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { cancel, log } from "@clack/prompts";
-import { CANCEL_MESSAGE, HATCH_LOG_LEVEL } from "./const";
-import { CodeGenError } from "./types";
+import { CANCEL_MESSAGE, HATCH_LOG_LEVEL } from "../const";
+import { CodeGenError } from "../types";
 import path from "node:path";
 
 /**

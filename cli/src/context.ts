@@ -1,5 +1,5 @@
 import type { Message } from "ai";
-import { getPackageManager } from "./utils";
+import { getPackageManager } from "./utils/utils";
 
 export interface Context {
   apiKey?: string;
@@ -37,6 +37,11 @@ export interface Context {
    * Where we should write the spec file
    */
   specPath?: string;
+
+  /**
+   * The contents of the schema file
+   */
+  schemaFile?: string;
 
   /**
    * A random id for the current session.

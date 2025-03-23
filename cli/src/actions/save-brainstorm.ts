@@ -1,6 +1,6 @@
 import { writeFileSync } from "node:fs";
 import type { Context } from "@/context";
-import { convertSpecNameToFilename, pathFromInput } from "@/utils";
+import { convertSpecNameToFilename, pathFromInput } from "@/utils/utils";
 import { text } from "@clack/prompts";
 
 export async function actionSaveBrainstorm(ctx: Context) {

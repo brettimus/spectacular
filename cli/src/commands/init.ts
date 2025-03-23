@@ -1,17 +1,17 @@
 #!/usr/bin/env node
-import { intro, isCancel, outro } from "@clack/prompts";
+import { intro, isCancel, outro, note } from "@clack/prompts";
 import pico from "picocolors";
 import { actionIdeate } from "../actions/ideate";
 import { actionSaveBrainstorm } from "../actions/save-brainstorm";
-import { actionSaveHistory } from "../actions/save-history";
-import { actionCreateProjectFolder } from "../actions/create-project-folder";
+import { saveSpectacularFolder } from "../actions/save-spectacular-folder";
+import { promptProjectFolder, actionCreateProjectFolder } from "../actions/project-folder";
 import { SPECTACULAR_TITLE } from "../const";
 import { initContext } from "../context";
 import { promptDescription } from "../description";
 import { promptOpenAiKey } from "../openai-api-key";
-import { promptProjectFolder } from "../project-folder";
 import { isError } from "../types";
-import { handleCancel, handleError } from "../utils";
+import { handleCancel, handleError } from "../utils/utils";
+import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
 
 export async function commandInit() {
   console.log("");
@@ -48,6 +48,15 @@ export async function commandInit() {
 
   if (projectFolderResult instanceof Error) {
     handleError(projectFolderResult);
+  }
+
+  // Check if .spectacular directory already exists in the project folder
+  const projectPath = context.projectPath || process.cwd();
+  const configCheck = hasValidSpectacularConfig(projectPath);
+  
+  if (configCheck.exists) {
+    note(pico.yellow(`A Spectacular project already exists in this directory (version ${configCheck.version}).`));
+    process.exit(1);
   }
 
   const createProjectFolderResult = await actionCreateProjectFolder(context);
@@ -95,7 +104,7 @@ export async function commandInit() {
   }
 
   // Save the history to a file
-  await actionSaveHistory(context);
+  await saveSpectacularFolder(context);
 
   outro(`🦉 saved spec in ${context.specPath}!
 `);

@@ -4,7 +4,8 @@ import { config } from "dotenv";
 import pico from "picocolors";
 import { SPECTACULAR_TITLE } from "./const";
 import { commandInit } from "./commands/init";
-
+import { actionTemplate } from "./actions/template";
+import { initContext } from "./context";
 // For local development, to quickly configure env vars from a .env file
 config();
 
@@ -14,9 +15,15 @@ async function commandCreateSchema() {
   console.log("");
   
   intro("😮 spectacular - Create Schema");
+
+  const ctx = initContext();
+
+  // TODO - Load context from `.spectacular` folder
+
+  await actionTemplate(ctx);
   
   // TODO: Implement create-schema functionality
-  outro("Schema creation not yet implemented");
+  outro("Schema creation still being implemented");
 }
 
 async function commandCreateApi() {

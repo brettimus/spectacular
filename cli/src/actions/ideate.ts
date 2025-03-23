@@ -6,7 +6,7 @@ import {
   routerAgent,
 } from "@/integrations/ideation-agent";
 import { isError } from "@/types";
-import { handleCancel, handleError } from "@/utils";
+import { handleCancel, handleError } from "@/utils/utils";
 import { stream, isCancel, log, spinner, text } from "@clack/prompts";
 import { appendResponseMessages } from "ai";
 import pico from "picocolors";
