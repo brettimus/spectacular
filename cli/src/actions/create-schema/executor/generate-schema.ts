@@ -1,0 +1,41 @@
+import type { Context } from "@/context";
+import { generateSchema as agentGenerateSchema } from "@/integrations/schema-agent";
+import { handleError } from "@/utils/utils";
+import { spinner } from "@clack/prompts";
+import type { SchemaGenerationStep } from "../types";
+
+export async function generateSchema(
+  ctx: Context,
+  step: SchemaGenerationStep,
+): Promise<SchemaGenerationStep> {
+  const schemaSpinner = spinner();
+  try {
+    schemaSpinner.start("Generating schema file...");
+
+    schemaSpinner.message("Generating schema...");
+    const tableSchema = await agentGenerateSchema(
+      ctx,
+      step.data.tables,
+      step.data.relevantRules,
+    );
+    step.data.finalSchema = tableSchema.object.dbSchemaTs;
+
+    schemaSpinner.stop(
+      `Generated schemas for ${step.data.tableSchemas.length} tables`,
+    );
+    return {
+      step: "verify_schema",
+      status: "completed",
+      data: step.data,
+    };
+  } catch (error) {
+    schemaSpinner.stop("Error generating table schemas");
+    handleError(error as Error);
+    return {
+      step: "generate_schema",
+      status: "error",
+      message: `Error generating table schemas: ${(error as Error).message}`,
+      data: step.data,
+    };
+  }
+}
