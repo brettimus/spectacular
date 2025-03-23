@@ -5,6 +5,12 @@ export interface Context {
   apiKey?: string;
 
   cwd: string;
+
+  /**
+   * The path to the project folder
+   */
+  projectPath?: string;
+
   packageManager: string;
 
   /**

@@ -5,10 +5,12 @@ import pico from "picocolors";
 import { actionIdeate } from "./actions/ideate";
 import { actionSaveBrainstorm } from "./actions/save-brainstorm";
 import { actionSaveHistory } from "./actions/save-history";
+import { actionCreateProjectFolder } from "./actions/create-project-folder";
 import { SPECTACULAR_TITLE } from "./const";
 import { initContext } from "./context";
 import { promptDescription } from "./description";
 import { promptOpenAiKey } from "./openai-api-key";
+import { promptProjectFolder } from "./project-folder";
 import { isError } from "./types";
 import { handleCancel, handleError } from "./utils";
 
@@ -39,6 +41,27 @@ async function main() {
 
   if (!context.apiKey) {
     throw new Error("OPENAI_API_KEY is not set");
+  }
+
+  // INIT: Get a project folder from the user
+  const projectFolderResult = await promptProjectFolder(context);
+
+  if (isCancel(projectFolderResult)) {
+    handleCancel();
+  }
+
+  if (projectFolderResult instanceof Error) {
+    handleError(projectFolderResult);
+  }
+
+  const createProjectFolderResult = await actionCreateProjectFolder(context);
+
+  if (isCancel(createProjectFolderResult)) {
+    handleCancel();
+  }
+
+  if (createProjectFolderResult instanceof Error) {
+    handleError(createProjectFolderResult);
   }
 
   // INIT: Get a description of the api from the user

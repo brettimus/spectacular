@@ -1,7 +1,6 @@
 import { writeFileSync } from "node:fs";
-import path from "node:path";
 import type { Context } from "@/context";
-import { convertSpecNameToFilename } from "@/utils";
+import { convertSpecNameToFilename, pathFromInput } from "@/utils";
 import { text } from "@clack/prompts";
 
 export async function actionSaveBrainstorm(ctx: Context) {
@@ -17,19 +16,7 @@ export async function actionSaveBrainstorm(ctx: Context) {
       if (result === "") {
         ctx.specPath = placeholder;
       } else {
-        // Check if it's a bare filename (no directory separators and no relative path markers)
-        // Use path.dirname for cross-platform compatibility
-        const dirname = path.dirname(result);
-        if (
-          dirname === "." &&
-          !result.startsWith("./") &&
-          !result.startsWith("../")
-        ) {
-          // It's a bare filename, so add it to the current working directory
-          ctx.specPath = path.join(ctx.cwd, result);
-        } else {
-          ctx.specPath = result;
-        }
+        ctx.specPath = pathFromInput(result, ctx.cwd);
       }
     }
 
