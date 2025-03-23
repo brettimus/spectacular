@@ -1,5 +1,6 @@
 import type { Message } from "ai";
 import { getPackageManager, randomId } from "./utils/utils";
+import { getApiKey } from "./utils/credentials";
 
 export interface Context {
   apiKey?: string;
@@ -57,7 +58,8 @@ export interface Context {
 
 export function initContext(): Context {
   return {
-    apiKey: process.env.OPENAI_API_KEY,
+    // First try environment variable, then try saved credentials
+    apiKey: process.env.OPENAI_API_KEY || getApiKey(),
     cwd: process.env.SPECTACULAR_CWD || process.cwd(),
     packageManager: getPackageManager() ?? "npm",
 

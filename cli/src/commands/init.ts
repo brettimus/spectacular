@@ -15,6 +15,7 @@ import { promptOpenAiKey } from "../openai-api-key";
 import { isError } from "../types";
 import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
 import { handleCancel, handleError } from "../utils/utils";
+import { saveGlobalDebugInfo } from "../utils/credentials";
 
 export async function commandInit() {
   console.log("");
@@ -112,6 +113,9 @@ export async function commandInit() {
 
   // Save the history to a file
   await saveSpectacularFolder(context);
+
+  // Also save to the global debug directory
+  saveGlobalDebugInfo(context);
 
   outro(`🦉 saved spec in ${context.specPath}!
 `);
