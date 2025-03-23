@@ -50,12 +50,13 @@ export async function actionCreateProjectFolder(ctx: Context) {
   }
 }
 
-
 function validateProjectFolder(value: string, ctx: Context) {
   const configCheck = hasValidSpectacularConfig(pathFromInput(value, ctx.cwd));
 
   if (configCheck.exists) {
-    return pico.italic("A Spectacular project already exists in this directory.");
+    return pico.italic(
+      "A Spectacular project already exists in this directory.",
+    );
   }
 
   return undefined;

@@ -13,7 +13,7 @@ async function commandCreateSchema() {
   console.log("");
   console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
   console.log("");
-  
+
   intro("😮 spectacular - Create Schema");
 
   const ctx = initContext();
@@ -21,7 +21,7 @@ async function commandCreateSchema() {
   // TODO - Load context from `.spectacular` folder
 
   await actionTemplate(ctx);
-  
+
   // TODO: Implement create-schema functionality
   outro("Schema creation still being implemented");
 }
@@ -30,31 +30,31 @@ async function commandCreateApi() {
   console.log("");
   console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
   console.log("");
-  
+
   intro("😮 spectacular - Create API");
-  
+
   // TODO: Implement create-api functionality
   outro("API creation not yet implemented");
 }
 
 async function main() {
   console.log(process.argv);
-  const command = process.argv[2] || 'init';
-  
+  const command = process.argv[2] || "init";
+
   try {
     switch (command) {
-      case 'init':
+      case "init":
         await commandInit();
         break;
-      case 'create-schema':
+      case "create-schema":
         await commandCreateSchema();
         break;
-      case 'create-api':
+      case "create-api":
         await commandCreateApi();
         break;
       default:
         console.error(`Unknown command: ${command}`);
-        console.log('Available commands: init, create-schema, create-api');
+        console.log("Available commands: init, create-schema, create-api");
         process.exit(1);
     }
   } catch (err) {

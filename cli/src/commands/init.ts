@@ -4,7 +4,10 @@ import pico from "picocolors";
 import { actionIdeate } from "../actions/ideate";
 import { actionSaveSpec } from "../actions/save-spec";
 import { saveSpectacularFolder } from "../actions/save-spectacular-folder";
-import { promptProjectFolder, actionCreateProjectFolder } from "../actions/project-folder";
+import {
+  promptProjectFolder,
+  actionCreateProjectFolder,
+} from "../actions/project-folder";
 import { SPECTACULAR_TITLE } from "../const";
 import { initContext } from "../context";
 import { promptDescription } from "../description";
@@ -53,9 +56,13 @@ export async function commandInit() {
   // Check if .spectacular directory already exists in the project folder
   const projectPath = context.projectPath || process.cwd();
   const configCheck = hasValidSpectacularConfig(projectPath);
-  
+
   if (configCheck.exists) {
-    note(pico.yellow(`A Spectacular project already exists in this directory (version ${configCheck.version}).`));
+    note(
+      pico.yellow(
+        `A Spectacular project already exists in this directory (version ${configCheck.version}).`,
+      ),
+    );
     process.exit(1);
   }
 

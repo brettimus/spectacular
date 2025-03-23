@@ -13,13 +13,16 @@ export function getSpectacularDirPath(path: string): string {
  * Check if a spectacular directory exists and contains a valid configuration
  * @returns true if valid configuration exists, false otherwise
  */
-export function hasValidSpectacularConfig(path: string): { exists: boolean; version?: string } {
+export function hasValidSpectacularConfig(path: string): {
+  exists: boolean;
+  version?: string;
+} {
   const spectacularDir = getSpectacularDirPath(path);
-  
+
   if (!existsSync(spectacularDir)) {
     return { exists: false };
   }
-  
+
   try {
     const metadataPath = join(spectacularDir, "metadata.json");
     if (existsSync(metadataPath)) {
@@ -48,13 +51,13 @@ export function ensureSpectacularDir(path: string): void {
  * Save metadata to the spectacular directory
  */
 export function saveSpectacularMetadata(
-  path: string, 
+  path: string,
   specPath: string,
-  version = "0.0.3"
+  version = "0.0.3",
 ): void {
   const spectacularDir = getSpectacularDirPath(path);
   ensureSpectacularDir(path);
-  
+
   const now = new Date().toISOString();
   const metadata = {
     version,
@@ -62,7 +65,7 @@ export function saveSpectacularMetadata(
     createdAt: now,
     updatedAt: now,
   };
-  
+
   const metadataPath = join(spectacularDir, "metadata.json");
   writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
 }
@@ -73,7 +76,7 @@ export function saveSpectacularMetadata(
 export function saveSpectacularDebugInfo(path: string, context: Context): void {
   const spectacularDir = getSpectacularDirPath(path);
   ensureSpectacularDir(path);
-  
+
   const history = {
     apiKey: context.apiKey ? "REDACTED" : "MISSING!",
     cwd: context.cwd,
@@ -84,7 +87,7 @@ export function saveSpectacularDebugInfo(path: string, context: Context): void {
     specContent: context.specContent,
     sessionId: context.sessionId,
   };
-  
+
   const debugPath = join(spectacularDir, "init-debug.json");
   writeFileSync(debugPath, JSON.stringify(history, null, 2));
-} 
+}

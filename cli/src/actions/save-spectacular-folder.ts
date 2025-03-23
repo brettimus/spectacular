@@ -1,5 +1,8 @@
 import type { Context } from "@/context";
-import { saveSpectacularDebugInfo, saveSpectacularMetadata } from "../utils/spectacular-dir";
+import {
+  saveSpectacularDebugInfo,
+  saveSpectacularMetadata,
+} from "../utils/spectacular-dir";
 
 export async function saveSpectacularFolder(ctx: Context) {
   try {
@@ -8,10 +11,10 @@ export async function saveSpectacularFolder(ctx: Context) {
     }
 
     const basePath = process.cwd();
-    
+
     // Save debug information
     saveSpectacularDebugInfo(basePath, ctx);
-    
+
     // Save metadata
     saveSpectacularMetadata(basePath, ctx.specPath);
 
@@ -20,4 +23,3 @@ export async function saveSpectacularFolder(ctx: Context) {
     return error;
   }
 }
-
