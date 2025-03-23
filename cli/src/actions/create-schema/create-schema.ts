@@ -11,24 +11,10 @@ import type { SchemaGenerationStep } from "./types";
 // 2. Determine database tables from the spec (LLM call)
 // 3. Generate a schema file (LLM call)
 // 4. Verify the generated schema with a thinking model (LLM call)
-
-// FUTURE - Proposed implementation of create-schema functionality
-//
-// 1. Read the spec file (.spectacular/metadata.json->specPath)
-// 2. Determine database tables from the spec (LLM call)
-// 3. Break down each operation that we want to perform to create the schema (LLM call)
-// 4. Select relevant RULES to implement the proposed operations (LLM call)
-// 5. For each operation:
-//    - ~Search for relevant RULES from 4 to implement the operation (LLM call)~
-//    - Generate a schema for each table (LLM call)
-// 6. Verify the generated schema with a thinking model (LLM call)
-// 7. Save the schema to `db/schema.ts`
-// 8. Run `tsc` to compile the code
-//    - Feed errors back into a fixer (LLM call)
-// 9. Try running `db:generate`
-//    - Feed errors back into a fixer (LLM call)
-// 10. Save the schema to `db/schema.ts`
-//
+// 5. Save the schema to `db/schema.ts`
+// 6. Compile the schema with tsc
+// 7. Run `db:generate`
+// 8. Save the schema to `db/schema.ts`
 
 /**
  * Main function to orchestrate the schema creation process
