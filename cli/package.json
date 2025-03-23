@@ -6,7 +6,9 @@
   "scripts": {
     "build": "pnpm clean && tsup",
     "dev": "tsup --watch && node dist/index.js",
-    "dev:hatch": "tsup --watch --onSuccess 'node dist/index.js --hatch'",
+    "dev:init": "pnpm dev",
+    "dev:create-schema": "tsup --watch --onSuccess 'node dist/index.js create-schema'",
+    "dev:create-api": "tsup --watch --onSuccess 'node dist/index.js create-api'",
     "eval:dev": "evalite watch",
     "format": "biome format . --write",
     "typecheck": "tsc --noEmit",
