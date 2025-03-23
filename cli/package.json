@@ -1,14 +1,14 @@
 {
   "name": "@fiberplane/spectacular-cli",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An interactive CLI to iterate on project specifications with AI",
   "scripts": {
     "build": "pnpm clean && tsup",
     "dev": "tsup --watch && node dist/index.js",
     "dev:init": "pnpm dev",
-    "dev:create-schema": "tsup --watch --onSuccess 'node dist/index.js create-schema'",
-    "dev:create-api": "tsup --watch --onSuccess 'node dist/index.js create-api'",
+    "dev:create-schema": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js create-schema'",
+    "dev:create-api": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js create-api'",
     "eval:dev": "evalite watch",
     "format": "biome format . --write",
     "typecheck": "tsc --noEmit",

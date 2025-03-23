@@ -16,7 +16,7 @@ export async function saveSpectacularFolder(ctx: Context) {
     saveSpectacularDebugInfo(basePath, ctx);
 
     // Save metadata
-    saveSpectacularMetadata(basePath, ctx.specPath);
+    saveSpectacularMetadata(basePath, ctx.specPath, ctx.sessionId);
 
     return;
   } catch (error) {

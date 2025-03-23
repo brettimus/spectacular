@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Context } from "../context";
+import { randomId } from "./utils";
 
 /**
  * Path to the spectacular directory
@@ -53,14 +54,14 @@ export function ensureSpectacularDir(path: string): void {
 export function saveSpectacularMetadata(
   path: string,
   specPath: string,
-  version = "0.0.3",
+  sessionId: string,
 ): void {
   const spectacularDir = getSpectacularDirPath(path);
   ensureSpectacularDir(path);
 
   const now = new Date().toISOString();
   const metadata = {
-    version,
+    sessionId,
     specPath,
     createdAt: now,
     updatedAt: now,
@@ -88,6 +89,9 @@ export function saveSpectacularDebugInfo(path: string, context: Context): void {
     sessionId: context.sessionId,
   };
 
-  const debugPath = join(spectacularDir, "init-debug.json");
+  const debugPath = join(
+    spectacularDir,
+    `init-debug-${context.sessionId ?? randomId()}.json`,
+  );
   writeFileSync(debugPath, JSON.stringify(history, null, 2));
 }

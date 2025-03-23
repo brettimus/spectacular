@@ -4,38 +4,12 @@ import { config } from "dotenv";
 import pico from "picocolors";
 import { SPECTACULAR_TITLE } from "./const";
 import { commandInit } from "./commands/init";
-import { actionTemplate } from "./actions/template";
-import { initContext } from "./context";
+import { commandCreateSchema } from "./commands/create-schema";
+
 // For local development, to quickly configure env vars from a .env file
 config();
 
-async function commandCreateSchema() {
-  console.log("");
-  console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
-  console.log("");
-
-  intro("😮 spectacular - Create Schema");
-
-  const ctx = initContext();
-
-  // TODO - Load context from `.spectacular` folder
-
-  await actionTemplate(ctx);
-
-  // TODO: Implement create-schema functionality
-  outro("Schema creation still being implemented");
-}
-
-async function commandCreateApi() {
-  console.log("");
-  console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
-  console.log("");
-
-  intro("😮 spectacular - Create API");
-
-  // TODO: Implement create-api functionality
-  outro("API creation not yet implemented");
-}
+main();
 
 async function main() {
   console.log(process.argv);
@@ -63,4 +37,13 @@ async function main() {
   }
 }
 
-main();
+async function commandCreateApi() {
+  console.log("");
+  console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
+  console.log("");
+
+  intro("😮 spectacular - Create API");
+
+  // TODO: Implement create-api functionality
+  outro("API creation not yet implemented");
+}

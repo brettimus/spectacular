@@ -91,3 +91,7 @@ export function safeReadFile(path: string) {
     return null;
   }
 }
+
+export function randomId() {
+  return Math.random().toString(36).substring(2);
+}

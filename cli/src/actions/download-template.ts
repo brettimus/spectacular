@@ -4,13 +4,16 @@ import { safeReadFile } from "@/utils/utils";
 import { log, spinner } from "@clack/prompts";
 import { downloadTemplate } from "giget";
 
-export async function actionTemplate(ctx: Context) {
+export async function actionDownloadTemplate(ctx: Context) {
   const s = spinner();
   s.start("Setting up template...");
 
-  const templateUrl = "github:brettimus/mega-honc";
+  // NOTE - The "#create-schema" branch is a temporary template for the create-schema command
+  const templateUrl = "github:brettimus/mega-honc#create-schema";
 
   try {
+    console.log("Downloading template...", ctx.cwd);
+
     await downloadTemplate(templateUrl, {
       cwd: ctx.cwd,
       dir: ".",
