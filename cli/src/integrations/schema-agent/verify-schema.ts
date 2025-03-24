@@ -4,7 +4,28 @@ import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
 import { createUserMessage } from "../utils";
-import { SCHEMA_SYSTEM_PROMPT } from "./analyze-tables";
+import {
+  getD1SchemaExample,
+  getDrizzleSchemaExamples,
+} from "./generate-schema";
+
+const SCHEMA_VERIFICATION_SYSTEM_PROMPT = `
+You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.
+
+The user has generated a Drizzle ORM schema, and you should verify it for any issues or improvements.
+
+Here is a simple sample Drizzle database schema example for D1:
+
+${getD1SchemaExample()}
+
+Here are some additional code references:
+
+${getDrizzleSchemaExamples()}
+
+[Additional Instructions]
+
+- Make sure all dependencies were properly imported
+`;
 
 export async function verifyGeneratedSchema(ctx: Context, schema: string) {
   const openai = createOpenAI({ apiKey: ctx.apiKey });
@@ -27,6 +48,6 @@ export async function verifyGeneratedSchema(ctx: Context, schema: string) {
 ${schema}
 \`\`\``),
     ],
-    system: SCHEMA_SYSTEM_PROMPT,
+    system: SCHEMA_VERIFICATION_SYSTEM_PROMPT,
   });
 }

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { createUserMessage } from "../utils";
 import type { DatabaseTable, SelectedRule } from "./types";
 
-const SYSTEM_PROMPT = `
+export const GENERATE_SCHEMA_SYSTEM_PROMPT = `
 You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.
 
 I will give you a written plan for a database schema, and you should turn it into code.
@@ -19,6 +19,7 @@ Here are some additional code references:
 
 ${getDrizzleSchemaExamples()}
 `;
+
 export async function generateSchema(
   ctx: Context,
   tables: DatabaseTable[],
@@ -53,11 +54,11 @@ ${JSON.stringify(relevantRules, null, 2)}
 Use the additional context to help you generate the schema. This is important to my career.
 `),
     ],
-    system: SYSTEM_PROMPT,
+    system: GENERATE_SCHEMA_SYSTEM_PROMPT,
   });
 }
 
-function getDrizzleSchemaExamples() {
+export function getDrizzleSchemaExamples() {
   return `
 Here are some examples of how to use the Drizzle ORM to define tables:
 
@@ -204,7 +205,7 @@ function getDrizzleRelationsExample() {
     `;
 }
 
-function getD1SchemaExample() {
+export function getD1SchemaExample() {
   return `
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
