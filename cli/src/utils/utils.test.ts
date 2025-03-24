@@ -1,16 +1,68 @@
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { convertSpecNameToFilename, pathFromInput } from "./utils";
+import * as fs from "node:fs";
+import type { PathLike } from "node:fs";
+
+// Mock the fs.existsSync function
+vi.mock("node:fs", async () => {
+  const actual = await vi.importActual("node:fs");
+  return {
+    ...actual,
+    existsSync: vi.fn(),
+  };
+});
 
 describe("convertSpecNameToFilename", () => {
+  beforeEach(() => {
+    // Reset the mock before each test
+    vi.mocked(fs.existsSync).mockReset();
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
   it("should convert spec name to filename", () => {
+    // Mock that the file doesn't exist
+    vi.mocked(fs.existsSync).mockReturnValue(false);
     expect(convertSpecNameToFilename("My Spec")).toBe("my-spec.md");
   });
 
   it("should convert spec name to filename with slashes", () => {
+    // Mock that the file doesn't exist
+    vi.mocked(fs.existsSync).mockReturnValue(false);
     expect(
       convertSpecNameToFilename(`My Spec${path.sep}With${path.sep}Slashes`),
     ).toBe("my-spec-with-slashes.md");
+  });
+
+  it("should add version suffix if file already exists", () => {
+    // Mock that the file exists once and then doesn't exist
+    vi.mocked(fs.existsSync).mockImplementation((filePath: PathLike) => {
+      return filePath.toString() === "my-spec.md";
+    });
+
+    expect(convertSpecNameToFilename("My Spec")).toBe("my-spec-v0.md");
+  });
+
+  it("should increment version if multiple versions exist", () => {
+    // Mock that the file and v0 exist, but v1 doesn't
+    vi.mocked(fs.existsSync).mockImplementation((filePath: PathLike) => {
+      const pathStr = filePath.toString();
+      return pathStr === "my-spec.md" || pathStr === "my-spec-v0.md";
+    });
+
+    expect(convertSpecNameToFilename("My Spec")).toBe("my-spec-v1.md");
+  });
+
+  it("should handle files already containing md extension", () => {
+    // Mock that the file exists
+    vi.mocked(fs.existsSync).mockImplementation((filePath: PathLike) => {
+      return filePath.toString() === "my-spec.md";
+    });
+
+    expect(convertSpecNameToFilename("My Spec.md")).toBe("my-spec-v0.md");
   });
 });
 

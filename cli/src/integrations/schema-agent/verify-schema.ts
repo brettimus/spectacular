@@ -25,6 +25,7 @@ ${getDrizzleSchemaExamples()}
 [Additional Instructions]
 
 - Make sure all dependencies were properly imported
+- IMPORTANT: \`import { sql } from "drizzle-orm"\`, not from \`drizzle-orm/sqlite-core'\`
 `;
 
 export async function verifyGeneratedSchema(ctx: Context, schema: string) {

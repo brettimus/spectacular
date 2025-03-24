@@ -2,16 +2,16 @@
 import { intro, outro } from "@clack/prompts";
 import { config } from "dotenv";
 import pico from "picocolors";
-import { commandCreateSchema } from "./commands/create-schema";
-import { commandInit } from "./commands/init";
-import { SPECTACULAR_TITLE } from "./const";
 import {
   commandApiKeyAdd,
   commandApiKeyList,
   commandApiKeyRemove,
   commandApiKeySetDefault,
 } from "./commands/api-keys";
+import { commandCreateSchema } from "./commands/create-schema";
+import { commandInit } from "./commands/init";
 import { commandViewLogs } from "./commands/logs";
+import { SPECTACULAR_TITLE } from "./const";
 
 // For local development, to quickly configure env vars from a .env file
 config();

@@ -1,13 +1,13 @@
 import fs from "node:fs";
-import path from "node:path";
 import type { Context } from "@/context";
 import pico from "picocolors";
 import { executeStep } from "./executor";
+import { loadExistingSpec } from "./load-existing-spec";
 import type { SchemaGenerationStep } from "./types";
 
 // CURRENT - Implementation of create-schema functionality
 //
-// 1. Read the spec file (.spectacular/metadata.json->specPath)
+// 1. Read the spec file (spectacular/metadata.json->specPath)
 // 2. Determine database tables from the spec (LLM call)
 // 3. Generate a schema file (LLM call)
 // 4. Verify the generated schema with a thinking model (LLM call)
@@ -20,21 +20,7 @@ import type { SchemaGenerationStep } from "./types";
  * Main function to orchestrate the schema creation process
  */
 export async function actionCreateSchema(ctx: Context) {
-  // Check if spec exists
-  if (!ctx.specPath) {
-    const metadataPath = path.join(ctx.cwd, ".spectacular", "metadata.json");
-    try {
-      if (fs.existsSync(metadataPath)) {
-        const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-        ctx.specPath = metadata.specPath;
-      }
-    } catch (error) {
-      console.error("Error reading metadata:", error);
-      throw new Error(
-        "Could not find spec path. Make sure you have a .spectacular/metadata.json file.",
-      );
-    }
-  }
+  loadExistingSpec(ctx);
 
   // Read spec file if not already loaded
   if (!ctx.specContent && ctx.specPath) {

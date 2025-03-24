@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { intro, outro, select, isCancel } from "@clack/prompts";
-import pico from "picocolors";
 import fs from "node:fs";
 import path from "node:path";
+import { intro, isCancel, outro, select } from "@clack/prompts";
+import pico from "picocolors";
 import { SPECTACULAR_TITLE } from "../const";
 import { getSpectacularDirPath } from "../utils/credentials";
 import { handleCancel } from "../utils/utils";

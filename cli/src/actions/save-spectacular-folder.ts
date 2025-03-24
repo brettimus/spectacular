@@ -1,4 +1,5 @@
 import type { Context } from "@/context";
+import { log } from "@clack/prompts";
 import {
   saveSpectacularDebugInfo,
   saveSpectacularMetadata,
@@ -17,6 +18,8 @@ export async function saveSpectacularFolder(ctx: Context) {
 
     // Save metadata
     saveSpectacularMetadata(basePath, ctx.specPath, ctx.sessionId);
+
+    log.info("Spectacular folder saved");
 
     return;
   } catch (error) {

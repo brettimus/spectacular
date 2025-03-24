@@ -3,11 +3,36 @@ import { join } from "node:path";
 import type { Context } from "../context";
 import { randomId } from "./utils";
 
+export const SPECTACULAR_PROJECT_DIR_NAME = "spectacular";
+
 /**
  * Path to the spectacular directory
  */
 export function getSpectacularDirPath(path: string): string {
-  return join(path, ".spectacular");
+  return join(path, SPECTACULAR_PROJECT_DIR_NAME);
+}
+
+/**
+ * Path to the metadata file
+ */
+export function getMetadataFilePath(path: string): string {
+  return join(path, SPECTACULAR_PROJECT_DIR_NAME, "metadata.json");
+}
+
+/**
+ * Get the metadata file
+ */
+export function getMetadataFile(path: string): unknown | null {
+  const metadataPath = getMetadataFilePath(path);
+  if (!existsSync(metadataPath)) {
+    return null;
+  }
+  try {
+    return JSON.parse(readFileSync(metadataPath, "utf8"));
+  } catch (error) {
+    console.error("Error reading metadata:", error);
+    return null;
+  }
 }
 
 /**

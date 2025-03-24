@@ -96,7 +96,6 @@ The system is to be built using Cloudflare Workers with Hono as the API framewor
 
 - <column-name> (<column-type>, <column-constraints>)
 
-
 ## 3. API Endpoints
 
 We will structure our API endpoints into logical groups for <quick-description-of-the-api-endpoints-groups />.
@@ -114,7 +113,6 @@ We will structure our API endpoints into logical groups for <quick-description-o
   - Description: <description-of-the-endpoint>
   - Query Params: <list-of-expected-query-params>
 
-
 ## 4. Integrations
 
 <list-of-integrations-with-other-services-or-apis />
@@ -125,11 +123,15 @@ We will structure our API endpoints into logical groups for <quick-description-o
 - OpenAI for AI integrations
 - ...
 
-## 5. Future Considerations
+## 5. Additional Notes (Deployment configuration, etc)
+
+<additional-notes-for-the-developer />
+
+## 6. Future Considerations
 
 <list-of-future-considerations-for-the-project />
 
-## 6. Further Reading
+## 7. Further Reading
 
 Take inspiration from the project template here: https://github.com/fiberplane/create-honc-app/tree/main/templates/d1
 

@@ -1,6 +1,6 @@
 import fs from "node:fs";
-import path from "node:path";
 import os from "node:os";
+import path from "node:path";
 import type { Context } from "../context";
 
 interface Credentials {
@@ -8,17 +8,20 @@ interface Credentials {
   defaultApiKey?: string;
 }
 
-const SPECTACULAR_DIR = ".spectacular_stuff";
+const SPECTACULAR_HOME_DIR_NAME = ".spectacular_stuff";
 const CREDENTIALS_FILE = "credentials";
-const SPECTACULAR_DIR_PATH = path.join(os.homedir(), SPECTACULAR_DIR);
-const CREDENTIALS_PATH = path.join(SPECTACULAR_DIR_PATH, CREDENTIALS_FILE);
+const SPECTACULAR_HOME_DIR_PATH = path.join(
+  os.homedir(),
+  SPECTACULAR_HOME_DIR_NAME,
+);
+const CREDENTIALS_PATH = path.join(SPECTACULAR_HOME_DIR_PATH, CREDENTIALS_FILE);
 
 /**
  * Ensure the spectacular directory exists
  */
 function ensureSpectacularDir(): void {
-  if (!fs.existsSync(SPECTACULAR_DIR_PATH)) {
-    fs.mkdirSync(SPECTACULAR_DIR_PATH, { recursive: true });
+  if (!fs.existsSync(SPECTACULAR_HOME_DIR_PATH)) {
+    fs.mkdirSync(SPECTACULAR_HOME_DIR_PATH, { recursive: true });
   }
 }
 
@@ -163,7 +166,7 @@ export function loadApiKeyToContext(ctx: Context): void {
  */
 export function getSpectacularDirPath(): string {
   ensureSpectacularDir();
-  return SPECTACULAR_DIR_PATH;
+  return SPECTACULAR_HOME_DIR_PATH;
 }
 
 /**
@@ -172,7 +175,7 @@ export function getSpectacularDirPath(): string {
 export function saveDebugInfo(filename: string, data: unknown): void {
   try {
     ensureSpectacularDir();
-    const debugPath = path.join(SPECTACULAR_DIR_PATH, filename);
+    const debugPath = path.join(SPECTACULAR_HOME_DIR_PATH, filename);
     fs.writeFileSync(debugPath, JSON.stringify(data, null, 2), "utf-8");
   } catch (error) {
     console.error(`Error saving debug info to ${filename}:`, error);
@@ -188,7 +191,7 @@ export function appendToLog(
 ): void {
   try {
     ensureSpectacularDir();
-    const logPath = path.join(SPECTACULAR_DIR_PATH, `${logname}.log`);
+    const logPath = path.join(SPECTACULAR_HOME_DIR_PATH, `${logname}.log`);
 
     let entryText: string;
     if (typeof entry === "string") {
@@ -227,7 +230,7 @@ export function saveGlobalDebugInfo(context: Context): void {
     };
 
     const debugPath = path.join(
-      SPECTACULAR_DIR_PATH,
+      SPECTACULAR_HOME_DIR_PATH,
       `debug-${context.sessionId ?? new Date().getTime()}.json`,
     );
     fs.writeFileSync(debugPath, JSON.stringify(history, null, 2), "utf-8");

@@ -13,9 +13,9 @@ import { initContext } from "../context";
 import { promptDescription } from "../description";
 import { promptOpenAiKey } from "../openai-api-key";
 import { isError } from "../types";
+import { saveGlobalDebugInfo } from "../utils/credentials";
 import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
 import { handleCancel, handleError } from "../utils/utils";
-import { saveGlobalDebugInfo } from "../utils/credentials";
 
 export async function commandInit() {
   console.log("");
@@ -54,7 +54,7 @@ export async function commandInit() {
     handleError(projectFolderResult);
   }
 
-  // Check if .spectacular directory already exists in the project folder
+  // Check if spectacular directory already exists in the project folder
   const projectPath = context.projectPath || process.cwd();
   const configCheck = hasValidSpectacularConfig(projectPath);
 
@@ -117,6 +117,6 @@ export async function commandInit() {
   // Also save to the global debug directory
   saveGlobalDebugInfo(context);
 
-  outro(`🦉 saved spec in ${context.specPath}!
+  outro(`🦉 spec was created ${context.specPath}!
 `);
 }

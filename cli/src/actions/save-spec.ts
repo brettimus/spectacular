@@ -1,25 +1,12 @@
 import { writeFileSync } from "node:fs";
 import type { Context } from "@/context";
 import { convertSpecNameToFilename, pathFromInput } from "@/utils/utils";
-import { text } from "@clack/prompts";
+import { log } from "@clack/prompts";
 
 export async function actionSaveSpec(ctx: Context) {
   try {
-    const placeholder = convertSpecNameToFilename(ctx.specName ?? "spec");
-    const result = await text({
-      message: "Where should we save your spec? (./relative-path)",
-      placeholder,
-      defaultValue: placeholder,
-    });
-
-    if (typeof result === "string") {
-      if (result === "") {
-        ctx.specPath = placeholder;
-      } else {
-        ctx.specPath = pathFromInput(result, ctx.cwd);
-      }
-    }
-
+    const specName = convertSpecNameToFilename(ctx.specName ?? "spec");
+    ctx.specPath = pathFromInput(specName, ctx.cwd);
     // Appease typescript
     if (!ctx.specPath) {
       throw new Error("Path to save spec is required");
@@ -32,7 +19,9 @@ export async function actionSaveSpec(ctx: Context) {
     // Write the spec to the file
     writeFileSync(ctx.specPath, ctx.specContent);
 
-    return result;
+    log.success(`Spectacular file saved in ${ctx.specPath}`);
+
+    return specName;
   } catch (error) {
     return error;
   }

@@ -10,7 +10,7 @@ import { actionDownloadTemplate } from "../../actions/download-template";
 import { SPECTACULAR_TITLE } from "../../const";
 import { initContext } from "../../context";
 import { promptOpenAiKey } from "../../openai-api-key";
-import { saveGlobalDebugInfo, appendToLog } from "../../utils/credentials";
+import { appendToLog, saveGlobalDebugInfo } from "../../utils/credentials";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
