@@ -3,7 +3,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
-import { createUserMessage } from "../ideation-agent";
+import { createUserMessage } from "../utils";
 import type { DatabaseTable, SelectedRule } from "./types";
 
 const SYSTEM_PROMPT = `

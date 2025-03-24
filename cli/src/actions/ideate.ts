@@ -1,10 +1,10 @@
 import type { Context } from "@/context";
 import {
   askFollowUpQuestion,
-  createUserMessage,
   generateImplementationPlan,
   routerAgent,
 } from "@/integrations/ideation-agent";
+import { createUserMessage } from "@/integrations/utils";
 import { isError } from "@/types";
 import { handleCancel, handleError } from "@/utils/utils";
 import { stream, isCancel, log, spinner, text } from "@clack/prompts";

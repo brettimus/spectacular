@@ -3,7 +3,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
-import { createUserMessage } from "../ideation-agent/utils";
+import { createUserMessage } from "../utils";
 import { SCHEMA_SYSTEM_PROMPT } from "./analyze-tables";
 
 export async function fixSchemaErrors(

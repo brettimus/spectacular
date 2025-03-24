@@ -3,7 +3,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
-import { createUserMessage } from "../ideation-agent/utils";
+import { createUserMessage } from "../utils";
 
 export const SCHEMA_SYSTEM_PROMPT = `
 You are an expert database schema designer specializing in Drizzle ORM with SQLite (D1).
