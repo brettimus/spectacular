@@ -8,7 +8,7 @@ import { SCHEMA_SYSTEM_PROMPT } from "./analyze-tables";
 
 export async function verifyGeneratedSchema(ctx: Context, schema: string) {
   const openai = createOpenAI({ apiKey: ctx.apiKey });
-  const model = traceAISDKModel(openai("gpt-4o"));
+  const model = traceAISDKModel(openai("o3-mini"));
 
   return generateObject({
     model,
