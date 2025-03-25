@@ -1,8 +1,8 @@
 import type { Context } from "@/context";
-import { confirm, isCancel, select, text } from "@clack/prompts";
+import { confirm, select, text } from "@clack/prompts";
 import pico from "picocolors";
 import { getApiKey, listApiKeys, saveApiKey } from "./utils/credentials";
-import { handleCancel } from "./utils/utils";
+import { handleResult } from "./utils";
 
 export async function promptOpenAiKey(ctx: Context) {
   try {
@@ -15,9 +15,7 @@ export async function promptOpenAiKey(ctx: Context) {
         message: `You have ${savedKeys.length} saved API key(s). Would you like to use one of them?`,
       });
 
-      if (isCancel(useExistingKey)) {
-        handleCancel();
-      }
+      handleResult(useExistingKey);
 
       if (useExistingKey) {
         // Let user select from saved keys
@@ -29,9 +27,7 @@ export async function promptOpenAiKey(ctx: Context) {
           })),
         });
 
-        if (isCancel(selectedKey)) {
-          handleCancel();
-        }
+        handleResult(selectedKey);
 
         const keyName = String(selectedKey);
         const apiKey = getApiKey(keyName);
@@ -56,9 +52,7 @@ export async function promptOpenAiKey(ctx: Context) {
       },
     });
 
-    if (isCancel(result)) {
-      handleCancel();
-    }
+    handleResult(result);
 
     // If we got a valid API key, offer to save it
     if (typeof result === "string" && result !== "") {
@@ -70,9 +64,7 @@ export async function promptOpenAiKey(ctx: Context) {
         placeholder: "default",
       });
 
-      if (isCancel(saveName)) {
-        handleCancel();
-      }
+      handleResult(saveName);
 
       if (typeof saveName === "string" && saveName !== "") {
         const makeDefault =
@@ -81,9 +73,7 @@ export async function promptOpenAiKey(ctx: Context) {
             message: "Would you like to make this the default API key?",
           }));
 
-        if (isCancel(makeDefault)) {
-          handleCancel();
-        }
+        handleResult(makeDefault);
 
         saveApiKey(saveName, result, makeDefault === true);
       }

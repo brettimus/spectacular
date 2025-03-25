@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-import { intro, isCancel, outro, select } from "@clack/prompts";
+import { intro, outro, select } from "@clack/prompts";
 import pico from "picocolors";
 import { SPECTACULAR_TITLE } from "../const";
 import { getSpectacularDirPath } from "../utils/credentials";
-import { handleCancel } from "../utils/utils";
+import { handleResult } from "../utils";
 
 export async function commandViewLogs() {
   console.log("");
@@ -41,9 +41,7 @@ export async function commandViewLogs() {
     })),
   });
 
-  if (isCancel(selectedFile)) {
-    handleCancel();
-  }
+  handleResult(selectedFile);
 
   const fileName = String(selectedFile);
   const filePath = path.join(logDir, fileName);

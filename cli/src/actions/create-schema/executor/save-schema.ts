@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Context } from "@/context";
-import { handleError } from "@/utils/utils";
+import { handleError } from "@/utils";
 import { spinner } from "@clack/prompts";
 import type { SchemaGenerationStep } from "../types";
 

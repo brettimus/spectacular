@@ -5,9 +5,8 @@ import {
   routerAgent,
 } from "@/integrations/ideation-agent";
 import { createUserMessage } from "@/integrations/utils";
-import { isError } from "@/types";
-import { handleCancel, handleError } from "@/utils/utils";
-import { stream, isCancel, log, spinner, text } from "@clack/prompts";
+import { handleResult } from "@/utils";
+import { stream, log, spinner, text } from "@clack/prompts";
 import { appendResponseMessages } from "ai";
 import pico from "picocolors";
 
@@ -66,13 +65,7 @@ async function promptUserClarification(ctx: Context) {
     },
   });
 
-  if (isCancel(userAnswer)) {
-    handleCancel();
-  }
-
-  if (isError(userAnswer)) {
-    handleError(userAnswer);
-  }
+  handleResult(userAnswer);
 
   ctx.messages.push(createUserMessage(userAnswer as string));
 }

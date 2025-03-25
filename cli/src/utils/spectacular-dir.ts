@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Context } from "../context";
-import { randomId } from "./utils";
+import { randomId } from "./random-id";
 
 export const SPECTACULAR_PROJECT_DIR_NAME = "spectacular";
 

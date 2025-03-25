@@ -1,6 +1,6 @@
 import type { Context } from "@/context";
 import { analyzeDatabaseTables } from "@/integrations/schema-agent";
-import { handleError } from "@/utils/utils";
+import { handleError } from "@/utils";
 import { spinner } from "@clack/prompts";
 import type { SchemaGenerationStep } from "../types";
 

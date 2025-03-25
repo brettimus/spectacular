@@ -1,6 +1,6 @@
 import type { Message } from "ai";
 import { getApiKey } from "./utils/credentials";
-import { getPackageManager, randomId } from "./utils/utils";
+import { getPackageManager, randomId } from "./utils";
 
 export interface Context {
   apiKey?: string;

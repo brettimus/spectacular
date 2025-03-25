@@ -9,7 +9,7 @@ import {
   saveApiKey,
   setDefaultApiKey,
 } from "../utils/credentials";
-import { handleCancel } from "../utils/utils";
+import { handleCancel } from "../utils";
 
 export async function commandApiKeyAdd() {
   console.log("");

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Context } from "@/context";
 import { fixSchemaErrors } from "@/integrations/schema-agent";
-import { handleError, runShell } from "@/utils/utils";
+import { handleError, runShell } from "@/utils";
 import { spinner } from "@clack/prompts";
 import type { SchemaGenerationStep } from "../types";
 

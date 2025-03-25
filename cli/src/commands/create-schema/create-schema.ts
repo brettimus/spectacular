@@ -2,29 +2,35 @@
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isError } from "@/types";
-import { handleCancel, handleError } from "@/utils/utils";
+import { handleCancel, handleError } from "@/utils";
 import { confirm, intro, isCancel, outro } from "@clack/prompts";
 import pico from "picocolors";
 import { actionCreateSchema } from "../../actions/create-schema";
 import { actionDownloadTemplate } from "../../actions/download-template";
 import { SPECTACULAR_TITLE } from "../../const";
-import { initContext } from "../../context";
+import { type Context, initContext } from "../../context";
 import { promptOpenAiKey } from "../../openai-api-key";
 import { appendToLog, saveGlobalDebugInfo } from "../../utils/credentials";
+import { actionDependencies } from "@/actions/dependencies";
+import { handleResult } from "@/utils/result";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// HACK - A directory for rules to use in code generation
+//        Not yet completed or filled in or compiled or anything
 const rulesDir = path.join(__dirname, "rules");
 
-export async function commandCreateSchema() {
-  console.log("");
-  console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
-  console.log("");
+export async function commandCreateSchema(continuingWithContext?: Context) {
+  const ctx = continuingWithContext ?? initContext();
 
-  intro("😮 spectacular - Create Schema");
+  if (!continuingWithContext) {
+    console.log("");
+    console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
+    console.log("");
 
-  const ctx = initContext();
+    intro("😮 spectacular - Create Schema");
+  }
 
   // Log the action start
   appendToLog("commands", {
@@ -39,13 +45,7 @@ export async function commandCreateSchema() {
     if (!ctx.apiKey) {
       const result = await promptOpenAiKey(ctx);
 
-      if (isCancel(result)) {
-        handleCancel();
-      }
-
-      if (result instanceof Error) {
-        handleError(result);
-      }
+      handleResult(result);
     }
 
     if (!ctx.apiKey) {
@@ -58,13 +58,7 @@ export async function commandCreateSchema() {
       initialValue: true,
     });
 
-    if (isCancel(shouldDownloadTemplate)) {
-      handleCancel();
-    }
-
-    if (isError(shouldDownloadTemplate)) {
-      handleError(shouldDownloadTemplate);
-    }
+    handleResult(shouldDownloadTemplate);
 
     if (typeof shouldDownloadTemplate === "boolean" && shouldDownloadTemplate) {
       // First, ensure we have a template downloaded
@@ -77,6 +71,16 @@ export async function commandCreateSchema() {
       if (isError(downloadTemplateResult)) {
         handleError(downloadTemplateResult);
       }
+    }
+
+    const dependenciesResult = await actionDependencies(ctx);
+
+    if (isCancel(dependenciesResult)) {
+      handleCancel();
+    }
+
+    if (isError(dependenciesResult)) {
+      handleError(dependenciesResult);
     }
 
     // Then generate the schema
