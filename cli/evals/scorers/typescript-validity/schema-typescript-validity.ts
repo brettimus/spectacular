@@ -1,15 +1,16 @@
 import fs from "node:fs";
-import path from "node:path";
+import path, { basename } from "node:path";
 import { createScorer } from "evalite";
-import type { SpectacularSpecFile } from "../../utils";
 import { validateTypeScript } from "../../../src/utils/typechecking";
 import type { TypeScriptValidityResult } from "./types";
+import type { DatabaseSchemaEvalInput } from "../../database-schema";
+import { createNewProject } from "../../runner-utils";
 
 /**
  * TypeScript Validity scorer that uses the TypeScript compiler to check for errors.
  */
 export const SchemaTypeScriptValidity = createScorer<
-  SpectacularSpecFile,
+  DatabaseSchemaEvalInput,
   { code: string }
 >({
   name: "TypeScript Validity",
@@ -17,15 +18,17 @@ export const SchemaTypeScriptValidity = createScorer<
   // `input` comes from `data` and contains the code to validate and a unique ID
   // `expected` also comes from `data` but is not used in this scorer
   // `output` is the output of `task` but not used in this scorer
-  scorer: async ({ input: _input, expected: _expected, output }) => {
-    // if (!input?.fullPath) {
-    //   throw new Error(
-    //     "Full path is required to score (and cache the score of) the TypeScript code.",
-    //   );
-    // }
-
+  scorer: async ({ input, expected: _expected, output }) => {
+    const { runDirectory, specFileDetails } = input;
+    const projectName = basename(
+      specFileDetails.fileName,
+      path.extname(specFileDetails.fileName),
+    );
+    const projectDir = await createNewProject(runDirectory, projectName);
+    console.log("Project dir", projectDir);
     const result = await typecheckCode({
       code: output.code,
+      projectDir,
     });
 
     return result;
@@ -37,11 +40,9 @@ export const SchemaTypeScriptValidity = createScorer<
  */
 const typecheckCode = async (opts: {
   code: string;
+  projectDir: string;
 }): Promise<TypeScriptValidityResult> => {
-  // Current working directory because it should be path to `cli` dir
-  // since that is where PNPM executes the eval script.
-  const cliDir = process.cwd();
-  const projectDir = path.join(cliDir, "..", "eval-repos", "schema-validation");
+  const { code, projectDir } = opts;
 
   if (!fs.existsSync(projectDir)) {
     throw new Error("Directory to store project does not exist");
@@ -52,11 +53,11 @@ const typecheckCode = async (opts: {
   try {
     console.log(
       "[SchemaTypeScriptValidity] Writing code to db/schema.ts",
-      opts.code.slice(0, 100),
+      code.slice(0, 100),
       "...",
     );
     // Write the code to the `db/schema.ts` file
-    fs.writeFileSync(dbSchemaFilePath, opts.code);
+    fs.writeFileSync(dbSchemaFilePath, code);
 
     const validationResult = await validateTypeScript(projectDir);
 

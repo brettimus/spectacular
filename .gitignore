@@ -2,6 +2,9 @@
 
 node_modules
 
+# Ignore repos from eval runs
+eval-repos/run-*/**
+
 # Ignore test apps
 cli/test-apps/**
 !cli/test-apps/.gitkeep

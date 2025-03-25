@@ -7,7 +7,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    // 2 mins... but probably want longer for evals
-    testTimeout: 120000,
+    // 20 mins, which is huge, but i wanna run e2e evals on lots of llm calls so shush.
+    testTimeout: 20 * 60 * 1000, // 20 minutes in milliseconds
   },
 });

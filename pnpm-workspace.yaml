@@ -2,3 +2,4 @@ packages:
   - "cli"
   - "service"
   - "eval-repos/*"
+  - "eval-repos/run-*/*"

@@ -6,7 +6,8 @@
     "preinstall": "npx only-allow pnpm",
     "format": "biome check . --write",
     "lint": "pnpm --recursive lint",
-    "typecheck": "pnpm --recursive typecheck"
+    "typecheck": "pnpm --recursive typecheck",
+    "clean:eval-repos": "rm -rf eval-repos/run-*/**"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
