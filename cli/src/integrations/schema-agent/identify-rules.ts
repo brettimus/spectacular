@@ -68,6 +68,7 @@ Tables:
 ${JSON.stringify(tables, null, 2)}`),
     ],
     system: RULES_SYSTEM_PROMPT,
+    temperature: 0
   });
 }
 

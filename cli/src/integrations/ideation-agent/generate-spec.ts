@@ -163,5 +163,6 @@ export async function generateImplementationPlan(ctx: Context) {
           "A detailed implementation plan / handoff document for a developer to implement the project (in markdown).",
         ),
     }),
+    temperature: 0.35
   });
 }

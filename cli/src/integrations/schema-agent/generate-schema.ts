@@ -55,6 +55,7 @@ Use the additional context to help you generate the schema. This is important to
 `),
     ],
     system: GENERATE_SCHEMA_SYSTEM_PROMPT,
+    temperature: 0.2
   });
 }
 

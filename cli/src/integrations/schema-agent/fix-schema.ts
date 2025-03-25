@@ -54,5 +54,6 @@ When fixing errors:
 - Make sure relationship references are correctly defined
 - Add any missing schema components
 `,
+    temperature: 0.1
   });
 }
