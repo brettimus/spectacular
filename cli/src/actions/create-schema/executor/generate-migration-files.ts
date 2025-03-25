@@ -15,6 +15,15 @@ export async function generateMigrationFiles(
     dbGenSpinner.start("Running db:generate...");
 
     try {
+      const dbTouchResult = await runShell(ctx.cwd, [
+        `${ctx.packageManager} run db:touch`,
+      ]);
+
+      // NOTE - This is kind of fatal?
+      if (dbTouchResult.exitCode !== 0) {
+        throw new Error(`db:touch failed: ${dbTouchResult.stderr}`);
+      }
+
       const result = await runShell(ctx.cwd, [
         `${ctx.packageManager} run db:generate`,
       ]);
