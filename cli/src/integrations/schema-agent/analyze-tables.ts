@@ -75,6 +75,6 @@ export async function analyzeDatabaseTables(ctx: Context) {
 ${ctx.specContent}`),
     ],
     system: SCHEMA_SYSTEM_PROMPT,
-    temperature: 0.2
+    temperature: 0.2,
   });
 }

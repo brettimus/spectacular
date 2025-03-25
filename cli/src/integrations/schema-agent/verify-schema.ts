@@ -50,6 +50,6 @@ ${schema}
 \`\`\``),
     ],
     system: SCHEMA_VERIFICATION_SYSTEM_PROMPT,
-    temperature: 0.1
+    temperature: 0.1,
   });
 }
