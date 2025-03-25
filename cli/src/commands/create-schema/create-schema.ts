@@ -13,6 +13,7 @@ import { promptOpenAiKey } from "../../openai-api-key";
 import { appendToLog, saveGlobalDebugInfo } from "../../utils/credentials";
 import { actionDependencies } from "@/actions/dependencies";
 import { handleResult } from "@/utils/result";
+import { commandCreateApi } from "../create-api";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -109,6 +110,8 @@ export async function commandCreateSchema(continuingWithContext?: Context) {
       outro("Schema creation completed successfully! 🎉");
       process.exit(0);
     }
+
+    await commandCreateApi(ctx);
   } catch (error) {
     // Log the error
     appendToLog("commands", {
