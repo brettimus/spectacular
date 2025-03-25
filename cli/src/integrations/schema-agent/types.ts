@@ -9,12 +9,6 @@ export interface TableField {
   description: string;
 }
 
-export interface DatabaseTable {
-  name: string;
-  description: string;
-  fields: TableField[];
-}
-
 export interface SelectedRule {
   ruleName: string;
   priority: number;

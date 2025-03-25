@@ -45,11 +45,11 @@ export async function actionCreateSchema(ctx: Context) {
     step: "init",
     status: "pending",
     data: {
-      tables: [],
       operations: [],
       relevantRules: [],
       tableSchemas: [],
       finalSchema: "",
+      schemaSpecification: "",
     },
   };
 

@@ -15,7 +15,7 @@ export async function generateSchema(
     schemaSpinner.message("Generating schema...");
     const tableSchema = await agentGenerateSchema(
       ctx,
-      step.data.tables,
+      step.data.schemaSpecification,
       step.data.relevantRules,
     );
     step.data.finalSchema = tableSchema.object.dbSchemaTs;

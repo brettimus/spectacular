@@ -6,8 +6,9 @@ import { z } from "zod";
 import { createUserMessage } from "../utils";
 
 export const SCHEMA_SYSTEM_PROMPT = `
-You are an expert database schema designer specializing in Drizzle ORM with SQLite (D1).
-Your task is to analyze a software specification and create an appropriate database schema.
+You are an expert database schema designer specializing in Drizzle ORM with SQLite (Cloudflare D1).
+
+Your task is to analyze a software specification and draft a document describing the appropriate database schema for the project.
 
 The schema should follow best practices for relational database design:
 - Use appropriate data types
@@ -16,7 +17,51 @@ The schema should follow best practices for relational database design:
 - Use indexes for columns that will be frequently queried
 - Follow naming conventions (snake_case for tables and columns)
 
-The output should be valid TypeScript code using Drizzle ORM syntax for SQLite (D1).
+The output should be a markdown document describing the tables and their relationships.
+
+Use the following outline:
+[Outline]
+# <name of the project> Database Schema
+
+## Tables
+
+### <table name>
+
+<description of the table>
+
+#### <column name>
+
+- <description of the column>
+- <data type>
+- <constraints>
+  - <primary key? foreign key?>
+  - <unique?>
+  - <required? nullable?>
+
+### <indexes>
+
+#### <index name>
+- <description of the index>
+- <columns>
+  - <column name>
+  - <column name>
+
+## Relations
+
+### <relationship name>
+
+- <description of the relationship>
+- <table name>
+- <column name>
+
+## Additional Notes and Future Considerations
+
+<description of additional notes and future considerations>
+
+[END OF OUTLINE]
+***
+
+Be thorough and detailed. This is important to my career.
 `;
 
 export async function analyzeDatabaseTables(ctx: Context) {
@@ -36,38 +81,11 @@ export async function analyzeDatabaseTables(ctx: Context) {
         .describe(
           "Your analysis of the specification and why you chose these tables.",
         ),
-      tables: z.array(
-        z.object({
-          name: z.string().describe("The name of the table in snake_case"),
-          description: z
-            .string()
-            .describe(
-              "A brief description of what this table stores and its purpose",
-            ),
-          fields: z.array(
-            z.object({
-              name: z.string().describe("The name of the field in snake_case"),
-              type: z.string().describe("The Drizzle data type"),
-              isPrimary: z.boolean().describe("Whether this is a primary key"),
-              isRequired: z
-                .boolean()
-                .describe("Whether this field is required"),
-              isForeignKey: z
-                .boolean()
-                .describe("Whether this is a foreign key"),
-              references: z
-                .string()
-                .optional()
-                .describe(
-                  "If a foreign key, the table and column it references",
-                ),
-              description: z
-                .string()
-                .describe("A brief description of this field"),
-            }),
-          ),
-        }),
-      ),
+      schemaSpecification: z
+        .string()
+        .describe(
+          "The detailed database schema specification as a markdown document.",
+        ),
     }),
     messages: [
       createUserMessage(`Please analyze this specification and determine the database tables needed:

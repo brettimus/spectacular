@@ -34,7 +34,6 @@ export interface SchemaGenerationStep {
   status: "pending" | "in-progress" | "completed" | "error";
   message?: string;
   data: {
-    tables: DatabaseTable[];
     operations: DatabaseOperation[];
     relevantRules: SelectedRule[];
     tableSchemas: Array<{
@@ -43,5 +42,6 @@ export interface SchemaGenerationStep {
       explanation: string;
     }>;
     finalSchema: string;
+    schemaSpecification: string;
   };
 }

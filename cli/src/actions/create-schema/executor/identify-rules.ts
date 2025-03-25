@@ -11,7 +11,10 @@ export async function identifyRules(
   const rulesSpinner = spinner();
   try {
     rulesSpinner.start("Identifying relevant rules...");
-    const rulesAnalysis = await identifyRelevantRules(ctx, step.data.tables);
+    const rulesAnalysis = await identifyRelevantRules(
+      ctx,
+      step.data.schemaSpecification,
+    );
     step.data.relevantRules = rulesAnalysis.object.selectedRules;
     rulesSpinner.stop(
       `Identified ${step.data.relevantRules.length} relevant rules`,

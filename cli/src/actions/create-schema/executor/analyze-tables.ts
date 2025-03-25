@@ -14,8 +14,9 @@ export async function analyzeTables(
       "Analyzing specification to determine database tables...",
     );
     const tableAnalysis = await analyzeDatabaseTables(ctx);
-    step.data.tables = tableAnalysis.object.tables;
-    tablesSpinner.stop(`Identified ${step.data.tables.length} tables`);
+    step.data.schemaSpecification = tableAnalysis.object.schemaSpecification;
+    // TODO - save the schema specification to the global debug directory
+    tablesSpinner.stop("Drafted schema specification");
     return {
       step: "identify_rules",
       status: "completed",

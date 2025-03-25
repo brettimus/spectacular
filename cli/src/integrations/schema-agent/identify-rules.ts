@@ -6,7 +6,6 @@ import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
 import { createUserMessage } from "../utils";
-import type { DatabaseTable } from "./types";
 
 const RULES_SYSTEM_PROMPT = `
 You are an expert in database schema design specializing in selecting the appropriate database rules.
@@ -17,7 +16,7 @@ A rule is a guideline or pattern for implementing specific database features lik
 
 export async function identifyRelevantRules(
   ctx: Context,
-  tables: DatabaseTable[],
+  schemaSpecification: string,
 ) {
   const openai = createOpenAI({ apiKey: ctx.apiKey });
   const model = traceAISDKModel(openai("gpt-4o"));
@@ -62,10 +61,15 @@ export async function identifyRelevantRules(
       ),
     }),
     messages: [
-      createUserMessage(`Based on these database tables, which rules should be applied? Available rules: ${rules.join(", ")}
-
-Tables:
-${JSON.stringify(tables, null, 2)}`),
+      createUserMessage(`Based on this database schema, which rules should be applied?
+[DATABASE SCHEMA SPECIFICATION]
+${schemaSpecification}
+[END DATABASE SCHEMA SPECIFICATION]
+***
+[AVAILABLE RULES]
+${rules.join(", ")}
+[END AVAILABLE RULES]
+`),
     ],
     system: RULES_SYSTEM_PROMPT,
     temperature: 0,

@@ -4,7 +4,7 @@ import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
 import { createUserMessage } from "../utils";
-import type { DatabaseTable, SelectedRule } from "./types";
+import type { SelectedRule } from "./types";
 
 export const GENERATE_SCHEMA_SYSTEM_PROMPT = `
 You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.
@@ -22,7 +22,7 @@ ${getDrizzleSchemaExamples()}
 
 export async function generateSchema(
   ctx: Context,
-  tables: DatabaseTable[],
+  schemaSpecification: string,
   relevantRules: SelectedRule[],
 ) {
   const openai = createOpenAI({ apiKey: ctx.apiKey });
@@ -43,8 +43,8 @@ export async function generateSchema(
  
 [BEGIN DATA]
 ************
-[Tables]:
-${JSON.stringify(tables, null, 2)}
+[specification]:
+${schemaSpecification}
 ************
 [Additional context]:
 ${JSON.stringify(relevantRules, null, 2)}
