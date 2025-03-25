@@ -12,9 +12,11 @@ export async function manuallyCheckTypeScript() {
   const cliDir = process.cwd();
   const projectDir = path.join(cliDir, "..", "eval-repos", "schema-validation");
 
-  const dbSchemaFilePath = path.join(projectDir, "src", "db", "schema.ts");
+  // const dbSchemaFilePath = path.join(projectDir, "src", "db", "schema.ts");
 
-  const result = await validateTypeScript(projectDir, dbSchemaFilePath);
+  const result = await validateTypeScript(projectDir);
 
+  console.log("[manuallyCheckTypeScript] ", projectDir);
+  console.log("--------------------------------");
   console.log(JSON.stringify(result, null, 2));
 }
