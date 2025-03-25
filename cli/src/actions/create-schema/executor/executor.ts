@@ -65,11 +65,12 @@ export async function executeStep(
       });
       if (typeof confirmation !== "boolean" || !confirmation) {
         log.warning(
-          "Skipping typescript compilation check - going to generate migration files",
+          "Skipping typescript compilation and database migration file checks",
         );
         return {
           ...step,
-          step: "generate_migration_files",
+          // step: "generate_migration_files",
+          step: "completed",
           status: "completed",
           data: step.data,
         };

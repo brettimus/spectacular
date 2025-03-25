@@ -154,6 +154,11 @@ Think step by step in this order:
 - What are the relevant columns in the database for this api?
 - How do I use the Drizzle ORM to query the database?
 - What are the endpoints that I need to implement?
+
+Things you usually screw up (things to avoid):
+- result of a d1 query with drizzle does not have a \`.changed\` property
+- do not include example code in the generated api routes file unless it is for unimplemented features
+
 `.trim();
 
     const result = await generateObject({
@@ -207,6 +212,10 @@ Carefully review the generated API and identify any issues related to:
 
 DO NOT suggest stylistic changes or minor optimizations.
 Only report actual problems that would prevent the API from working correctly.
+
+Things you usually screw up (things to avoid):
+- result of a d1 query with drizzle does not have a \`.changed\` property
+
 `.trim();
 
     const result = await generateObject({
@@ -278,6 +287,15 @@ const expensiveProducts = await db.select().from(schema.products).where(gte(sche
 
 // ...
 </drizzle-orm-example>
+
+<drizzle-orm-example description="Use the db.update method to update a user in the database">
+// ...
+
+const [updatedUser] = await db.update().set({ name: "John" }).where(eq(schema.users.id, id)).from(schema.users).returning();
+
+// ...
+</drizzle-orm-example>
+
 `.trim();
   }
 }

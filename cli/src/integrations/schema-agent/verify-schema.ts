@@ -24,9 +24,11 @@ ${getDrizzleSchemaExamples()}
 
 [Additional Instructions]
 
+Things you usually screw up (things to avoid):
+- \`.primaryKey().autoIncrement()\` is NOT VALID for D1
+  BETTER: use \`.primaryKey({ autoIncrement: true })\` instead
 - Make sure all dependencies were properly imported
 - IMPORTANT: \`import { sql } from "drizzle-orm"\`, not from \`drizzle-orm/sqlite-core'\`
-- .primaryKey().autoIncrement() is not valid for D1, use \`.primaryKey({ autoIncrement: true }) instead\`
 `;
 
 export async function verifyGeneratedSchema(ctx: Context, schema: string) {

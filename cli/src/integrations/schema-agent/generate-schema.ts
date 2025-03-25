@@ -51,8 +51,9 @@ ${JSON.stringify(relevantRules, null, 2)}
 ************
 [END DATA]
 
-Things you usually screw up:
-- .primaryKey().autoIncrement() is not valid for D1, use \`.primaryKey({ autoIncrement: true }) instead\`
+Things you usually screw up (things to avoid):
+- \`.primaryKey().autoIncrement()\` is NOT VALID for D1
+  BETTER: use \`.primaryKey({ autoIncrement: true })\` instead
 
 Use the additional context to help you generate the schema. This is important to my career.
 `),
