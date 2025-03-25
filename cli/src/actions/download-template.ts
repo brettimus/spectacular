@@ -8,8 +8,7 @@ export async function actionDownloadTemplate(ctx: Context) {
   const s = spinner();
   s.start("Setting up template...");
 
-  // NOTE - The "#create-schema" branch is a temporary template for the create-schema command
-  const templateUrl = "github:brettimus/mega-honc#create-schema";
+  const templateUrl = "github:brettimus/mega-honc";
 
   try {
     console.log("Downloading template...", ctx.cwd);

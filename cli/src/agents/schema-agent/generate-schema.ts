@@ -18,6 +18,27 @@ ${getD1SchemaExample()}
 Here are some additional code references:
 
 ${getDrizzleSchemaExamples()}
+
+[IMPORTANT]
+If you need the \`sql\` function, you must import it from \`drizzle-orm\`,
+not \`drizzle-orm/sqlite-core\`.
+
+\`\`\`typescript
+// THIS IS INCORRECT
+import { sqliteTable, text, integer, sql } from 'drizzle-orm/sqlite-core'
+
+// THIS IS CORRECT
+import {  sql } from 'drizzle-orm'
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+\`\`\`
+
+[Additional Instructions]
+
+Things you usually screw up (things to avoid):
+- \`.primaryKey().autoIncrement()\` is NOT VALID for D1
+  BETTER: use \`.primaryKey({ autoIncrement: true })\` instead
+- Make sure all dependencies were properly imported
+- IMPORTANT: \`import { sql } from "drizzle-orm"\`, not from \`drizzle-orm/sqlite-core'\`
 `;
 
 export async function generateSchema(

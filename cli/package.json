@@ -13,12 +13,15 @@
     "dev:apikey:list": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js apikey:list'",
     "dev:apikey:remove": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js apikey:remove'",
     "eval:dev": "evalite watch",
+    "eval:db:schema": "evalite evals/database-schema.eval.ts",
+    "eval:db:schema:watch": "evalite watch evals/database-schema.eval.ts",
     "format": "biome format . --write",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
     "clean:test-apps": "rimraf test-apps/* && touch test-apps/.gitkeep",
     "prepublishOnly": "pnpm build",
-    "test": "vitest"
+    "test": "vitest",
+    "test:typechecking:manual": "tsx src/utils/typechecking/manual-test.ts"
   },
   "exports": "./dist/index.js",
   "files": ["dist", "README.md", "LICENSE", ".gitignore"],
@@ -49,6 +52,7 @@
     "evalite": "^0.9.1",
     "rimraf": "^6.0.1",
     "tsup": "^8.2.3",
+    "tsx": "^4.19.2",
     "vite": "^6.2.0",
     "vitest": "3.0.7"
   },

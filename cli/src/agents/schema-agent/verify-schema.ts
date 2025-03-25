@@ -31,20 +31,22 @@ Things you usually screw up (things to avoid):
 - IMPORTANT: \`import { sql } from "drizzle-orm"\`, not from \`drizzle-orm/sqlite-core'\`
 `;
 
+export const ScehmaVerificationSchema = z.object({
+  isValid: z.boolean().describe("Whether the schema is valid"),
+  issues: z.array(z.string()).describe("List of issues found, if any"),
+  suggestions: z.array(z.string()).describe("Suggestions for improvement"),
+  fixedSchema: z.string().describe("The fixed schema, if there were issues"),
+});
+
+export type SchemaVerificationObject = z.infer<typeof ScehmaVerificationSchema>;
+
 export async function verifyGeneratedSchema(ctx: Context, schema: string) {
   const openai = createOpenAI({ apiKey: ctx.apiKey });
   const model = traceAISDKModel(openai("o3-mini"));
 
   return generateObject({
     model,
-    schema: z.object({
-      isValid: z.boolean().describe("Whether the schema is valid"),
-      issues: z.array(z.string()).describe("List of issues found, if any"),
-      suggestions: z.array(z.string()).describe("Suggestions for improvement"),
-      fixedSchema: z
-        .string()
-        .describe("The fixed schema, if there were issues"),
-    }),
+    schema: ScehmaVerificationSchema,
     messages: [
       createUserMessage(`Verify this Drizzle ORM schema code and check for any issues or improvements:
       
