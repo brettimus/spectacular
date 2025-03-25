@@ -4,7 +4,7 @@ import path from "node:path";
 import { intro, outro, select } from "@clack/prompts";
 import pico from "picocolors";
 import { SPECTACULAR_TITLE } from "../const";
-import { getSpectacularDirPath } from "../utils/credentials";
+import { getSpectacularHomeDirPath } from "../utils/credentials";
 import { handleResult } from "../utils";
 
 export async function commandViewLogs() {
@@ -15,7 +15,7 @@ export async function commandViewLogs() {
   intro("😮 spectacular - View Logs");
 
   // Get the directory where logs are stored
-  const logDir = getSpectacularDirPath();
+  const logDir = getSpectacularHomeDirPath();
 
   // Get all log files
   const files = fs

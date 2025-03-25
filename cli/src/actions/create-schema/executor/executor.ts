@@ -1,5 +1,5 @@
 import type { Context } from "@/context";
-import { confirm } from "@clack/prompts";
+import { confirm, log } from "@clack/prompts";
 import type { SchemaGenerationStep } from "../types";
 import { analyzeTables } from "./analyze-tables";
 import { compileSchema } from "./compile-schema";
@@ -64,11 +64,14 @@ export async function executeStep(
         initialValue: false,
       });
       if (typeof confirmation !== "boolean" || !confirmation) {
+        log.warning(
+          "Skipping typescript compilation check - going to generate migration files",
+        );
         return {
           ...step,
-          step: "error",
-          status: "error",
-          message: "Compilation cancelled",
+          step: "generate_migration_files",
+          status: "completed",
+          data: step.data,
         };
       }
       return await compileSchema(ctx, step);

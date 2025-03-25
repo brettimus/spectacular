@@ -8,7 +8,7 @@ export const SPECTACULAR_PROJECT_DIR_NAME = "spectacular";
 /**
  * Path to the spectacular directory
  */
-export function getSpectacularDirPath(path: string): string {
+export function getSpectacularProjectDirPath(path: string): string {
   return join(path, SPECTACULAR_PROJECT_DIR_NAME);
 }
 
@@ -43,7 +43,7 @@ export function hasValidSpectacularConfig(path: string): {
   exists: boolean;
   version?: string;
 } {
-  const spectacularDir = getSpectacularDirPath(path);
+  const spectacularDir = getSpectacularProjectDirPath(path);
 
   if (!existsSync(spectacularDir)) {
     return { exists: false };
@@ -67,7 +67,7 @@ export function hasValidSpectacularConfig(path: string): {
  * Creates the spectacular directory if it doesn't exist
  */
 export function ensureSpectacularDir(path: string): void {
-  const spectacularDir = getSpectacularDirPath(path);
+  const spectacularDir = getSpectacularProjectDirPath(path);
   if (!existsSync(spectacularDir)) {
     mkdirSync(spectacularDir, { recursive: true });
   }
@@ -81,7 +81,7 @@ export function saveSpectacularMetadata(
   specPath: string,
   sessionId: string,
 ): void {
-  const spectacularDir = getSpectacularDirPath(path);
+  const spectacularDir = getSpectacularProjectDirPath(path);
   ensureSpectacularDir(path);
 
   const now = new Date().toISOString();
@@ -100,7 +100,7 @@ export function saveSpectacularMetadata(
  * Save debug information to the spectacular directory
  */
 export function saveSpectacularDebugInfo(path: string, context: Context): void {
-  const spectacularDir = getSpectacularDirPath(path);
+  const spectacularDir = getSpectacularProjectDirPath(path);
   ensureSpectacularDir(path);
 
   const history = {

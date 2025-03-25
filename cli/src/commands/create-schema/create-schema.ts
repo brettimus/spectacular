@@ -98,7 +98,17 @@ export async function commandCreateSchema(continuingWithContext?: Context) {
       timestamp: new Date().toISOString(),
     });
 
-    outro("Schema creation completed successfully! 🎉");
+    const shouldContinue = await confirm({
+      message: "Do you want to continue creating the api routes?",
+      initialValue: true,
+    });
+
+    handleResult(shouldContinue);
+
+    if (!shouldContinue) {
+      outro("Schema creation completed successfully! 🎉");
+      process.exit(0);
+    }
   } catch (error) {
     // Log the error
     appendToLog("commands", {
@@ -109,6 +119,7 @@ export async function commandCreateSchema(continuingWithContext?: Context) {
       timestamp: new Date().toISOString(),
     });
 
+    // TODO - Handle cancellation better
     outro(`Schema creation failed: ${(error as Error).message} 😢`);
     process.exit(1);
   }

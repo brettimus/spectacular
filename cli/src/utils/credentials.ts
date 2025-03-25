@@ -19,7 +19,7 @@ const CREDENTIALS_PATH = path.join(SPECTACULAR_HOME_DIR_PATH, CREDENTIALS_FILE);
 /**
  * Ensure the spectacular directory exists
  */
-function ensureSpectacularDir(): void {
+function ensureSpectacularHomeDir(): void {
   if (!fs.existsSync(SPECTACULAR_HOME_DIR_PATH)) {
     fs.mkdirSync(SPECTACULAR_HOME_DIR_PATH, { recursive: true });
   }
@@ -46,7 +46,7 @@ export function loadCredentials(): Credentials {
  */
 export function saveCredentials(credentials: Credentials): void {
   try {
-    ensureSpectacularDir();
+    ensureSpectacularHomeDir();
     fs.writeFileSync(
       CREDENTIALS_PATH,
       JSON.stringify(credentials, null, 2),
@@ -164,8 +164,8 @@ export function loadApiKeyToContext(ctx: Context): void {
 /**
  * Get the path to the spectacular directory
  */
-export function getSpectacularDirPath(): string {
-  ensureSpectacularDir();
+export function getSpectacularHomeDirPath(): string {
+  ensureSpectacularHomeDir();
   return SPECTACULAR_HOME_DIR_PATH;
 }
 
@@ -174,7 +174,7 @@ export function getSpectacularDirPath(): string {
  */
 export function saveDebugInfo(filename: string, data: unknown): void {
   try {
-    ensureSpectacularDir();
+    ensureSpectacularHomeDir();
     const debugPath = path.join(SPECTACULAR_HOME_DIR_PATH, filename);
     fs.writeFileSync(debugPath, JSON.stringify(data, null, 2), "utf-8");
   } catch (error) {
@@ -190,7 +190,7 @@ export function appendToLog(
   entry: string | Record<string, unknown>,
 ): void {
   try {
-    ensureSpectacularDir();
+    ensureSpectacularHomeDir();
     const logPath = path.join(SPECTACULAR_HOME_DIR_PATH, `${logname}.log`);
 
     let entryText: string;
@@ -215,7 +215,7 @@ export function appendToLog(
  */
 export function saveGlobalDebugInfo(context: Context): void {
   try {
-    ensureSpectacularDir();
+    ensureSpectacularHomeDir();
 
     const history = {
       apiKey: context.apiKey ? "REDACTED" : "MISSING!",

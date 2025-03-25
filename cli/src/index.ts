@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-import { intro, outro } from "@clack/prompts";
 import { config } from "dotenv";
-import pico from "picocolors";
 import {
   commandApiKeyAdd,
   commandApiKeyList,
@@ -9,9 +7,9 @@ import {
   commandApiKeySetDefault,
 } from "./commands/api-keys";
 import { commandCreateSchema } from "./commands/create-schema";
+import { commandCreateApi } from "./commands/create-api";
 import { commandInit } from "./commands/init";
 import { commandViewLogs } from "./commands/logs";
-import { SPECTACULAR_TITLE } from "./const";
 
 // For local development, to quickly configure env vars from a .env file
 config();
@@ -63,15 +61,4 @@ async function main() {
     console.error("Unhandled error:", err);
     process.exit(1);
   }
-}
-
-async function commandCreateApi() {
-  console.log("");
-  console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
-  console.log("");
-
-  intro("😮 spectacular - Create API");
-
-  // TODO: Implement create-api functionality
-  outro("API creation not yet implemented");
 }
