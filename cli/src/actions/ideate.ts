@@ -3,8 +3,8 @@ import {
   askFollowUpQuestion,
   generateImplementationPlan,
   routerAgent,
-} from "@/integrations/ideation-agent";
-import { createUserMessage } from "@/integrations/utils";
+} from "@/agents/ideation-agent";
+import { createUserMessage } from "@/agents/utils";
 import { handleResult } from "@/utils";
 import { stream, log, spinner, text } from "@clack/prompts";
 import { appendResponseMessages } from "ai";
