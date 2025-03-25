@@ -1,1 +1,1 @@
-export { TypeScriptValidity } from "./typescript-validity"; 
+export { TypeScriptValidity } from "./typescript-validity";

@@ -18,13 +18,15 @@ if (!fs.existsSync(CACHE_DIR)) {
 /**
  * Gets a cached TypeScript validity check result for the given code ID
  */
-export function getCachedResult(codeId: string): TypeScriptValidityResult | null {
+export function getCachedResult(
+  codeId: string,
+): TypeScriptValidityResult | null {
   const cacheFilePath = path.join(CACHE_DIR, `${codeId}.json`);
-  
+
   if (!fs.existsSync(cacheFilePath)) {
     return null;
   }
-  
+
   try {
     const cachedData = fs.readFileSync(cacheFilePath, "utf8");
     return JSON.parse(cachedData) as TypeScriptValidityResult;
@@ -39,15 +41,15 @@ export function getCachedResult(codeId: string): TypeScriptValidityResult | null
  */
 export function cacheResult(
   codeId: string,
-  result: TypeScriptValidityResult
+  result: TypeScriptValidityResult,
 ): TypeScriptValidityResult {
   const cacheFilePath = path.join(CACHE_DIR, `${codeId}.json`);
-  
+
   try {
     fs.writeFileSync(cacheFilePath, JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Error writing cache file:", error);
   }
-  
+
   return result;
-} 
+}

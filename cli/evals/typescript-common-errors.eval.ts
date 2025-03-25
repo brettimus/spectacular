@@ -11,7 +11,7 @@ const testSamples = [
 function greet(name: string) {
   return \`Hello, \${username}!\`; // Error: 'username' is not defined
 }
-`
+`,
   },
   {
     id: randomUUID(),
@@ -22,7 +22,7 @@ function add(a: number, b: number): number {
 }
 
 const result: string = add(1, 2); // Error: Type 'number' is not assignable to type 'string'
-`
+`,
   },
   {
     id: randomUUID(),
@@ -39,7 +39,7 @@ const person: Person = {
   age: 30
   // Error: Property 'email' is missing in type '{ name: string; age: number; }' but required in type 'Person'
 };
-`
+`,
   },
   {
     id: randomUUID(),
@@ -55,7 +55,7 @@ const config: Config = {
   timeout: 5000,
   retries: 3 // Error: Object literal may only specify known properties, and 'retries' does not exist in type 'Config'
 };
-`
+`,
   },
   {
     id: randomUUID(),
@@ -65,7 +65,7 @@ const arr = [1, 2, 3];
 arr.push(4); // Valid
 arr.pop(); // Valid
 arr.remove(2); // Error: Property 'remove' does not exist on type 'number[]'
-`
+`,
   },
   {
     id: randomUUID(),
@@ -76,7 +76,7 @@ function createUser(name: string, age: number, isAdmin: boolean) {
 }
 
 createUser("John"); // Error: Expected 3 arguments, but got 1
-`
+`,
   },
   {
     id: randomUUID(),
@@ -84,7 +84,7 @@ createUser("John"); // Error: Expected 3 arguments, but got 1
     code: `
 let count: number = 5;
 count = "ten"; // Error: Type 'string' is not assignable to type 'number'
-`
+`,
   },
   {
     id: randomUUID(),
@@ -93,25 +93,25 @@ count = "ten"; // Error: Type 'string' is not assignable to type 'number'
 function getLength(text: string | null): number {
   return text.length; // Error: Object is possibly 'null'
 }
-`
-  }
+`,
+  },
 ];
 
 evalite("Common TypeScript Errors Evaluation", {
   data: async () => {
-    return testSamples.map(sample => ({
+    return testSamples.map((sample) => ({
       input: {
         code: sample.code,
-        id: sample.id
+        id: sample.id,
       },
       expected: null,
       metadata: {
-        name: sample.name
-      }
+        name: sample.name,
+      },
     }));
   },
   task: async (input) => {
     return input.code;
   },
   scorers: [TypeScriptValidity],
-}); 
+});

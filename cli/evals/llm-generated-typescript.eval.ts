@@ -7,34 +7,38 @@ import { TypeScriptValidity } from "./scorers/typescript-validity";
 // Prompts for generating TypeScript code
 const prompts = [
   {
-    prompt: "Write a TypeScript function that calculates the factorial of a number.",
+    prompt:
+      "Write a TypeScript function that calculates the factorial of a number.",
   },
   {
-    prompt: "Create a TypeScript class for a Todo item with methods to mark it complete and update its description.",
+    prompt:
+      "Create a TypeScript class for a Todo item with methods to mark it complete and update its description.",
   },
   {
     prompt: "Write a TypeScript utility that formats a date in ISO format.",
   },
   {
-    prompt: "Create a TypeScript interface for API responses with generic data typing and proper error handling.",
+    prompt:
+      "Create a TypeScript interface for API responses with generic data typing and proper error handling.",
   },
   {
-    prompt: "Write a TypeScript function that validates an email address using regular expressions.",
+    prompt:
+      "Write a TypeScript function that validates an email address using regular expressions.",
   },
 ];
 
 evalite("LLM-Generated TypeScript Validity Evaluation", {
   // A function that returns an array of test data
   data: async () => {
-    return prompts.map(item => ({
+    return prompts.map((item) => ({
       input: {
         prompt: item.prompt,
-        id: randomUUID()
+        id: randomUUID(),
       },
       expected: null,
       metadata: {
-        prompt: item.prompt
-      }
+        prompt: item.prompt,
+      },
     }));
   },
   // The task to perform - generate TypeScript code with an LLM
@@ -46,20 +50,22 @@ evalite("LLM-Generated TypeScript Validity Evaluation", {
 ${input.prompt}`,
       maxTokens: 1000,
     });
-    
+
     // Extract code from the LLM response (in case there's text before/after the code)
     const responseText = String(llmResponse);
     let code = responseText;
-    
+
     // If the response includes markdown code blocks, extract the content
-    const codeBlockMatch = responseText.match(/```(?:typescript|ts)?\s*([\s\S]*?)\s*```/);
+    const codeBlockMatch = responseText.match(
+      /```(?:typescript|ts)?\s*([\s\S]*?)\s*```/,
+    );
     if (codeBlockMatch?.[1]) {
       code = codeBlockMatch[1];
     }
-    
+
     // The TypeScriptValidity scorer expects an object with 'code' and 'id' properties
     return { code, id: input.id };
   },
   // The scoring methods for the eval
   scorers: [TypeScriptValidity],
-}); 
+});

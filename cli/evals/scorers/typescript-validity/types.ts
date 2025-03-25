@@ -4,10 +4,10 @@ export interface TypeScriptValidityResult {
     valid: boolean;
     errors: Array<{
       message: string;
-      severity: 'error' | 'warning';
+      severity: "error" | "warning";
       location?: string;
     }>;
     errorCount: number;
     warningCount: number;
   };
-} 
+}

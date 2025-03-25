@@ -25,7 +25,7 @@ const user: User = {
 };
 
 console.log(greetUser(user));
-`
+`,
   },
   {
     id: randomUUID(),
@@ -48,7 +48,7 @@ const user = {
 };
 
 console.log(greetUser(user));
-`
+`,
   },
   {
     id: randomUUID(),
@@ -72,22 +72,22 @@ const user: User = {
 };
 
 console.log(greetUser(user));
-`
-  }
+`,
+  },
 ];
 
 evalite("TypeScript Validity Evaluation", {
   // A function that returns an array of test data
   data: async () => {
-    return testSamples.map(sample => ({
+    return testSamples.map((sample) => ({
       input: {
         code: sample.code,
-        id: sample.id
+        id: sample.id,
       },
       expected: null,
       metadata: {
-        name: sample.name
-      }
+        name: sample.name,
+      },
     }));
   },
   // The task to perform - in this case, we're not modifying the code
@@ -97,4 +97,4 @@ evalite("TypeScript Validity Evaluation", {
   },
   // The scoring methods for the eval
   scorers: [TypeScriptValidity],
-}); 
+});

@@ -66,7 +66,7 @@ export function UserProfile({ userId, onUserUpdate }: UserProps) {
     </div>
   );
 }
-`
+`,
   },
   {
     id: randomUUID(),
@@ -133,7 +133,7 @@ export function UserProfile({ userId, onUserUpdate }: UserProps) {
     </div>
   );
 }
-`
+`,
   },
   {
     id: randomUUID(),
@@ -177,22 +177,22 @@ async function getUserById(id: string): Promise<User> {
 getUserById('123').then(user => {
   console.log(user.username);
 });
-`
-  }
+`,
+  },
 ];
 
 evalite("Advanced TypeScript Validity Evaluation", {
   // A function that returns an array of test data
   data: async () => {
-    return testSamples.map(sample => ({
+    return testSamples.map((sample) => ({
       input: {
         code: sample.code,
-        id: sample.id
+        id: sample.id,
       },
       expected: null,
       metadata: {
-        name: sample.name
-      }
+        name: sample.name,
+      },
     }));
   },
   // The task to perform - in this case, we're not modifying the code
@@ -202,4 +202,4 @@ evalite("Advanced TypeScript Validity Evaluation", {
   },
   // The scoring methods for the eval
   scorers: [TypeScriptValidity],
-}); 
+});
