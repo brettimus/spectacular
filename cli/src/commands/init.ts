@@ -22,7 +22,7 @@ export async function commandInit() {
   console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
   console.log("");
 
-  intro("😮 spectacular");
+  intro("😮 spectacular TEST");
 
   const context = initContext();
 

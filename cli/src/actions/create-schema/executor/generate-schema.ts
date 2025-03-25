@@ -21,7 +21,7 @@ export async function generateSchema(
     step.data.finalSchema = tableSchema.object.dbSchemaTs;
 
     schemaSpinner.stop(
-      `Generated schemas for ${step.data.tableSchemas.length} tables`,
+      "Generated schemas database tables",
     );
     return {
       step: "verify_schema",
