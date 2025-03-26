@@ -128,6 +128,13 @@ ${this.getDrizzleOrmExamples()}
 
 ===
 
+There are some common mistakes you make when writing Hono apis on Cloudflare Workers.
+Avoid these mistakes:
+
+${this.getCommonHonoMistakes()}
+
+===
+
 Here is my current template file:
 
 <file language=typescript path=src/index.ts>
@@ -150,8 +157,22 @@ within the request handler functions.
 So, in "index.ts", you might see something like this:
 
 \`\`\`typescript
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateText } from "ai";
+
+type Bindings = {
+  OPENAI_API_KEY: string;
+};
+
+const app = new Hono<{ Bindings: Bindings }>();
+
 app.get("/", (c) => {
-  const DATABASE_URL = c.env.DATABASE_URL;
+  const OPENAI_API_KEY = c.env.OPENAI_API_KEY;
+  const model = createOpenAI({ apiKey: OPENAI_API_KEY });
+  const result = await generateText({
+    model,
+    prompt: "Hello, world!",
+  });
   // ...
 });
 \`\`\`
@@ -389,5 +410,41 @@ const [updatedUser] = await db.update().set({ name: "John" }).where(eq(schema.us
   }
 </drizzle-orm-example>
 `.trim();
+  }
+
+  private getCommonHonoMistakes(): string {
+    return `
+<hono-mistake description="Using process.env to access environment variables">
+import { Hono } from "hono";
+
+const app = new Hono<{ Bindings: { OPENAI_API_KEY: string } }>();
+
+app.get("/", (c) => {
+  // BAD: Using process.env to access environment variables
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+  // GOOD: Accessing environment variables from the context parameter
+  const OPENAI_API_KEY = c.env.OPENAI_API_KEY;
+});
+</hono-mistake>
+
+<hono-mistake description="accessing request headers">
+import { Hono } from "hono";
+
+const app = new Hono<{ Bindings: { MY_ENV_VAR: string } }>();
+
+app.get("/", (c) => {
+  // BAD: Accessing request headers on the \`c.req.headers\` object (does not exist)
+  const headers = c.req.headers("x-api-key");
+
+  // GOOD: Accessing request headers from the \`c.req.header\` object
+  const headers = c.req.header("x-api-key");
+});
+</hono-mistake>
+
+<hono-mistake description="accessing request body">
+
+</hono-mistake>
+    `.trim();
   }
 }

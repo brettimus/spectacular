@@ -1,5 +1,5 @@
 import type { Context } from "@/context";
-import { confirm, log } from "@clack/prompts";
+// import { confirm, log } from "@clack/prompts";
 import { logActionExecution } from "../../../utils/logging";
 import type { SchemaGenerationStep } from "../types";
 import { analyzeTables } from "./analyze-tables";
@@ -69,28 +69,32 @@ export async function executeStep(
 
     // Compile the schema file with tsc
     case "compile_schema": {
-      const confirmation = await confirm({
-        message:
-          "Are you sure you want to compile the schema? This part is broken right now",
-        initialValue: false,
-      });
-      if (typeof confirmation !== "boolean" || !confirmation) {
-        log.warning(
-          "Skipping typescript compilation and database migration file checks",
-        );
-        result = {
-          ...step,
-          // step: "generate_migration_files",
-          step: "completed",
-          status: "completed",
-          data: step.data,
-        };
-      } else {
-        result = await compileSchema(ctx, step);
-      }
+      result = await compileSchema(ctx, step);
+      // NOTE - Commented this out because I fixed some of the wonkiness with the compilation
+      //
+      // const confirmation = await confirm({
+      //   message:
+      //     "Are you sure you want to compile the schema? This part is broken right now",
+      //   initialValue: false,
+      // });
+      // if (typeof confirmation !== "boolean" || !confirmation) {
+      //   log.warning(
+      //     "Skipping typescript compilation and database migration file checks",
+      //   );
+      //   result = {
+      //     ...step,
+      //     // step: "generate_migration_files",
+      //     step: "completed",
+      //     status: "completed",
+      //     data: step.data,
+      //   };
+      // } else {
+      //   result = await compileSchema(ctx, step);
+      // }
       break;
     }
 
+    // NOTE IN USE AS OF WRITING - but you should double check
     // Run the db:generate command to create the migration files
     case "generate_migration_files": {
       result = await generateMigrationFiles(ctx, step);

@@ -2,17 +2,15 @@
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { actionDependencies } from "@/actions/dependencies";
-import { isError } from "@/types";
-import { handleCancel, handleError } from "@/utils";
 import { handleResult } from "@/utils/result";
-import { confirm, intro, isCancel, outro } from "@clack/prompts";
+import { confirm, intro, outro } from "@clack/prompts";
 import pico from "picocolors";
-import { actionCreateSchema } from "../../actions/create-schema";
-import { actionDownloadTemplate } from "../../actions/download-template";
-import { SPECTACULAR_TITLE } from "../../const";
-import { type Context, initContext } from "../../context";
-import { promptOpenAiKey } from "../../openai-api-key";
-import { appendToLog, saveGlobalDebugInfo } from "../../utils/credentials";
+import { actionCreateSchema } from "@/actions/create-schema";
+import { actionDownloadTemplate } from "@/actions/download-template";
+import { SPECTACULAR_TITLE } from "@/const";
+import { type Context, initContext } from "@/context";
+import { promptOpenAiKey } from "@/openai-api-key";
+import { appendToLog, saveGlobalDebugInfo } from "@/utils/credentials";
 import { commandCreateApi } from "../create-api";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -53,36 +51,12 @@ export async function commandCreateSchema(continuingWithContext?: Context) {
       throw new Error("OPENAI_API_KEY is not set");
     }
 
-    const shouldDownloadTemplate = await confirm({
-      message:
-        "Do you want to download a HONC template? (will overwrite existing template files)",
-      initialValue: true,
-    });
-
-    handleResult(shouldDownloadTemplate);
-
-    if (typeof shouldDownloadTemplate === "boolean" && shouldDownloadTemplate) {
-      // First, ensure we have a template downloaded
-      const downloadTemplateResult = await actionDownloadTemplate(ctx);
-
-      if (isCancel(downloadTemplateResult)) {
-        handleCancel();
-      }
-
-      if (isError(downloadTemplateResult)) {
-        handleError(downloadTemplateResult);
-      }
-    }
+    // First, ensure we have a template downloaded
+    const downloadTemplateResult = await actionDownloadTemplate(ctx);
+    handleResult(downloadTemplateResult);
 
     const dependenciesResult = await actionDependencies(ctx);
-
-    if (isCancel(dependenciesResult)) {
-      handleCancel();
-    }
-
-    if (isError(dependenciesResult)) {
-      handleError(dependenciesResult);
-    }
+    handleResult(dependenciesResult);
 
     // Then generate the schema
     ctx.rulesDir = rulesDir;

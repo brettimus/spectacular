@@ -11,7 +11,7 @@ export async function actionDownloadTemplate(ctx: Context) {
   const templateUrl = "github:brettimus/mega-honc";
 
   try {
-    console.log("Downloading template...", ctx.cwd);
+    log.step(`Downloading template into ${ctx.cwd}`);
 
     await downloadTemplate(templateUrl, {
       cwd: ctx.cwd,

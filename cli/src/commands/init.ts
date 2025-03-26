@@ -80,7 +80,7 @@ export async function commandInit() {
   saveGlobalDebugInfo(context);
 
   const shouldDoCodeGen = await confirm({
-    message: "Do you want to generate code?",
+    message: `Do you want to generate code?\n(will overwrite existing typescript files in ${context.projectPath})`,
     initialValue: true,
     active: "Yes",
   });
