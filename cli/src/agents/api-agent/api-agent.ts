@@ -409,6 +409,14 @@ const [updatedUser] = await db.update().set({ name: "John" }).where(eq(schema.us
   }, 500);
   }
 </drizzle-orm-example>
+<drizzle-orm-example description="access a json column">
+// ...
+// if a column has { mode: "json" } in the schema, you can access it like this:
+const user = await db.select().from(schema.users).where(eq(schema.users.id, id));
+const userJson = user[0]?.jsonColumn;
+// ...
+// and the json should already be parsed - you don't need to parse it again
+</drizzle-orm-example>
 `.trim();
   }
 

@@ -268,6 +268,9 @@ export const users = sqliteTable("users", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   email: text("email"),
+  // This is how you define a json column
+  metadata: text("metadata", { mode: "json" }),
+  // This is how you define timestamp columns
   createdAt: text("created_at").notNull().default(sql\`(CURRENT_TIMESTAMP)\`),
   updatedAt: text("updated_at").notNull().default(sql\`(CURRENT_TIMESTAMP)\`),
 }, (table) => [
