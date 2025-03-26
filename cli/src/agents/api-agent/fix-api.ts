@@ -19,8 +19,6 @@ export async function fixApiErrors(
   const model = traceAISDKModel(openai("gpt-4o"));
 
   try {
-    console.log("Generating fixed API code using OpenAI...");
-
     const systemPrompt = `
 You are a world class software engineer, and an expert in Hono.js and Drizzle ORM for Cloudflare Workers.
 

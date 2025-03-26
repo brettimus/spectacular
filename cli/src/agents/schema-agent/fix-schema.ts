@@ -18,8 +18,6 @@ export async function fixSchemaErrors(
   const model = traceAISDKModel(openai("gpt-4o"));
 
   try {
-    console.log("Generating fixed schema using OpenAI...");
-
     const result = await generateText({
       model,
       system: `
