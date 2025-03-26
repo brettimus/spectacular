@@ -52,7 +52,7 @@ ${fixContent}
 
 Based on this analysis, generate a corrected schema.ts file that fixes all the issues identified.
 
-Return only the fixed schema code and a brief explanation of the changes you made.
+Return only the fixed schema code. It should be valid TypeScript code. DO NOT INCLUDE A CHAT MESSAGE WITH THE FIXED CODE IN MARKDOWN!
 `,
         },
       ],

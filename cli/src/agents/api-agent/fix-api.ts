@@ -48,7 +48,7 @@ ${fixContent}
 
 Based on this analysis, generate a corrected index.ts file that fixes all the issues identified.
 
-Return only the fixed code and a brief explanation of the changes you made.
+Return only the fixed code. It should be valid TypeScript code. DO NOT INCLUDE A CHAT MESSAGE WITH THE FIXED CODE IN MARKDOWN!
 `;
 
     const input = {
