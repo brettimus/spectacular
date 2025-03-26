@@ -4,3 +4,4 @@ packages:
   - "eval-repos/*"
   - "eval-repos/run-*/*"
   - "posthonc"
+  - "autogander"

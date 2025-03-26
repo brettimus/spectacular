@@ -4,7 +4,11 @@ const isDev = process.env.npm_lifecycle_event === "dev";
 
 export default defineConfig({
   clean: true,
-  entry: ["src/index.ts"],
+  entry: [
+    "src/index.ts", 
+    "src/machines/index.ts",
+    "src/machines/commands/cli-entry.ts"
+  ],
   format: ["esm"],
   minify: false,
   target: "esnext",

@@ -12,6 +12,11 @@
     "dev:apikey:add": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js apikey:add'",
     "dev:apikey:list": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js apikey:list'",
     "dev:apikey:remove": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js apikey:remove'",
+    "dev:machines:eval-spec": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node -e \"import { commandEvalSpecGeneration } from \\\"./dist/machines/index.js\\\"; commandEvalSpecGeneration();\"'",
+    "dev:machines:eval-schema": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node -e \"import { commandEvalSchemaGeneration } from \\\"./dist/machines/index.js\\\"; commandEvalSchemaGeneration(\\\"$SPEC_PATH\\\");\"'",
+    "dev:machines:eval-full": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node -e \"import { commandEvalFullWorkflow } from \\\"./dist/machines/index.js\\\"; commandEvalFullWorkflow();\"'",
+    "dev:machines:create-schema": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node -e \"import { commandCreateSchemaMachine } from \\\"./dist/machines/index.js\\\"; commandCreateSchemaMachine(\\\"$SPEC_PATH\\\");\"'",
+    "dev:machines:cli": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/machines/commands/cli-entry.js'",
     "eval:dev": "evalite watch",
     "eval:db:schema": "evalite evals/database-schema/database-schema.eval.ts",
     "eval:db:schema:watch": "evalite watch evals/database-schema/database-schema.eval.ts",
@@ -26,9 +31,15 @@
     "test:typechecking:manual": "tsx src/utils/typechecking/manual-test.ts"
   },
   "exports": "./dist/index.js",
-  "files": ["dist", "README.md", "LICENSE", ".gitignore"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    ".gitignore"
+  ],
   "bin": {
-    "spectacular": "dist/index.js"
+    "spectacular": "dist/index.js",
+    "spectacular-machine": "dist/machines/commands/cli-entry.js"
   },
   "author": "Fiberplane<info@fiberplane.com>",
   "license": "MIT",
@@ -41,14 +52,17 @@
     "@clack/core": "^0.3.4",
     "@clack/prompts": "^0.10.0",
     "ai": "^4.2.6",
+    "commander": "^11.1.0",
     "dotenv": "^16.4.5",
     "giget": "^1.2.3",
     "open": "^10.1.0",
     "oslo": "^1.2.1",
     "picocolors": "^1.0.1",
+    "xstate": "^5.19.2",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/commander": "^2.12.5",
     "@types/node": "^22.2.0",
     "autoevals": "^0.0.124",
     "evalite": "^0.9.1",

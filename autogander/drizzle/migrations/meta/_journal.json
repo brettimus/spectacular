@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1743024916216,
+      "tag": "0000_curious_blue_marvel",
+      "breakpoints": true
+    }
+  ]
+}
