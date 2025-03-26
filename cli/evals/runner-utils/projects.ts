@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { downloadTemplate } from "giget";
-import type { SpectacularSpecFile } from "../utils";
+import type { SpectacularSchemaFile, SpectacularSpecFile } from "../utils";
 
 const BASE_TEMPLATE_URL = "github:brettimus/mega-honc";
 const BASE_TEMPLATE_DIR = "_base-template";
@@ -13,6 +13,15 @@ export function getProjectNameFromSpecFile(
   return path.basename(
     specFileDetails.fileName,
     path.extname(specFileDetails.fileName),
+  );
+}
+
+export function getProjectNameFromSchemaFile(
+  schemaFileDetails: SpectacularSchemaFile,
+) {
+  return path.basename(
+    schemaFileDetails.fileName,
+    path.extname(schemaFileDetails.fileName),
   );
 }
 

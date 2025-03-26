@@ -1,4 +1,4 @@
-import type { Context } from "@/context";
+import { initContext, type Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
@@ -47,6 +47,16 @@ export default app;
 `;
 
 export class ApiAgentService implements ApiAgentInterface {
+  async generateApiRoutesFromSpecAndSchema(spec: string, schema: string) {
+    const context = initContext();
+    context.specContent = spec;
+    // context.schemaFile = schema;
+    const result = await this.generateApiWithReasoning(context, {
+      schema: schema,
+    });
+    return result;
+  }
+
   async generateApiRoutes(
     context: Context,
     options: ApiGenerationOptions,
@@ -172,7 +182,7 @@ Things you usually screw up (things to avoid):
           .describe("The generated api routes file, in typescript"),
       }),
       prompt: PROMPT,
-      temperature: 0.25,
+      temperature: 0.2,
     });
 
     return {

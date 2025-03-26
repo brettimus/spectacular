@@ -2,7 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import { createScorer } from "evalite";
 import { validateTypeScript } from "../../../src/utils/typechecking";
-import type { DatabaseSchemaEvalInput } from "../../database-schema";
 import {
   createNewProject,
   getProjectLogger,
@@ -10,12 +9,13 @@ import {
 } from "../../runner-utils";
 import type { EvalLogger } from "../../runner-utils";
 import type { TypeScriptValidityResult } from "./types";
+import type { ApiRoutesEvalInput } from "../../api-routes";
 
 /**
  * TypeScript Validity scorer that uses the TypeScript compiler to check for errors.
  */
-export const SchemaTypeScriptValidity = createScorer<
-  DatabaseSchemaEvalInput,
+export const ApiTypeScriptValidity = createScorer<
+  ApiRoutesEvalInput,
   { code: string }
 >({
   name: "TypeScript Validity",
@@ -32,11 +32,12 @@ export const SchemaTypeScriptValidity = createScorer<
     const logger = getProjectLogger(
       projectDir,
       runId,
-      "db-schema-typescript-validity",
+      "api-typescript-validity",
     );
 
     const result = await typecheckCode({
-      code: output.code,
+      schemaTs: input.schemaFileDetails.schema,
+      indexTs: output.code,
       projectDir,
       logger,
     });
@@ -49,48 +50,56 @@ export const SchemaTypeScriptValidity = createScorer<
  * Validates TypeScript code by writing it to a file in the project directory and running the TypeScript compiler.
  */
 const typecheckCode = async (opts: {
-  code: string;
+  schemaTs: string;
+  indexTs: string;
   projectDir: string;
   logger: EvalLogger;
 }): Promise<TypeScriptValidityResult> => {
-  const { code, projectDir, logger } = opts;
+  const { schemaTs, indexTs, projectDir, logger } = opts;
 
   if (!fs.existsSync(projectDir)) {
     throw new Error("Directory to store project does not exist");
   }
 
   const dbSchemaFilePath = path.join(projectDir, "src", "db", "schema.ts");
+  const indexTsFilePath = path.join(projectDir, "src", "index.ts");
 
   try {
     console.log(
-      "[SchemaTypeScriptValidity] Writing code to db/schema.ts",
-      code.slice(0, 100),
+      "[ApiTypeScriptValidity] Writing code to db/schema.ts",
+      schemaTs.slice(0, 100),
       "...",
     );
     // Write the code to the `db/schema.ts` file
-    fs.writeFileSync(dbSchemaFilePath, code);
+    fs.writeFileSync(dbSchemaFilePath, schemaTs);
+
+    console.log(
+      "[ApiTypeScriptValidity] Writing code to index.ts",
+      indexTs.slice(0, 100),
+      "...",
+    );
+    // Write the code to the `index.ts` file
+    fs.writeFileSync(indexTsFilePath, indexTs);
 
     const validationResult = await validateTypeScript(projectDir);
 
-    console.log(
-      "[SchemaTypeScriptValidity] validationResult",
-      validationResult,
-    );
+    console.log("[ApiTypeScriptValidity] validationResult", validationResult);
 
-    const schemaErrors = validationResult.filter((e) =>
-      e.location?.includes("schema.ts"),
+    const apiErrors = validationResult.filter(
+      (e) =>
+        e.location?.includes("schema.ts") || e.location?.includes("index.ts"),
     );
 
     // Log the validation errors
-    if (schemaErrors.length > 0) {
+    if (apiErrors.length > 0) {
       logger.logError({
-        context: "schema_validation",
-        errors: schemaErrors,
+        context: "api_validation",
+        errors: apiErrors,
       });
     }
 
     // If there's no stderr, the code is valid
-    if (!schemaErrors.length) {
+    if (!apiErrors.length) {
       logger.logInfo({
         message: "TypeScript validation passed with no errors",
       });
@@ -107,10 +116,8 @@ const typecheckCode = async (opts: {
 
     // Parse the TypeScript compiler errors
     // const errors = parseTypeScriptErrors(stderr);
-    const errorCount = schemaErrors.filter(
-      (e) => e.severity === "error",
-    ).length;
-    const warningCount = schemaErrors.filter(
+    const errorCount = apiErrors.filter((e) => e.severity === "error").length;
+    const warningCount = apiErrors.filter(
       (e) => e.severity === "warning",
     ).length;
 
@@ -121,7 +128,7 @@ const typecheckCode = async (opts: {
       score,
       metadata: {
         valid: errorCount === 0,
-        errors: schemaErrors,
+        errors: apiErrors,
         errorCount,
         warningCount,
       },
@@ -129,7 +136,7 @@ const typecheckCode = async (opts: {
   } catch (error) {
     // Log and handle execution errors
     logger.logError({
-      context: "schema_validation_error",
+      context: "api_validation_error",
       message: `Failed to validate TypeScript: ${error instanceof Error ? error.message : String(error)}`,
       error,
     });

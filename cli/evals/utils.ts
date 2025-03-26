@@ -8,6 +8,7 @@ const __dirname = dirname(__filename);
 const DATA_DIR = path.join(__dirname, "data");
 const CONVERSATIONS_DIR = path.join(DATA_DIR, "spectacular-conversations");
 const SPECS_DIR = path.join(DATA_DIR, "spectacular-specs");
+const SCHEMAS_DIR = path.join(DATA_DIR, "spectacular-schemas");
 
 export function getConversationTestDataFile<T>(
   fileName: string,
@@ -47,4 +48,30 @@ export function getAllSpectacularSpecFiles(): SpectacularSpecFile[] {
         fullPath: path.join(SPECS_DIR, file),
       }))
   );
+}
+
+export type SpectacularSchemaFile = {
+  fileName: string;
+  schema: string;
+  fullPath: string;
+};
+
+export function getAllSpectacularSchemaFiles(): SpectacularSchemaFile[] {
+  return (
+    fs
+      .readdirSync(SCHEMAS_DIR)
+      // Only include files that are files (not directories)
+      .filter((file) => fs.statSync(path.join(SCHEMAS_DIR, file)).isFile())
+      // Ignore files that start with an underscore
+      .filter((file) => !file.startsWith("_"))
+      .map((file) => ({
+        fileName: file,
+        schema: getSpectacularSchemaFile(file),
+        fullPath: path.join(SCHEMAS_DIR, file),
+      }))
+  );
+}
+
+function getSpectacularSchemaFile(fileName: string): string {
+  return fs.readFileSync(path.join(SCHEMAS_DIR, fileName), "utf8").toString();
 }
