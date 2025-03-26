@@ -7,6 +7,7 @@ import { saveApiCode } from "./save-api-code";
 import { validateTypeScript } from "@/utils/typechecking";
 import type { ErrorInfo } from "@/utils/typechecking/types";
 import { initCommandLogSession, logActionExecution } from "../../utils/logging";
+import { removeCwd } from "@/utils";
 
 export async function actionCreateApi(context: Context): Promise<void> {
   // Initialize log session for this command
@@ -25,7 +26,8 @@ export async function actionCreateApi(context: Context): Promise<void> {
 
   s.stop("Loaded existing schema");
 
-  note(`Found schema at ${pico.cyan(schemaPath)}
+  const relativeSchemaPath = removeCwd(context, schemaPath);
+  note(`Found schema at ${pico.cyan(relativeSchemaPath)}
 The agent will use this schema to generate API endpoints.`);
 
   const apiAgent = new ApiAgentService();

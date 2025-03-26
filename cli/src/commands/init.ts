@@ -12,7 +12,7 @@ import { SPECTACULAR_TITLE } from "../const";
 import { initContext } from "../context";
 import { promptDescription } from "../description";
 import { promptOpenAiKey } from "../openai-api-key";
-import { handleResult } from "../utils";
+import { handleResult, removeCwd } from "../utils";
 import { saveGlobalDebugInfo } from "../utils/credentials";
 import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
 import { commandCreateSchema } from "./create-schema";
@@ -79,8 +79,9 @@ export async function commandInit() {
   // Also save to the global debug directory
   saveGlobalDebugInfo(context);
 
+  const relativeProjectPath = removeCwd(context, context.projectPath ?? "");
   const shouldDoCodeGen = await confirm({
-    message: `Do you want to generate code?\n(will overwrite existing typescript files in ${context.projectPath})`,
+    message: `Do you want to generate code? (may overwrite files in ${relativeProjectPath})`,
     initialValue: true,
     active: "Yes",
   });
