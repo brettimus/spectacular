@@ -2,7 +2,7 @@ import path from "node:path";
 import { evalite } from "evalite";
 import { ApiAgentService } from "../../src/agents/api-agent";
 import { getEvalRunProjectDir, getProjectLogger } from "../runner-utils";
-import { SchemaTypeScriptValidity } from "../scorers/typescript-validity";
+import { ApiTypeScriptValidity } from "../scorers/typescript-validity";
 import {
   getAllSpectacularSchemaFiles,
   getAllSpectacularSpecFiles,
@@ -87,5 +87,5 @@ evalite("LLM-Generated TypeScript Validity Evaluation", {
     return output;
   },
   // The scoring methods for the eval
-  scorers: [SchemaTypeScriptValidity],
+  scorers: [ApiTypeScriptValidity],
 });
