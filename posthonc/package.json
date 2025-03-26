@@ -1,0 +1,22 @@
+{
+  "name": "posthonc",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ai-sdk/openai": "^1.1.15",
+    "ai": "^4.1.53"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7",
+    "tsx": "^4.19.2"
+  }
+}
