@@ -46,6 +46,8 @@ export async function executeStep(
       return await generateSchema(ctx, step);
     }
 
+    // NOT IN USE!!! - This was kind of overkill
+    //
     // Verify the generated schema
     case "verify_schema": {
       return await verifySchema(ctx, step);

@@ -1,116 +1,123 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fixSchemaErrors } from "@/agents/schema-agent";
+// import fs from "node:fs";
+// import path from "node:path";
+// import { fixSchemaErrors } from "@/agents/schema-agent";
 import type { Context } from "@/context";
-import { handleError, runShell } from "@/utils";
-import { spinner } from "@clack/prompts";
+// import { handleError, runShell } from "@/utils";
+// import { spinner } from "@clack/prompts";
 import type { SchemaGenerationStep } from "../types";
 
 export async function generateMigrationFiles(
-  ctx: Context,
+  _ctx: Context,
   step: SchemaGenerationStep,
 ): Promise<SchemaGenerationStep> {
-  const dbGenSpinner = spinner();
-  try {
-    dbGenSpinner.start("Running db:generate...");
+  return {
+    step: "generate_migration_files",
+    status: "error",
+    message: "Not implemented",
+    data: step.data,
+  };
 
-    try {
-      const dbTouchResult = await runShell(ctx.cwd, [
-        `${ctx.packageManager} run db:touch`,
-      ]);
+  // const dbGenSpinner = spinner();
+  // try {
+  //   dbGenSpinner.start("Running db:generate...");
 
-      // NOTE - This is kind of fatal?
-      if (dbTouchResult.exitCode !== 0) {
-        throw new Error(`db:touch failed: ${dbTouchResult.stderr}`);
-      }
+  //   try {
+  //     const dbTouchResult = await runShell(ctx.cwd, [
+  //       `${ctx.packageManager} run db:touch`,
+  //     ]);
 
-      const result = await runShell(ctx.cwd, [
-        `${ctx.packageManager} run db:generate`,
-      ]);
+  //     // NOTE - This is kind of fatal?
+  //     if (dbTouchResult.exitCode !== 0) {
+  //       throw new Error(`db:touch failed: ${dbTouchResult.stderr}`);
+  //     }
 
-      if (result.exitCode === 0) {
-        dbGenSpinner.stop("Migration file generation completed successfully");
-        return {
-          step: "completed",
-          status: "completed",
-          data: step.data,
-        };
-      }
+  //     const result = await runShell(ctx.cwd, [
+  //       `${ctx.packageManager} run db:generate`,
+  //     ]);
 
-      throw new Error(`Migration file generation failed: ${result.stderr}`);
-    } catch (dbGenError) {
-      dbGenSpinner.stop(
-        "Migration file generation failed, attempting to fix...",
-      );
+  //     if (result.exitCode === 0) {
+  //       dbGenSpinner.stop("Migration file generation completed successfully");
+  //       return {
+  //         step: "completed",
+  //         status: "completed",
+  //         data: step.data,
+  //       };
+  //     }
 
-      // Extract detailed error information
-      const errorObj = dbGenError as Error | { stderr: string; stdout: string };
-      const errorOutput =
-        "stderr" in errorObj
-          ? `${errorObj.stderr}\n${errorObj.stdout || ""}`
-          : errorObj.message;
+  //     throw new Error(`Migration file generation failed: ${result.stderr}`);
+  //   } catch (dbGenError) {
+  //     dbGenSpinner.stop(
+  //       "Migration file generation failed, attempting to fix...",
+  //     );
 
-      const fixSpinner = spinner();
-      fixSpinner.start("Fixing migration file generation errors...");
+  //     // Extract detailed error information
+  //     const errorObj = dbGenError as Error | { stderr: string; stdout: string };
+  //     const errorOutput =
+  //       "stderr" in errorObj
+  //         ? `${errorObj.stderr}\n${errorObj.stdout || ""}`
+  //         : errorObj.message;
 
-      const fixedSchema = await fixSchemaErrors(
-        ctx,
-        step.data.finalSchema,
-        errorOutput,
-      );
-      step.data.finalSchema = fixedSchema.object.fixedSchema;
+  //     const fixSpinner = spinner();
+  //     fixSpinner.start("Fixing migration file generation errors...");
 
-      // Save the fixed schema
-      const schemaPath = path.join(ctx.cwd, "src", "db", "schema.ts");
-      fs.writeFileSync(schemaPath, step.data.finalSchema);
+  //     const fixedSchema = await fixSchemaErrors(
+  //       ctx,
+  //       step.data.finalSchema,
+  //       errorOutput,
+  //     );
+  //     step.data.finalSchema = fixedSchema.object.fixedSchema;
 
-      fixSpinner.stop(
-        `Migration file generation fixed: ${fixedSchema.object.explanation}`,
-      );
+  //     // Save the fixed schema
+  //     const schemaPath = path.join(ctx.cwd, "src", "db", "schema.ts");
+  //     fs.writeFileSync(schemaPath, step.data.finalSchema);
 
-      // Try generating again
-      try {
-        const retryResult = await runShell(ctx.cwd, [
-          `${ctx.packageManager} run db:generate`,
-        ]);
+  //     fixSpinner.stop(
+  //       `Migration file generation fixed: ${fixedSchema.object.explanation}`,
+  //     );
 
-        if (retryResult.exitCode === 0) {
-          return {
-            step: "completed",
-            status: "completed",
-            data: step.data,
-          };
-        }
+  //     // Try generating again
+  //     try {
+  //       const retryResult = await runShell(ctx.cwd, [
+  //         `${ctx.packageManager} run db:generate`,
+  //       ]);
 
-        throw new Error(
-          `Migration file generation still failing: ${retryResult.stderr}`,
-        );
-      } catch (retryError) {
-        // Extract detailed error information
-        const retryErrorObj = retryError as
-          | Error
-          | { stderr: string; stdout: string };
-        const retryErrorOutput =
-          "stderr" in retryErrorObj
-            ? `${retryErrorObj.stderr}\n${retryErrorObj.stdout || ""}`
-            : retryErrorObj.message;
+  //       if (retryResult.exitCode === 0) {
+  //         return {
+  //           step: "completed",
+  //           status: "completed",
+  //           data: step.data,
+  //         };
+  //       }
 
-        return {
-          step: "generate_migration_files",
-          status: "error",
-          message: `Migration file generation still failing: ${retryErrorOutput}`,
-          data: step.data,
-        };
-      }
-    }
-  } catch (error) {
-    dbGenSpinner.stop("Error during migration file generation");
-    handleError(error as Error);
-    return {
-      step: "generate_migration_files",
-      status: "error",
-      message: `Error during migration file generation: ${(error as Error).message}`,
-      data: step.data,
-    };
-  }
+  //       throw new Error(
+  //         `Migration file generation still failing: ${retryResult.stderr}`,
+  //       );
+  //     } catch (retryError) {
+  //       // Extract detailed error information
+  //       const retryErrorObj = retryError as
+  //         | Error
+  //         | { stderr: string; stdout: string };
+  //       const retryErrorOutput =
+  //         "stderr" in retryErrorObj
+  //           ? `${retryErrorObj.stderr}\n${retryErrorObj.stdout || ""}`
+  //           : retryErrorObj.message;
+
+  //       return {
+  //         step: "generate_migration_files",
+  //         status: "error",
+  //         message: `Migration file generation still failing: ${retryErrorOutput}`,
+  //         data: step.data,
+  //       };
+  //     }
+  //   }
+  // } catch (error) {
+  //   dbGenSpinner.stop("Error during migration file generation");
+  //   handleError(error as Error);
+  //   return {
+  //     step: "generate_migration_files",
+  //     status: "error",
+  //     message: `Error during migration file generation: ${(error as Error).message}`,
+  //     data: step.data,
+  //   };
+  // }
 }

@@ -10,9 +10,9 @@ import type { SchemaGenerationStep } from "./types";
 // 1. Read the spec file (spectacular/metadata.json->specPath)
 // 2. Determine database tables from the spec (LLM call)
 // 3. Generate a schema file (LLM call)
-// 4. Verify the generated schema with a thinking model (LLM call)
-// 5. Save the schema to `db/schema.ts`
-// 6. Compile the schema with tsc
+// 4. Save the schema to `db/schema.ts`
+// 5. Compile the schema with tsc
+// 6. - If errors, fix the schema with web search
 // 7. Run `db:generate`
 // 8. Save the schema to `db/schema.ts`
 
@@ -56,7 +56,7 @@ export async function actionCreateSchema(ctx: Context) {
   // Track current state for our state machine
   let currentStep = initialState;
   let stepCount = 0;
-  const MAX_STEPS = 20; // Prevent infinite loops
+  const MAX_STEPS = 12; // Prevent infinite loops
 
   // Start processing steps
   while (

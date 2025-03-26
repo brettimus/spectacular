@@ -7,6 +7,8 @@ import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
 import { createUserMessage } from "../utils";
 
+// NOTE - THERE ARE NO RULES FOR NOW - This is mean to be a stopgap for a knowledge base
+
 const RULES_SYSTEM_PROMPT = `
 You are an expert in database schema design specializing in selecting the appropriate database rules.
 Your task is to analyze a list of database tables and operations and determine which rules should be applied.
@@ -33,6 +35,7 @@ export async function identifyRelevantRules(
     if (fs.existsSync(rulesDir)) {
       rules = fs
         .readdirSync(rulesDir)
+        .filter((file) => !file.startsWith("_"))
         .filter((file) => file.endsWith(".ts") || file.endsWith(".js"))
         .map((file) => file.replace(/\.(ts|js)$/, ""));
     }
@@ -45,6 +48,15 @@ export async function identifyRelevantRules(
   console.log(
     `Found ${rules.length} rules in ${rulesDir}: ${rulePaths.length > 0 ? rulePaths.join(", ") : "none"}`,
   );
+
+  if (rulePaths.length === 0) {
+    return {
+      object: {
+        reasoning: "No rules found",
+        selectedRules: [],
+      },
+    };
+  }
 
   return generateObject({
     model,

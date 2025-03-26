@@ -3,57 +3,72 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
-import { createUserMessage } from "../utils";
-import { SCHEMA_SYSTEM_PROMPT } from "./analyze-tables";
 
-export async function fixSchemaErrors(
-  ctx: Context,
-  schema: string,
-  errorMessage: string,
-) {
+/**
+ * Generate a fixed schema based on the analysis results
+ */
+export async function fixSchemaErrors(ctx: Context, fixContent: string) {
   const openai = createOpenAI({ apiKey: ctx.apiKey });
   const model = traceAISDKModel(openai("gpt-4o"));
 
-  return generateObject({
-    model,
-    schema: z.object({
-      fixedSchema: z.string().describe("The fixed schema code"),
-      explanation: z.string().describe("Explanation of the fixes made"),
-    }),
-    messages: [
-      createUserMessage(`Fix the errors in this Drizzle ORM schema:
-      
-\`\`\`typescript
-${schema}
-\`\`\`
+  try {
+    console.log("Generating fixed schema using OpenAI...");
 
-Error output:
-${errorMessage}
+    const result = await generateObject({
+      model,
+      schema: z.object({
+        explanation: z
+          .string()
+          .describe(
+            "Explanation of the schema design decisions and fixes applied",
+          ),
+        code: z
+          .string()
+          .describe("The fixed Drizzle typescript schema definition"),
+      }),
+      system: `
+You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.
 
-Please carefully analyze the error output and fix all issues in the schema.
-Return the entire fixed schema, not just the changed parts.`),
-    ],
-    system: `
-${SCHEMA_SYSTEM_PROMPT}
+Here are some key things to remember when writing Drizzle ORM schemas:
+- \`.primaryKey().autoIncrement()\` is NOT VALID for D1
+  BETTER: use \`.primaryKey({ autoIncrement: true })\` instead
+- Make sure all dependencies are properly imported
+- IMPORTANT: \`import { sql } from "drizzle-orm"\`, not from \`drizzle-orm/sqlite-core\`
+- Relations must be properly defined using the relations helper from drizzle-orm
+- For SQLite tables, use \`sqliteTable\` from \`drizzle-orm/sqlite-core\`
+- For indexes, use \`index\` and \`uniqueIndex\` from \`drizzle-orm/sqlite-core\`
 
-You are now specifically tasked with fixing errors in a Drizzle ORM schema.
-Analyze compiler errors and runtime errors carefully to understand the root cause.
-
-Common error types you might encounter:
-1. Type errors - Mismatches between expected and provided types
-2. Missing imports - Required functions or types not imported
-3. Syntax errors - Incorrect Drizzle ORM syntax or TypeScript syntax
-4. Reference errors - Attempting to use variables that don't exist
-5. Runtime errors - Problems that occur when the schema is used at runtime
-
-When fixing errors:
-- Understand the complete context before making changes
-- Ensure all imports are correct and complete
-- Check for typos in field and table names
-- Verify that all referenced variables are defined
-- Make sure relationship references are correctly defined
-- Add any missing schema components
+When defining relations:
+- Use \`one\` for one-to-one or many-to-one relations
+- Use \`many\` for one-to-many or many-to-many relations
+- Always specify \`fields\` (the foreign key fields in the current table)
+- Always specify \`references\` (the primary key fields in the referenced table)
 `,
-    temperature: 0.1,
-  });
+      messages: [
+        {
+          role: "user",
+          content: `
+I need you to generate a fixed version of a Drizzle ORM schema.ts file. The original schema had TypeScript errors that were analyzed, and I'm providing you with the analysis results.
+
+Here's the analysis of the schema errors:
+
+${fixContent}
+
+Based on this analysis, generate a corrected schema.ts file that fixes all the issues identified.
+
+Return only the fixed schema code and a brief explanation of the changes you made.
+`,
+        },
+      ],
+      temperature: 0.2,
+    });
+
+    return {
+      code: result.object.code,
+      explanation: result.object.explanation,
+    };
+  } catch (error) {
+    console.error("Error generating fixed schema:", error);
+    return null;
+  }
 }

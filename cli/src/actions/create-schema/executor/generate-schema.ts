@@ -22,7 +22,7 @@ export async function generateSchema(
 
     schemaSpinner.stop("Generated schemas database tables");
     return {
-      step: "verify_schema",
+      step: "save_schema",
       status: "completed",
       data: step.data,
     };

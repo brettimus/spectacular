@@ -12,6 +12,7 @@ const execPromise = util.promisify(exec);
  */
 export const validateTypeScript = async (
   projectDir: string,
+  packageManager = "npm",
 ): Promise<ErrorInfo[]> => {
   if (!fs.existsSync(projectDir)) {
     throw new Error("Directory to project does not exist");
@@ -23,7 +24,9 @@ export const validateTypeScript = async (
 
     try {
       // Execute the typecheck command - only works on *nix systems
-      result = await execPromise(`cd ${projectDir} && npm run typecheck`);
+      result = await execPromise(
+        `cd ${projectDir} && ${packageManager} run typecheck`,
+      );
       // Capture both stdout and stderr
       output =
         (result.stdout?.toString() || "") + (result.stderr?.toString() || "");
