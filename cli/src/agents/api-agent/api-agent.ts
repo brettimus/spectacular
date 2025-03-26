@@ -441,9 +441,20 @@ app.get("/", (c) => {
   const headers = c.req.header("x-api-key");
 });
 </hono-mistake>
+<hono-mistake description="setting status codes">
+import { Hono } from "hono";
 
-<hono-mistake description="accessing request body">
+const app = new Hono();
 
+app.post("/", (c) => {
+  // ...
+
+  // BAD: Setting status code like this
+  return c.json({ error: 'Authentication required or user not found' }, { status: c.status });
+
+  // GOOD: Setting status code after the json response
+  return c.json({ error: 'Authentication required or user not found' }, 401);
+});
 </hono-mistake>
     `.trim();
   }
