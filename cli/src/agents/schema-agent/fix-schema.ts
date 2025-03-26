@@ -55,7 +55,7 @@ Return only the fixed schema code. It should be valid TypeScript code. DO NOT IN
         },
       ],
       temperature: 0.2,
-      experimental_providerMetadata: {
+      providerOptions: {
         openai: {
           prediction: {
             type: "content",

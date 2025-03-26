@@ -65,7 +65,7 @@ Return only the fixed code. It should be valid TypeScript code. DO NOT INCLUDE A
         },
       ],
       temperature: 0.2,
-      experimental_providerMetadata: {
+      providerOptions: {
         openai: {
           prediction: {
             type: "content",
