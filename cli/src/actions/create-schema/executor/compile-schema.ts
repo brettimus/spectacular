@@ -21,12 +21,16 @@ export async function compileSchema(
       ctx.cwd,
       ctx.packageManager,
     );
-    log.warn(
-      `Typescript errors: ${typescriptErrors.length} \n ${JSON.stringify(typescriptErrors, null, 2)}`,
-    );
+
     const schemaErrors = typescriptErrors.filter((e) =>
       e?.location?.includes("schema.ts"),
     );
+
+    if (schemaErrors?.length > 0) {
+      log.warn(
+        `Typescript errors in schema.ts: ${schemaErrors.length} \n ${JSON.stringify(schemaErrors, null, 2)}`,
+      );
+    }
 
     if (schemaErrors.length === 0) {
       compileSpinner.stop("Schema compiled successfully");

@@ -1,7 +1,7 @@
 {
   "name": "@fiberplane/spectacular-cli",
   "type": "module",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "An interactive CLI to iterate on project specifications with AI",
   "scripts": {
     "build": "pnpm clean && tsup",
