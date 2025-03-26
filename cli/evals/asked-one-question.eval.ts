@@ -1,13 +1,13 @@
 import type { Message } from "ai";
 import { evalite } from "evalite";
 import { AskedOneQuestion } from "./scorers/asked-one-question";
-import { getTestDataFile } from "./utils";
+import { getConversationTestDataFile } from "./utils";
 
 function getTestData(): { input: Message }[] {
   const files = ["dog-fashion-recommendations-api--debug.json"];
   return files.flatMap((file) => {
     // TODO - Validate data structure
-    const data = getTestDataFile<{ messages: Message[] }>(file);
+    const data = getConversationTestDataFile<{ messages: Message[] }>(file);
     const assistantMessages = data.messages.filter(
       (m) => m.role === "assistant",
     );

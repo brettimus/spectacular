@@ -6,10 +6,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const DATA_DIR = path.join(__dirname, "data");
+const CONVERSATIONS_DIR = path.join(DATA_DIR, "spectacular-conversations");
 const SPECS_DIR = path.join(DATA_DIR, "spectacular-specs");
 
-export function getTestDataFile<T>(fileName: string, type = "json"): T {
-  const rawDataFile = fs.readFileSync(path.join(DATA_DIR, fileName), "utf8");
+export function getConversationTestDataFile<T>(fileName: string, type = "json"): T {
+  const filePath = path.join(CONVERSATIONS_DIR, fileName);
+  const rawDataFile = fs.readFileSync(filePath, "utf8");
   switch (type) {
     case "json":
       return JSON.parse(rawDataFile);
