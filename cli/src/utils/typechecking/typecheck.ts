@@ -30,9 +30,6 @@ export const validateTypeScript = async (
     } catch (execError) {
       // When tsc finds type errors, it exits with non-zero code, which causes exec to throw
       if (isExecError(execError)) {
-        console.debug(
-          "[validateTypeScript] Processing exec error with stdout/stderr",
-        );
         const stdout = execError.stdout?.toString() || "";
         const stderr = execError.stderr?.toString() || "";
         output = stdout + stderr;
@@ -44,8 +41,6 @@ export const validateTypeScript = async (
         throw execError; // Re-throw if it's not the expected error format
       }
     }
-
-    console.debug("[validateTypeScript] output", output);
 
     // Parse the TypeScript compiler errors
     return parseTypeScriptErrors(output);

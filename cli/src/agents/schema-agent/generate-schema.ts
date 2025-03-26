@@ -112,6 +112,22 @@ Here are some examples of how to use the Drizzle ORM to define tables:
     );
   </sql>
 </example>
+<example type="indexes">
+  <description>
+    Drizzle ORM provides you an API to define indexes on tables.
+  </description>
+  <typescript>
+    import { integer, text, index, uniqueIndex, sqliteTable } from "drizzle-orm/sqlite-core";
+    export const user = sqliteTable("user", {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      name: text("name"),
+      email: text("email"),
+    }, (table) => [
+      index("name_idx").on(table.name),
+      uniqueIndex("email_idx").on(table.email),
+    ]);
+  </typescript>
+</example>
 ${getDrizzleRelationsExample()}
     `;
 }
@@ -234,7 +250,7 @@ function getDrizzleRelationsExample() {
 export function getD1SchemaExample() {
   return `
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, text, sqliteTable, index } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -242,6 +258,9 @@ export const users = sqliteTable("users", {
   email: text("email"),
   createdAt: text("created_at").notNull().default(sql\`(CURRENT_TIMESTAMP)\`),
   updatedAt: text("updated_at").notNull().default(sql\`(CURRENT_TIMESTAMP)\`),
-});
+}, (table) => [
+  index("name_idx").on(table.name),
+  uniqueIndex("email_idx").on(table.email),
+]);
 `.trim();
 }

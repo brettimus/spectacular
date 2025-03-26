@@ -22,9 +22,6 @@ export function isExecError(error: unknown): error is ExecError {
     return false;
   }
 
-  // Log the error to help debug
-  console.debug("[isExecError] Checking error:", Object.keys(error));
-
   // Check specific properties we care about
   return (
     "stdout" in error || "stderr" in error || "code" in error || "cmd" in error
