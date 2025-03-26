@@ -35,13 +35,17 @@ interface GetFixesResponse {
   fixes: Record<string, unknown>[];
 }
 
+// Use http://localhost:4008 for local development
+const DEFAULT_BASE_URL =
+  process.env.AUTOGANDER_BASE_URL || "https://autogander.fp.dev";
+
 /**
  * Autogander API client for interacting with the fixes API
  */
 export class AutoganderClient {
   private baseUrl: string;
 
-  constructor(baseUrl = "http://localhost:4008") {
+  constructor(baseUrl = DEFAULT_BASE_URL) {
     this.baseUrl = baseUrl;
   }
 

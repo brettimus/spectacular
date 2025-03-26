@@ -30,7 +30,7 @@ interface ApiErrorInfo {
   dirName: string;
   specName: string;
   originalCode?: string;
-  errors?: Array<Record<string, unknown>>;
+  errors?: Record<string, unknown> | Array<Record<string, unknown>>;
   fixedCode?: string;
   analysis?: string;
   isSubmitted?: boolean;
@@ -309,6 +309,16 @@ async function listFixesForSessions(
   }
 }
 
+// Helper to extract error information in the correct format
+function normalizeErrorsForSubmission(
+  errors: Record<string, unknown> | Array<Record<string, unknown>>,
+): Record<string, unknown> {
+  if (Array.isArray(errors)) {
+    return { messages: errors };
+  }
+  return errors;
+}
+
 /**
  * Command to list all autogander fixes in the database
  */
@@ -452,7 +462,7 @@ export async function commandSubmitFixesToAutogander() {
             const response = await client.submitApiFix(
               sessionInfo.sessionId,
               sessionInfo.originalCode,
-              sessionInfo.errors,
+              normalizeErrorsForSubmission(sessionInfo.errors),
               analysis,
               sessionInfo.fixedCode,
             );
@@ -583,7 +593,7 @@ export async function commandSubmitFixesToAutogander() {
         const response = await client.submitApiFix(
           sessionInfo.sessionId,
           sessionInfo.originalCode,
-          sessionInfo.errors,
+          normalizeErrorsForSubmission(sessionInfo.errors),
           analysis,
           sessionInfo.fixedCode,
         );
@@ -667,6 +677,140 @@ export async function commandSubmitFixesToAutogander() {
 }
 
 /**
+ * Command to clear _autogander.json tracking files
+ */
+export async function commandClearAutogander() {
+  console.log("");
+  console.log(pico.magentaBright(pico.bold(SPECTACULAR_TITLE)));
+  console.log("");
+
+  intro("😮 spectacular - Clear Autogander Tracking");
+
+  // Initialize context for logging
+  const ctx = initContext();
+  // Initialize log session for this command
+  initCommandLogSession(ctx, "autogander-clear");
+
+  if (!fs.existsSync(SPECTACULAR_HOME_DIR_PATH)) {
+    outro("No .spectacular_stuff directory found");
+    return;
+  }
+
+  // Find all directories with tracking files
+  const dirs = fs
+    .readdirSync(SPECTACULAR_HOME_DIR_PATH, { withFileTypes: true })
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name);
+
+  const dirsWithTrackingFiles = dirs.filter((dir) => {
+    const trackingFilePath = path.join(
+      SPECTACULAR_HOME_DIR_PATH,
+      dir,
+      AUTOGANDER_TRACKING_FILENAME,
+    );
+    return fs.existsSync(trackingFilePath);
+  });
+
+  if (dirsWithTrackingFiles.length === 0) {
+    outro("No tracking files found in any session directories");
+    return;
+  }
+
+  console.log("");
+  console.log(
+    pico.bold(
+      `Found ${dirsWithTrackingFiles.length} session directories with tracking files:`,
+    ),
+  );
+  console.log("");
+
+  // List directories with tracking files
+  for (const dir of dirsWithTrackingFiles) {
+    const trackingFilePath = path.join(
+      SPECTACULAR_HOME_DIR_PATH,
+      dir,
+      AUTOGANDER_TRACKING_FILENAME,
+    );
+    try {
+      const data = JSON.parse(
+        fs.readFileSync(trackingFilePath, "utf-8"),
+      ) as AutoganderTrackingData;
+      console.log(`- ${dir} (${data.specName}, Session ID: ${data.sessionId})`);
+    } catch {
+      console.log(`- ${dir} (Invalid tracking data)`);
+    }
+  }
+
+  console.log("");
+
+  // Confirm deletion
+  const shouldClear = await confirm({
+    message: `Are you sure you want to clear all ${dirsWithTrackingFiles.length} tracking files?`,
+  });
+
+  if (isCancel(shouldClear)) {
+    handleCancel();
+  }
+
+  if (!shouldClear) {
+    outro("Operation cancelled");
+    return;
+  }
+
+  // Log the action
+  logActionExecution(ctx, "autogander", {
+    action: "clear-tracking",
+    count: dirsWithTrackingFiles.length,
+  });
+
+  const progress = spinner();
+  progress.start("Clearing tracking files");
+
+  // Delete tracking files
+  const results = [];
+  for (const dir of dirsWithTrackingFiles) {
+    const trackingFilePath = path.join(
+      SPECTACULAR_HOME_DIR_PATH,
+      dir,
+      AUTOGANDER_TRACKING_FILENAME,
+    );
+
+    try {
+      fs.unlinkSync(trackingFilePath);
+      results.push({ dir, success: true });
+    } catch (error) {
+      results.push({
+        dir,
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  progress.stop("Done clearing tracking files");
+
+  console.log("");
+  console.log(pico.bold("Results:"));
+  console.log("");
+
+  // Display results
+  for (const result of results) {
+    if (result.success) {
+      console.log(
+        `- ${pico.green("✓")} ${result.dir}: Tracking file removed successfully`,
+      );
+    } else {
+      console.log(`- ${pico.red("✗")} ${result.dir}: Error - ${result.error}`);
+    }
+  }
+
+  const successCount = results.filter((r) => r.success).length;
+  outro(
+    `Successfully cleared ${successCount} of ${results.length} tracking files`,
+  );
+}
+
+/**
  * Main command that handles both listing and submitting
  */
 export async function commandAutogander() {
@@ -687,6 +831,7 @@ export async function commandAutogander() {
     options: [
       { value: "submit", label: "Submit fixes to Autogander" },
       { value: "list", label: "List fixes in Autogander" },
+      { value: "clear", label: "Clear tracking information" },
     ],
   });
 
@@ -696,6 +841,8 @@ export async function commandAutogander() {
 
   if (actionChoice === "submit") {
     await commandSubmitFixesToAutogander();
+  } else if (actionChoice === "clear") {
+    await commandClearAutogander();
   } else {
     await commandListAutogander();
   }

@@ -1,4 +1,4 @@
-name = "mega-honc"
+name = "autogander"
 compatibility_date = "2025-02-04"
 compatibility_flags = [ "nodejs_compat" ]
 
@@ -7,8 +7,8 @@ port = 4008
 
 [[d1_databases]]
 binding = "DB"
-database_name = "honc-d1-database"
-database_id = "local-honc-d1-database"
+database_name = "autogander-d1-database"
+database_id = "ba717767-a906-4d1f-8dc7-eb5e2afae111"
 migrations_dir = "drizzle/migrations"
 
 # [vars]

@@ -10,6 +10,7 @@ import {
   commandAutogander,
   commandListAutogander,
   commandSubmitFixesToAutogander,
+  commandClearAutogander,
 } from "./commands/autogander-fixes";
 import { commandCreateApi } from "./commands/create-api";
 import { commandCreateSchema } from "./commands/create-schema";
@@ -66,10 +67,13 @@ async function main() {
       case "fixes:submit":
         await commandSubmitFixesToAutogander();
         break;
+      case "autogander:clear":
+        await commandClearAutogander();
+        break;
       default:
         console.error(`Unknown command: ${command}`);
         console.log(
-          "Available commands: init, create-schema, create-api, apikey:add, apikey:list, apikey:remove, apikey:set-default, logs, autogander, autogander:list, autogander:submit",
+          "Available commands: init, create-schema, create-api, apikey:add, apikey:list, apikey:remove, apikey:set-default, logs, autogander, autogander:list, autogander:submit, autogander:clear",
         );
         process.exit(1);
     }
