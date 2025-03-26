@@ -20,7 +20,7 @@ export async function commandCreateApi(continuingWithContext?: Context) {
   }
 
   // Log the action start
-  appendToLog("commands", {
+  appendToLog(ctx, "commands", {
     command: "create-api",
     sessionId: ctx.sessionId,
     status: "started",
@@ -46,7 +46,7 @@ export async function commandCreateApi(continuingWithContext?: Context) {
     saveGlobalDebugInfo(ctx);
 
     // Log the successful completion
-    appendToLog("commands", {
+    appendToLog(ctx, "commands", {
       command: "create-api",
       sessionId: ctx.sessionId,
       status: "completed",
@@ -56,7 +56,7 @@ export async function commandCreateApi(continuingWithContext?: Context) {
     outro("API creation completed successfully! 🎉");
   } catch (error) {
     // Log the error
-    appendToLog("commands", {
+    appendToLog(ctx, "commands", {
       command: "create-api",
       sessionId: ctx.sessionId,
       status: "error",

@@ -10,6 +10,8 @@ import {
   saveApiKey,
   setDefaultApiKey,
 } from "../utils/credentials";
+import { initContext } from "../context";
+import { initCommandLogSession } from "../utils/logging";
 
 export async function commandApiKeyAdd() {
   console.log("");
@@ -17,6 +19,11 @@ export async function commandApiKeyAdd() {
   console.log("");
 
   intro("😮 spectacular - Add API Key");
+
+  // Initialize context for logging
+  const ctx = initContext();
+  // Initialize log session for this command
+  initCommandLogSession(ctx, "apikey-add");
 
   // Ask for the API key
   const apiKey = await text({
@@ -63,7 +70,7 @@ export async function commandApiKeyAdd() {
   saveApiKey(name as string, apiKey as string, makeDefault === true);
 
   // Log the action
-  appendToLog("api-keys", {
+  appendToLog(ctx, "api-keys", {
     action: "add",
     keyName: name as string,
     makeDefault: makeDefault === true,
@@ -78,6 +85,11 @@ export async function commandApiKeyList() {
   console.log("");
 
   intro("😮 spectacular - List API Keys");
+
+  // Initialize context for logging
+  const ctx = initContext();
+  // Initialize log session for this command
+  initCommandLogSession(ctx, "apikey-list");
 
   const keys = listApiKeys();
 
@@ -99,7 +111,7 @@ export async function commandApiKeyList() {
   console.log("");
 
   // Log the action
-  appendToLog("api-keys", {
+  appendToLog(ctx, "api-keys", {
     action: "list",
     count: keys.length,
   });
@@ -113,6 +125,11 @@ export async function commandApiKeyRemove() {
   console.log("");
 
   intro("😮 spectacular - Remove API Key");
+
+  // Initialize context for logging
+  const ctx = initContext();
+  // Initialize log session for this command
+  initCommandLogSession(ctx, "apikey-remove");
 
   const keys = listApiKeys();
 
@@ -149,7 +166,7 @@ export async function commandApiKeyRemove() {
   const success = removeApiKey(keyName);
 
   // Log the action
-  appendToLog("api-keys", {
+  appendToLog(ctx, "api-keys", {
     action: "remove",
     keyName,
     success,
@@ -168,6 +185,11 @@ export async function commandApiKeySetDefault() {
   console.log("");
 
   intro("😮 spectacular - Set Default API Key");
+
+  // Initialize context for logging
+  const ctx = initContext();
+  // Initialize log session for this command
+  initCommandLogSession(ctx, "apikey-set-default");
 
   const keys = listApiKeys();
 
@@ -205,7 +227,7 @@ export async function commandApiKeySetDefault() {
   const success = setDefaultApiKey(keyName);
 
   // Log the action
-  appendToLog("api-keys", {
+  appendToLog(ctx, "api-keys", {
     action: "set-default",
     keyName,
     success,

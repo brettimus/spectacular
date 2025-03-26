@@ -5,6 +5,7 @@ import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
 import { createUserMessage } from "../utils";
 import type { SelectedRule } from "./types";
+import { logAIInteraction } from "../../utils/logging";
 
 export const GENERATE_SCHEMA_SYSTEM_PROMPT = `
 You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.
@@ -49,7 +50,13 @@ export async function generateSchema(
   const openai = createOpenAI({ apiKey: ctx.apiKey });
   const model = traceAISDKModel(openai("gpt-4o"));
 
-  return generateObject({
+  const input = {
+    prompt: GENERATE_SCHEMA_SYSTEM_PROMPT,
+    schemaSpecification,
+    relevantRules,
+  };
+
+  const result = await generateObject({
     model,
     schema: z.object({
       explanation: z
@@ -82,6 +89,11 @@ Use the additional context to help you generate the schema. This is important to
     system: GENERATE_SCHEMA_SYSTEM_PROMPT,
     temperature: 0.2,
   });
+
+  // Log the AI interaction
+  logAIInteraction(ctx, "create-schema", "generate-schema", input, result);
+
+  return result;
 }
 
 export function getDrizzleSchemaExamples() {

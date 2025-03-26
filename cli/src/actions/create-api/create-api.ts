@@ -6,10 +6,20 @@ import { loadExistingSchema } from "./load-existing-schema";
 import { saveApiCode } from "./save-api-code";
 import { validateTypeScript } from "@/utils/typechecking";
 import type { ErrorInfo } from "@/utils/typechecking/types";
+import { initCommandLogSession, logActionExecution } from "../../utils/logging";
 
 export async function actionCreateApi(context: Context): Promise<void> {
+  // Initialize log session for this command
+  initCommandLogSession(context, "create-api");
+
   const s = spinner();
   s.start("Loading existing database schema");
+
+  // Log action start
+  logActionExecution(context, "create-api-start", {
+    cwd: context.cwd,
+    timestamp: new Date().toISOString(),
+  });
 
   const { schemaPath, schema } = await loadExistingSchema(context);
 
@@ -27,6 +37,13 @@ The agent will use this schema to generate API endpoints.`);
   const indexTsContent = generationResult.indexTs;
 
   s.stop("Generated API routes");
+
+  // Log API routes generation
+  logActionExecution(context, "create-api-routes-generated", {
+    schemaPath,
+    reasoningLength: generationResult.reasoning.length,
+    codeLength: indexTsContent.length,
+  });
 
   // s.start("Verifying API code");
   // const verificationResult = await apiAgent.verifyApi(context, {
@@ -64,6 +81,12 @@ The agent will use this schema to generate API endpoints.`);
     );
   }
 
+  // Log API code save
+  logActionExecution(context, "create-api-code-saved", {
+    indexTsPath: firstSaveResult.indexTsPath,
+    reasoningPath: firstSaveResult.reasoningPath,
+  });
+
   // Validate with TypeScript compiler
   s.start("Running TypeScript validation");
   const typescriptErrors = await validateTypeScript(
@@ -76,9 +99,24 @@ The agent will use this schema to generate API endpoints.`);
 
   if (apiErrors.length === 0) {
     s.stop("TypeScript validation passed successfully");
+
+    // Log successful validation
+    logActionExecution(context, "create-api-validation-success", {
+      timestamp: new Date().toISOString(),
+    });
   } else {
     s.stop(`TypeScript validation found ${apiErrors.length} errors`);
-    
+
+    // Log validation errors
+    logActionExecution(context, "create-api-validation-errors", {
+      errorCount: apiErrors.length,
+      errors: apiErrors.map((e) => ({
+        message: e.message,
+        severity: e.severity,
+        location: e.location,
+      })),
+    });
+
     note(
       pico.yellow(
         `Found ${apiErrors.length} TypeScript errors in the generated API. Attempting to fix...`,
@@ -100,6 +138,11 @@ The agent will use this schema to generate API endpoints.`);
           "Failed to analyze TypeScript errors.\nPlease check the generated code manually.",
         ),
       );
+
+      // Log analysis failure
+      logActionExecution(context, "create-api-error-analysis-failed", {
+        timestamp: new Date().toISOString(),
+      });
     } else {
       // Fix the API code
       s.start("Fixing API code");
@@ -116,6 +159,11 @@ The agent will use this schema to generate API endpoints.`);
             "Failed to fix TypeScript errors. Please check the generated code manually.",
           ),
         );
+
+        // Log fix failure
+        logActionExecution(context, "create-api-fix-failed", {
+          timestamp: new Date().toISOString(),
+        });
       } else {
         // Save the fixed API code
         s.start("Writing fixed API code to index.ts");
@@ -135,6 +183,12 @@ The agent will use this schema to generate API endpoints.`);
           );
         }
 
+        // Log fixed code save
+        logActionExecution(context, "create-api-fixed-code-saved", {
+          indexTsPath: fixedSaveResult.indexTsPath,
+          reasoningPath: fixedSaveResult.reasoningPath,
+        });
+
         // Validate fixed code with TypeScript again
         s.start("Validating fixed API code");
         const fixedTypescriptErrors = await validateTypeScript(
@@ -147,8 +201,26 @@ The agent will use this schema to generate API endpoints.`);
 
         if (fixedApiErrors.length === 0) {
           s.stop("Fixed API code compiles successfully");
+
+          // Log successful validation after fix
+          logActionExecution(context, "create-api-fixed-validation-success", {
+            timestamp: new Date().toISOString(),
+          });
         } else {
-          s.stop(`Fixed API code still has ${fixedApiErrors.length} TypeScript errors`);
+          s.stop(
+            `Fixed API code still has ${fixedApiErrors.length} TypeScript errors`,
+          );
+
+          // Log remaining errors after fix
+          logActionExecution(context, "create-api-fixed-validation-errors", {
+            errorCount: fixedApiErrors.length,
+            errors: fixedApiErrors.map((e) => ({
+              message: e.message,
+              severity: e.severity,
+              location: e.location,
+            })),
+          });
+
           note(
             pico.yellow(
               "Some TypeScript errors could not be automatically fixed. Please review and fix the generated code manually.",
@@ -160,6 +232,11 @@ The agent will use this schema to generate API endpoints.`);
   }
 
   note(
-    "Your API has been generated successfully! You can now start the service to test it."
+    "Your API has been generated successfully! You can now start the service to test it.",
   );
+
+  // Log action completion
+  logActionExecution(context, "create-api-complete", {
+    timestamp: new Date().toISOString(),
+  });
 }

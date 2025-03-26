@@ -4,6 +4,7 @@ import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
 import { createUserMessage } from "../utils";
+import { logAIInteraction } from "../../utils/logging";
 
 export const SCHEMA_SYSTEM_PROMPT = `
 You are an expert database schema designer specializing in Drizzle ORM with SQLite (Cloudflare D1).
@@ -73,7 +74,12 @@ export async function analyzeDatabaseTables(ctx: Context) {
     throw new Error("Spec content is required for schema analysis");
   }
 
-  return generateObject({
+  const input = {
+    prompt: SCHEMA_SYSTEM_PROMPT,
+    specification: ctx.specContent,
+  };
+
+  const result = await generateObject({
     model,
     schema: z.object({
       reasoning: z
@@ -95,4 +101,9 @@ ${ctx.specContent}`),
     system: SCHEMA_SYSTEM_PROMPT,
     temperature: 0.2,
   });
+
+  // Log the AI interaction
+  logAIInteraction(ctx, "create-schema", "analyze-tables", input, result);
+
+  return result;
 }

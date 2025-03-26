@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import type { Context } from "../context";
+import { createLogFilename, getSessionLogDir } from "./logging";
 
 interface Credentials {
   apiKeys: Record<string, string>;
@@ -183,29 +184,86 @@ export function saveDebugInfo(filename: string, data: unknown): void {
 }
 
 /**
- * Append a log entry to a log file in the spectacular directory
+ * Append a log entry to a log file in the session directory
+ *
+ * @deprecated Use logActionExecution or logAIInteraction instead
  */
 export function appendToLog(
-  logname: string,
-  entry: string | Record<string, unknown>,
+  contextOrLogname: Context | string,
+  lognameOrEntry: string | Record<string, unknown>,
+  entry?: string | Record<string, unknown>,
 ): void {
   try {
-    ensureSpectacularHomeDir();
-    const logPath = path.join(SPECTACULAR_HOME_DIR_PATH, `${logname}.log`);
+    // Handle the old signature: appendToLog(logname, entry)
+    if (typeof contextOrLogname === "string") {
+      console.warn(
+        "[DEPRECATED] appendToLog called with old signature, using default log location. " +
+          "Please update to use appendToLog(context, logname, entry)",
+      );
 
-    let entryText: string;
-    if (typeof entry === "string") {
-      entryText = entry;
-    } else {
-      entryText = JSON.stringify(entry);
+      // Create a log entry in the home directory since we don't have a context
+      ensureSpectacularHomeDir();
+      const logPath = path.join(
+        SPECTACULAR_HOME_DIR_PATH,
+        `${contextOrLogname}.log.json`,
+      );
+
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        content: lognameOrEntry,
+      };
+
+      // Read existing entries or start with an empty array
+      let entries = [];
+      if (fs.existsSync(logPath)) {
+        try {
+          entries = JSON.parse(fs.readFileSync(logPath, "utf-8"));
+        } catch {
+          // If the file exists but can't be parsed, start with an empty array
+          // No need to use the error
+        }
+      }
+
+      // Add the new entry and write back
+      entries.push(logEntry);
+      fs.writeFileSync(logPath, JSON.stringify(entries, null, 2), "utf-8");
+      return;
     }
 
-    const timestamp = new Date().toISOString();
-    const logEntry = `[${timestamp}] ${entryText}\n`;
+    // Handle the new signature: appendToLog(context, logname, entry)
+    const context = contextOrLogname;
+    const logname = lognameOrEntry as string;
 
-    fs.appendFileSync(logPath, logEntry, "utf-8");
+    // We must have a session to log to
+    if (!context.sessionId) {
+      console.error("Cannot append to log: no sessionId in context");
+      return;
+    }
+
+    const sessionDir = getSessionLogDir(context);
+    const logPath = path.join(sessionDir, `${logname}.log.json`);
+
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      content: entry,
+    };
+
+    // Read existing entries or start with an empty array
+    let entries = [];
+    if (fs.existsSync(logPath)) {
+      try {
+        entries = JSON.parse(fs.readFileSync(logPath, "utf-8"));
+      } catch {
+        // If the file exists but can't be parsed, start with an empty array
+        // No need to use the error
+      }
+    }
+
+    // Add the new entry and write back
+    entries.push(logEntry);
+    fs.writeFileSync(logPath, JSON.stringify(entries, null, 2), "utf-8");
   } catch (error) {
-    console.error(`Error appending to log ${logname}:`, error);
+    console.error("Error appending to log:", error);
   }
 }
 
@@ -229,10 +287,25 @@ export function saveGlobalDebugInfo(context: Context): void {
       timestamp: new Date().toISOString(),
     };
 
-    const debugPath = path.join(
-      SPECTACULAR_HOME_DIR_PATH,
-      `debug-${context.sessionId ?? new Date().getTime()}.json`,
-    );
+    // Use the session log directory if possible
+    if (context.sessionId) {
+      try {
+        const sessionDir = getSessionLogDir(context);
+        const filename = createLogFilename("global-debug");
+        const debugPath = path.join(sessionDir, filename);
+        fs.writeFileSync(debugPath, JSON.stringify(history, null, 2), "utf-8");
+        return;
+      } catch (error) {
+        console.error(
+          "Failed to save to session log dir, falling back to home dir:",
+          error,
+        );
+      }
+    }
+
+    // Fallback to home directory if session dir isn't available
+    const filename = createLogFilename("global-debug");
+    const debugPath = path.join(SPECTACULAR_HOME_DIR_PATH, filename);
     fs.writeFileSync(debugPath, JSON.stringify(history, null, 2), "utf-8");
   } catch (error) {
     console.error("Error saving global debug info:", error);

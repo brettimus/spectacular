@@ -45,16 +45,16 @@ export interface ApiAgentInterface {
     context: Context,
     options: ApiVerificationOptions,
   ): Promise<ApiVerificationResult>;
-  
+
   analyzeApiErrors(
-    context: Context, 
-    apiCode: string, 
-    errors: ErrorInfo[]
+    context: Context,
+    apiCode: string,
+    errors: ErrorInfo[],
   ): Promise<ApiErrorAnalysisResult | null>;
-  
+
   fixApiErrors(
-    context: Context, 
-    fixContent: string, 
-    originalApiCode: string
+    context: Context,
+    fixContent: string,
+    originalApiCode: string,
   ): Promise<ApiFixResult | null>;
 }

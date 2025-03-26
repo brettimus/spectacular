@@ -3,6 +3,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import type { ErrorInfo } from "@/utils/typechecking/types";
 import { traceAISDKModel } from "evalite/ai-sdk";
+import { logAIInteraction } from "../../utils/logging";
 
 /**
  * Generate a prompt for the AI to analyze API errors
@@ -45,12 +46,24 @@ export async function analyzeApiErrors(
   try {
     const prompt = generateApiErrorAnalysisPrompt(apiCode, errorMessages);
 
+    const input = {
+      prompt,
+      apiCode,
+      errorMessages,
+    };
+
     const result = await generateText({
       model,
       prompt,
       tools: {
         web_search_preview: openai.tools.webSearchPreview(),
       },
+    });
+
+    // Log the AI interaction
+    logAIInteraction(ctx, "create-api", "analyze-errors", input, {
+      text: result.text,
+      sources: Boolean(result.sources),
     });
 
     return {
@@ -61,4 +74,4 @@ export async function analyzeApiErrors(
     console.error("Error analyzing API errors:", error);
     return null;
   }
-} 
+}

@@ -1,5 +1,6 @@
 import type { Context } from "@/context";
 import { confirm, log } from "@clack/prompts";
+import { logActionExecution } from "../../../utils/logging";
 import type { SchemaGenerationStep } from "../types";
 import { analyzeTables } from "./analyze-tables";
 import { compileSchema } from "./compile-schema";
@@ -22,40 +23,48 @@ export async function executeStep(
   }
 
   // Execute step based on current state
+  let result: SchemaGenerationStep;
+
   switch (step.step) {
     case "init":
-      return {
+      result = {
         step: "analyze_tables",
         status: "pending",
         data: step.data,
       };
+      break;
 
     // Draft which tables are needed based on the spec
     case "analyze_tables": {
-      return await analyzeTables(ctx, step);
+      result = await analyzeTables(ctx, step);
+      break;
     }
 
     // Identify which rules are relevant to the operations
     // These should be injected as context into the generate_schema step
     case "identify_rules": {
-      return await identifyRules(ctx, step);
+      result = await identifyRules(ctx, step);
+      break;
     }
 
     // Generate the schema file
     case "generate_schema": {
-      return await generateSchema(ctx, step);
+      result = await generateSchema(ctx, step);
+      break;
     }
 
     // NOT IN USE!!! - This was kind of overkill
     //
     // Verify the generated schema
     case "verify_schema": {
-      return await verifySchema(ctx, step);
+      result = await verifySchema(ctx, step);
+      break;
     }
 
     // Save the schema file to src/db/schema.ts
     case "save_schema": {
-      return await saveSchema(ctx, step);
+      result = await saveSchema(ctx, step);
+      break;
     }
 
     // Compile the schema file with tsc
@@ -69,31 +78,47 @@ export async function executeStep(
         log.warning(
           "Skipping typescript compilation and database migration file checks",
         );
-        return {
+        result = {
           ...step,
           // step: "generate_migration_files",
           step: "completed",
           status: "completed",
           data: step.data,
         };
+      } else {
+        result = await compileSchema(ctx, step);
       }
-      return await compileSchema(ctx, step);
+      break;
     }
 
     // Run the db:generate command to create the migration files
     case "generate_migration_files": {
-      return await generateMigrationFiles(ctx, step);
+      result = await generateMigrationFiles(ctx, step);
+      break;
     }
 
     case "completed":
-      return { ...step, step: "done" };
+      result = { ...step, step: "done" };
+      break;
 
     default:
-      return {
+      result = {
         step: "error",
         status: "error",
         message: `Unknown step: ${step.step}`,
         data: step.data,
       };
   }
+
+  // Log the step execution
+  logActionExecution(ctx, `create-schema-${result.step}`, {
+    previousStep: step.step,
+    currentStep: result.step,
+    status: result.status,
+    message: result.message,
+    // We don't log the full data to avoid excessive log files
+    dataKeys: Object.keys(result.data || {}),
+  });
+
+  return result;
 }

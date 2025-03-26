@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Context } from "../context";
-import { randomId } from "./random-id";
+import { createLogFilename, getSessionLogDir } from "./logging";
 
 export const SPECTACULAR_PROJECT_DIR_NAME = "spectacular";
 
@@ -99,7 +99,10 @@ export function saveSpectacularMetadata(
 /**
  * Save debug information to the spectacular directory
  */
-export function saveSpectacularInitDebugInfo(path: string, context: Context): void {
+export function saveSpectacularInitDebugInfo(
+  path: string,
+  context: Context,
+): void {
   const spectacularDir = getSpectacularProjectDirPath(path);
   ensureSpectacularDir(path);
 
@@ -112,11 +115,23 @@ export function saveSpectacularInitDebugInfo(path: string, context: Context): vo
     specName: context.specName,
     specContent: context.specContent,
     sessionId: context.sessionId,
+    timestamp: new Date().toISOString(),
   };
 
-  const debugPath = join(
-    spectacularDir,
-    `init-debug-${context.sessionId ?? randomId()}.json`,
-  );
+  // Save in both places - project directory for project-specific access and session log dir for better organization
+  // Project directory version
+  const filename = createLogFilename("init-debug");
+  const debugPath = join(spectacularDir, filename);
   writeFileSync(debugPath, JSON.stringify(history, null, 2));
+
+  // Session log dir version - only if sessionId exists
+  if (context.sessionId) {
+    try {
+      const sessionDir = getSessionLogDir(context);
+      const sessionLogPath = join(sessionDir, filename);
+      writeFileSync(sessionLogPath, JSON.stringify(history, null, 2));
+    } catch (error) {
+      console.error("Failed to save debug info to session log dir:", error);
+    }
+  }
 }

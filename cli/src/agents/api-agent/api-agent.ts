@@ -12,6 +12,7 @@ import type {
 import type { ErrorInfo } from "@/utils/typechecking/types";
 import { analyzeApiErrors as analyzeErrors } from "./analyze-api-errors";
 import { fixApiErrors as fixErrors } from "./fix-api";
+import { logAIInteraction } from "../../utils/logging";
 
 const TEMPLATE_EXAMPLE = `
 import { instrument } from "@fiberplane/hono-otel";
@@ -174,6 +175,12 @@ Things you usually screw up (things to avoid):
 
 `.trim();
 
+    const input = {
+      prompt: PROMPT,
+      dbSchema,
+      apiPlan,
+    };
+
     const result = await generateObject({
       model,
       schema: z.object({
@@ -187,6 +194,9 @@ Things you usually screw up (things to avoid):
       prompt: PROMPT,
       temperature: 0.2,
     });
+
+    // Log the AI interaction
+    logAIInteraction(context, "create-api", "generate-routes", input, result);
 
     return {
       indexTs: result.object.indexTs,
@@ -231,6 +241,12 @@ Things you usually screw up (things to avoid):
 
 `.trim();
 
+    const input = {
+      prompt: VERIFICATION_PROMPT,
+      schema: options.schema,
+      apiCode: options.apiCode,
+    };
+
     const result = await generateObject({
       model,
       schema: z.object({
@@ -244,6 +260,9 @@ Things you usually screw up (things to avoid):
       temperature: 0.1,
     });
 
+    // Log the AI interaction
+    logAIInteraction(context, "create-api", "verify-api", input, result);
+
     return {
       valid: result.object.valid,
       issues: result.object.issues,
@@ -253,15 +272,15 @@ Things you usually screw up (things to avoid):
   async analyzeApiErrors(
     context: Context,
     apiCode: string,
-    errors: ErrorInfo[]
+    errors: ErrorInfo[],
   ) {
     return analyzeErrors(context, apiCode, errors);
   }
-  
+
   async fixApiErrors(
     context: Context,
     fixContent: string,
-    originalApiCode: string
+    originalApiCode: string,
   ) {
     return fixErrors(context, fixContent, originalApiCode);
   }
@@ -324,7 +343,51 @@ const [updatedUser] = await db.update().set({ name: "John" }).where(eq(schema.us
 
 // ...
 </drizzle-orm-example>
-
+<drizzle-orm-example description="Building queries with multiple filters">
+  import { eq, and } from 'drizzle-orm';
+  // ...
+  // BAD: Instead of reassigning the query multiple times (which causes TypeScript errors):
+  let query = db.select().from(schema.events);
+  if (typeFilter) {
+  query = query.where(eq(schema.events.type, typeFilter)); // TypeScript error!
+  }
+  if (traceIdFilter) {
+  query = query.where(eq(schema.events.traceId, traceIdFilter)); // TypeScript error!
+  }
+  query = query.limit(limit).offset(offset); // TypeScript error!
+  // GOOD: Use a conditions array and apply filters in a single where() call:
+  const conditions = [];
+  if (typeFilter) {
+  conditions.push(eq(schema.events.type, typeFilter));
+  }
+  if (traceIdFilter) {
+  conditions.push(eq(schema.events.traceId, traceIdFilter));
+  }
+  // Build the query in steps without reassignment
+  const query = db.select().from(schema.events);
+  const queryWithFilters = conditions.length
+  ? query.where(conditions.length === 1 ? conditions[0] : and(...conditions))
+  : query;
+  const events = await queryWithFilters.limit(limit).offset(offset);
+  // ...
+</drizzle-orm-example>
+<drizzle-orm-example description="Handle error types properly in Drizzle+Hono applications">
+  // Avoid using any type for errors
+  try {
+  // Database operation
+  } catch (error: any) { // TypeScript error
+  return c.json({ error: 'Database error', details: error.message }, 500);
+  }
+  // GOOD: Instead use proper type narrowing
+  try {
+  // Database operation
+  } catch (error) {
+  return c.json({
+  error: 'Database error',
+  details: error instanceof Error ? error.message : String(error)
+  }, 500);
+  }
+</drizzle-orm-example>
 `.trim();
   }
 }

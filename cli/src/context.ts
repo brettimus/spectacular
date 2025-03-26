@@ -54,6 +54,12 @@ export interface Context {
    * Can be useful for saving log files or other metadata.
    */
   sessionId: string;
+
+  /**
+   * The session log directory path for this session
+   * @internal
+   */
+  _logSessionDir?: string;
 }
 
 export function initContext(): Context {

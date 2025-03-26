@@ -4,6 +4,7 @@ import pico from "picocolors";
 import { executeStep } from "./executor";
 import { loadExistingSpec } from "./load-existing-spec";
 import type { SchemaGenerationStep } from "./types";
+import { initCommandLogSession } from "../../utils/logging";
 
 // CURRENT - Implementation of create-schema functionality
 //
@@ -20,6 +21,9 @@ import type { SchemaGenerationStep } from "./types";
  * Main function to orchestrate the schema creation process
  */
 export async function actionCreateSchema(ctx: Context) {
+  // Initialize log session for this command
+  initCommandLogSession(ctx, "create-schema");
+
   loadExistingSpec(ctx);
 
   // Read spec file if not already loaded
