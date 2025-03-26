@@ -16,6 +16,7 @@ import { handleResult, removeCwd } from "../utils";
 import { saveGlobalDebugInfo } from "../utils/credentials";
 import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
 import { commandCreateSchema } from "./create-schema";
+import path from "node:path";
 
 export async function commandInit() {
   console.log("");
@@ -79,7 +80,11 @@ export async function commandInit() {
   // Also save to the global debug directory
   saveGlobalDebugInfo(context);
 
-  const relativeProjectPath = removeCwd(context, context.projectPath ?? "");
+  let relativeProjectPath = removeCwd(context, context.projectPath ?? "");
+  if (relativeProjectPath === "") {
+    relativeProjectPath = pico.green(path.basename(context.projectPath ?? ""));
+  }
+
   const shouldDoCodeGen = await confirm({
     message: `Do you want to generate code? (may overwrite files in ${relativeProjectPath})`,
     initialValue: true,

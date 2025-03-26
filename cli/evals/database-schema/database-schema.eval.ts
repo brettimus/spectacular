@@ -61,7 +61,10 @@ evalite("LLM-Generated TypeScript Validity Evaluation", {
     const logger = getProjectLogger(projectDir, runId, "task");
 
     const agent = new SchemaAgentService();
-    const { code } = await agent.getSchemaFromSpec(input.specFileDetails.spec);
+    const { code } = await agent.getSchemaFromSpec(
+      input.specFileDetails.spec,
+      projectDir,
+    );
 
     // Log the output of the task
     const output = { code };

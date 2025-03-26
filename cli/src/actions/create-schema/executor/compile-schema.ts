@@ -66,7 +66,11 @@ export async function compileSchema(
     const fixSpinner = spinner();
     fixSpinner.start("Fixing TypeScript errors...");
 
-    const fixedSchema = await fixSchemaErrors(ctx, fixContent);
+    const fixedSchema = await fixSchemaErrors(
+      ctx,
+      step.data.finalSchema,
+      fixContent,
+    );
 
     // HACK - Just error out if the structured outputs failed
     if (!fixedSchema) {
@@ -79,7 +83,7 @@ export async function compileSchema(
       };
     }
 
-    step.data.finalSchema = fixedSchema.code;
+    step.data.finalSchema = fixedSchema;
 
     // Save the fixed schema
     const schemaPath = path.join(ctx.cwd, "src", "db", "schema.ts");

@@ -1,31 +1,27 @@
 import type { Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
-import { generateObject } from "ai";
+import { generateText } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
-import { z } from "zod";
 
 /**
  * Generate a fixed schema based on the analysis results
+ *
+ * NOTE - Cannot use experimental predictive outputs with a tool call,
+ *        so we just use generateText
  */
-export async function fixSchemaErrors(ctx: Context, fixContent: string) {
+export async function fixSchemaErrors(
+  ctx: Context,
+  originalFile: string,
+  fixContent: string,
+) {
   const openai = createOpenAI({ apiKey: ctx.apiKey });
   const model = traceAISDKModel(openai("gpt-4o"));
 
   try {
     console.log("Generating fixed schema using OpenAI...");
 
-    const result = await generateObject({
+    const result = await generateText({
       model,
-      schema: z.object({
-        explanation: z
-          .string()
-          .describe(
-            "Explanation of the schema design decisions and fixes applied",
-          ),
-        code: z
-          .string()
-          .describe("The fixed Drizzle typescript schema definition"),
-      }),
       system: `
 You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.
 
@@ -61,12 +57,17 @@ Return only the fixed schema code and a brief explanation of the changes you mad
         },
       ],
       temperature: 0.2,
+      experimental_providerMetadata: {
+        openai: {
+          prediction: {
+            type: "content",
+            content: originalFile,
+          },
+        },
+      },
     });
 
-    return {
-      code: result.object.code,
-      explanation: result.object.explanation,
-    };
+    return result.text;
   } catch (error) {
     console.error("Error generating fixed schema:", error);
     return null;

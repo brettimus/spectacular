@@ -27,7 +27,6 @@ export interface ApiErrorAnalysisResult {
 
 export interface ApiFixResult {
   code: string;
-  explanation: string;
 }
 
 export interface ApiAgentInterface {

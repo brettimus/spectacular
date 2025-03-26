@@ -8,9 +8,13 @@ import {
 } from "./verify-schema";
 
 export class SchemaAgentService {
-  async getSchemaFromSpec(specContent: string): Promise<{ code: string }> {
+  async getSchemaFromSpec(
+    specContent: string,
+    projectDir: string,
+  ): Promise<{ code: string }> {
     const context = initContext();
     context.specContent = specContent;
+    context.projectPath = projectDir;
     const tablesResult = await this.analyzeTables(context);
 
     // TODO - Uncomment rules once we have some
@@ -22,13 +26,11 @@ export class SchemaAgentService {
       relevantRules.object.relevantRules,
     );
 
-    return { code: schemaResult.object.dbSchemaTs };
+    if (projectDir) {
+      // TODO - Try to fix
+    }
 
-    // const verificationResult = await this.verifyGeneratedSchema(
-    //   context,
-    //   schemaResult.object.dbSchemaTs,
-    // );
-    // return { code: verificationResult.object.fixedSchema };
+    return { code: schemaResult.object.dbSchemaTs };
   }
 
   async analyzeTables(context: Context) {

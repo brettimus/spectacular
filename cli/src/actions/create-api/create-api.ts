@@ -26,7 +26,10 @@ export async function actionCreateApi(context: Context): Promise<void> {
 
   s.stop("Loaded existing schema");
 
-  const relativeSchemaPath = removeCwd(context, schemaPath);
+  let relativeSchemaPath = removeCwd(context, schemaPath);
+  if (relativeSchemaPath?.startsWith("/")) {
+    relativeSchemaPath = relativeSchemaPath.slice(1);
+  }
   note(`Found schema at ${pico.cyan(relativeSchemaPath)}
 The agent will use this schema to generate API endpoints.`);
 
@@ -172,7 +175,7 @@ The agent will use this schema to generate API endpoints.`);
         const fixedSaveResult = await saveApiCode(
           context,
           fixResult.code,
-          `${generationResult.reasoning}\n\n## Fix Applied\n\n${fixResult.explanation}`,
+          `${generationResult.reasoning}\n\n## Fix Applied\n\n${fixResult.code}`,
         );
 
         if (fixedSaveResult.reasoningPath) {

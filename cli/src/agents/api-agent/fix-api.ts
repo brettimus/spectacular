@@ -1,12 +1,14 @@
 import type { Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
-import { generateObject } from "ai";
+import { generateText } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
-import { z } from "zod";
 import { logAIInteraction } from "../../utils/logging";
 
 /**
  * Generate a fixed API code based on the analysis results
+ *
+ * NOTE - Cannot use experimental predictive outputs with a tool call,
+ *        so we just use generateText
  */
 export async function fixApiErrors(
   ctx: Context,
@@ -55,14 +57,8 @@ Return only the fixed code and a brief explanation of the changes you made.
       originalErrors: fixContent,
     };
 
-    const result = await generateObject({
+    const result = await generateText({
       model,
-      schema: z.object({
-        explanation: z
-          .string()
-          .describe("Explanation of the fixes applied to the API code"),
-        code: z.string().describe("The fixed Hono API typescript code"),
-      }),
       system: systemPrompt,
       messages: [
         {
@@ -71,18 +67,22 @@ Return only the fixed code and a brief explanation of the changes you made.
         },
       ],
       temperature: 0.2,
+      experimental_providerMetadata: {
+        openai: {
+          prediction: {
+            type: "content",
+            content: originalApiCode,
+          },
+        },
+      },
     });
 
     // Log the AI interaction
     logAIInteraction(ctx, "create-api", "fix-errors", input, {
-      explanation: result.object.explanation,
-      codeLength: result.object.code.length, // Just log the length instead of the full code
+      code: result.text,
     });
 
-    return {
-      code: result.object.code,
-      explanation: result.object.explanation,
-    };
+    return { code: result.text };
   } catch (error) {
     console.error("Error generating fixed API code:", error);
     return null;
