@@ -35,24 +35,28 @@ app.get("/", (c) => {
  * Serve a simplified api specification for your API
  * As of writing, this is just the list of routes and their methods.
  */
-app.get("/openapi.json", c => {
-  return c.json(createOpenAPISpec(app, {
-    info: {
-      title: "Honc D1 App",
-      version: "1.0.0",
-    },
-  }))
+app.get("/openapi.json", (c) => {
+  return c.json(
+    createOpenAPISpec(app, {
+      info: {
+        title: "Honc D1 App",
+        version: "1.0.0",
+      },
+    }),
+  );
 });
 
 /**
  * Mount the Fiberplane api explorer to be able to make requests against your API.
- * 
+ *
  * Visit the explorer at `/fp`
  */
-app.use("/fp/*", createFiberplane({
-  app,
-  openapi: { url: "/openapi.json" }
-}));
-
+app.use(
+  "/fp/*",
+  createFiberplane({
+    app,
+    openapi: { url: "/openapi.json" },
+  }),
+);
 
 export default app;

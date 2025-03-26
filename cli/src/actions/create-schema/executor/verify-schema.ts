@@ -1,5 +1,5 @@
-import type { Context } from "@/context";
 import { verifyGeneratedSchema } from "@/agents/schema-agent";
+import type { Context } from "@/context";
 import { handleError } from "@/utils";
 import { spinner } from "@clack/prompts";
 import type { SchemaGenerationStep } from "../types";

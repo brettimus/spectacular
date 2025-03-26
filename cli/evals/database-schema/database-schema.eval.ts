@@ -1,10 +1,14 @@
+import path from "node:path";
 import { evalite } from "evalite";
+import { SchemaAgentService } from "../../src/agents/schema-agent";
+import {
+  getEvalRunProjectDir,
+  getProjectLogger,
+  getProjectNameFromSpecFile,
+} from "../runner-utils";
 import { SchemaTypeScriptValidity } from "../scorers/typescript-validity";
 import { getAllSpectacularSpecFiles } from "../utils";
-import { SchemaAgentService } from "../../src/agents/schema-agent";
 import type { DatabaseSchemaEvalInput } from "./types";
-import path from "node:path";
-import { getEvalRunProjectDir } from "../runner-utils";
 
 // Use a timestamp as the run ID
 const runId = new Date().toISOString().replace(/[:.]/g, "_");
@@ -15,13 +19,22 @@ const runId = new Date().toISOString().replace(/[:.]/g, "_");
 function getTestData(
   runDirectory: string,
 ): { input: DatabaseSchemaEvalInput }[] {
-  return getAllSpectacularSpecFiles().map((specFileDetails) => ({
-    input: {
+  return getAllSpectacularSpecFiles().map((specFileDetails) => {
+    const projectName = getProjectNameFromSpecFile(specFileDetails);
+    const projectDir = path.join(runDirectory, projectName);
+
+    // Create a logger and log the input data
+    const logger = getProjectLogger(projectDir, runId, "setup");
+    const input = {
       runId,
       runDirectory,
       specFileDetails,
-    },
-  }));
+      projectDir,
+    };
+    logger.logSchemaInput(input);
+
+    return { input };
+  });
 }
 
 evalite("LLM-Generated TypeScript Validity Evaluation", {
@@ -39,12 +52,24 @@ evalite("LLM-Generated TypeScript Validity Evaluation", {
   },
   // The task to perform - generate Drizzle ORM `schema.ts` code with an LLM
   task: async (input: DatabaseSchemaEvalInput) => {
+    // Create a project-specific logger
+    const projectName = path.basename(
+      input.specFileDetails.fileName,
+      path.extname(input.specFileDetails.fileName),
+    );
+    const projectDir = path.join(input.runDirectory, projectName);
+    const logger = getProjectLogger(projectDir, runId, "task");
+
     const agent = new SchemaAgentService();
     const { code } = await agent.getSchemaFromSpec(input.specFileDetails.spec);
 
+    // Log the output of the task
+    const output = { code };
+    logger.logSchemaOutput(output);
+
     // TODO - Cache result in case we are watching files!!!
 
-    return { code };
+    return output;
   },
   // The scoring methods for the eval
   scorers: [SchemaTypeScriptValidity],

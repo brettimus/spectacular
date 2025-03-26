@@ -1,10 +1,15 @@
 import fs from "node:fs";
-import path, { basename } from "node:path";
+import path from "node:path";
 import { createScorer } from "evalite";
 import { validateTypeScript } from "../../../src/utils/typechecking";
-import type { TypeScriptValidityResult } from "./types";
 import type { DatabaseSchemaEvalInput } from "../../database-schema";
-import { createNewProject } from "../../runner-utils";
+import {
+  createNewProject,
+  getProjectLogger,
+  getProjectNameFromSpecFile,
+} from "../../runner-utils";
+import type { EvalLogger } from "../../runner-utils";
+import type { TypeScriptValidityResult } from "./types";
 
 /**
  * TypeScript Validity scorer that uses the TypeScript compiler to check for errors.
@@ -19,16 +24,17 @@ export const SchemaTypeScriptValidity = createScorer<
   // `expected` also comes from `data` but is not used in this scorer
   // `output` is the output of `task` but not used in this scorer
   scorer: async ({ input, expected: _expected, output }) => {
-    const { runDirectory, specFileDetails } = input;
-    const projectName = basename(
-      specFileDetails.fileName,
-      path.extname(specFileDetails.fileName),
-    );
+    const { runDirectory, specFileDetails, runId } = input;
+    const projectName = getProjectNameFromSpecFile(specFileDetails);
     const projectDir = await createNewProject(runDirectory, projectName);
-    console.log("Project dir", projectDir);
+
+    // Create a logger for the validation process
+    const logger = getProjectLogger(projectDir, runId, "typescript-validity");
+
     const result = await typecheckCode({
       code: output.code,
       projectDir,
+      logger,
     });
 
     return result;
@@ -41,8 +47,9 @@ export const SchemaTypeScriptValidity = createScorer<
 const typecheckCode = async (opts: {
   code: string;
   projectDir: string;
+  logger: EvalLogger;
 }): Promise<TypeScriptValidityResult> => {
-  const { code, projectDir } = opts;
+  const { code, projectDir, logger } = opts;
 
   if (!fs.existsSync(projectDir)) {
     throw new Error("Directory to store project does not exist");
@@ -70,8 +77,19 @@ const typecheckCode = async (opts: {
       e.location?.includes("schema.ts"),
     );
 
+    // Log the validation errors
+    if (schemaErrors.length > 0) {
+      logger.logError({
+        context: "schema_validation",
+        errors: schemaErrors,
+      });
+    }
+
     // If there's no stderr, the code is valid
     if (!schemaErrors.length) {
+      logger.logInfo({
+        message: "TypeScript validation passed with no errors",
+      });
       return {
         score: 1,
         metadata: {
@@ -105,6 +123,13 @@ const typecheckCode = async (opts: {
       },
     };
   } catch (error) {
+    // Log and handle execution errors
+    logger.logError({
+      context: "schema_validation_error",
+      message: `Failed to validate TypeScript: ${error instanceof Error ? error.message : String(error)}`,
+      error,
+    });
+
     // Handle execution errors
     return {
       score: 0,

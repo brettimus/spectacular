@@ -1,7 +1,7 @@
-import { initContext, type Context } from "@/context";
+import { type Context, initContext } from "@/context";
+import { analyzeDatabaseTables } from "./analyze-tables";
 import { generateSchema } from "./generate-schema";
 import type { SelectedRule } from "./types";
-import { analyzeDatabaseTables } from "./analyze-tables";
 import {
   verifyGeneratedSchema,
   // type SchemaVerificationObject,

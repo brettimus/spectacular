@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { intro, note, outro, confirm } from "@clack/prompts";
+import { confirm, intro, note, outro } from "@clack/prompts";
 import pico from "picocolors";
 import { actionIdeate } from "../actions/ideate";
 import {
@@ -12,9 +12,9 @@ import { SPECTACULAR_TITLE } from "../const";
 import { initContext } from "../context";
 import { promptDescription } from "../description";
 import { promptOpenAiKey } from "../openai-api-key";
+import { handleResult } from "../utils";
 import { saveGlobalDebugInfo } from "../utils/credentials";
 import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
-import { handleResult } from "../utils";
 import { commandCreateSchema } from "./create-schema";
 
 export async function commandInit() {

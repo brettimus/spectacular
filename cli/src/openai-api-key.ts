@@ -1,8 +1,8 @@
 import type { Context } from "@/context";
 import { confirm, select, text } from "@clack/prompts";
 import pico from "picocolors";
-import { getApiKey, listApiKeys, saveApiKey } from "./utils/credentials";
 import { handleResult } from "./utils";
+import { getApiKey, listApiKeys, saveApiKey } from "./utils/credentials";
 
 export async function promptOpenAiKey(ctx: Context) {
   try {

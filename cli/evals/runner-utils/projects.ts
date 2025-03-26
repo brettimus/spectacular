@@ -1,10 +1,20 @@
+import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { downloadTemplate } from "giget";
-import { spawn } from "node:child_process";
+import type { SpectacularSpecFile } from "../utils";
 
 const BASE_TEMPLATE_URL = "github:brettimus/mega-honc";
 const BASE_TEMPLATE_DIR = "_base-template";
+
+export function getProjectNameFromSpecFile(
+  specFileDetails: SpectacularSpecFile,
+) {
+  return path.basename(
+    specFileDetails.fileName,
+    path.extname(specFileDetails.fileName),
+  );
+}
 
 /**
  * Returns (or creates and returns) a run directory for a given run ID
@@ -61,8 +71,10 @@ export async function createNewProject(
   }
 
   const targetDir = path.join(runDirPath, dirName);
+  const targetDirTsConfig = path.join(targetDir, "tsconfig.json");
   // Create target directory if it doesn't exist
-  if (!fs.existsSync(targetDir)) {
+  // HACK - We need to check if the tsconfig.json exists as a means of checking if the project files were copied in already
+  if (!fs.existsSync(targetDir) || !fs.existsSync(targetDirTsConfig)) {
     fs.mkdirSync(targetDir, { recursive: true });
     // Copy all files from base template to target directory
     fs.cpSync(baseProjectDir, targetDir, { recursive: true });

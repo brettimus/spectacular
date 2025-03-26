@@ -4,8 +4,8 @@ import path from "node:path";
 import { intro, outro, select } from "@clack/prompts";
 import pico from "picocolors";
 import { SPECTACULAR_TITLE } from "../const";
-import { getSpectacularHomeDirPath } from "../utils/credentials";
 import { handleResult } from "../utils";
+import { getSpectacularHomeDirPath } from "../utils/credentials";
 
 export async function commandViewLogs() {
   console.log("");

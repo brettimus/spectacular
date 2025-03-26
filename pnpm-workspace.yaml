@@ -3,3 +3,4 @@ packages:
   - "service"
   - "eval-repos/*"
   - "eval-repos/run-*/*"
+  - "posthonc"

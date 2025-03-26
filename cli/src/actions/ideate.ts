@@ -1,10 +1,10 @@
-import type { Context } from "@/context";
 import {
   askFollowUpQuestion,
   generateImplementationPlan,
   routerAgent,
 } from "@/agents/ideation-agent";
 import { createUserMessage } from "@/agents/utils";
+import type { Context } from "@/context";
 import { handleResult } from "@/utils";
 import { stream, log, spinner, text } from "@clack/prompts";
 import { appendResponseMessages } from "ai";

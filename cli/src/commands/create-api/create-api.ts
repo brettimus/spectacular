@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { handleResult } from "@/utils/result";
 import { intro, outro } from "@clack/prompts";
 import pico from "picocolors";
 import { actionCreateApi } from "../../actions/create-api";
@@ -6,7 +7,6 @@ import { SPECTACULAR_TITLE } from "../../const";
 import { type Context, initContext } from "../../context";
 import { promptOpenAiKey } from "../../openai-api-key";
 import { appendToLog, saveGlobalDebugInfo } from "../../utils/credentials";
-import { handleResult } from "@/utils/result";
 
 export async function commandCreateApi(continuingWithContext?: Context) {
   const ctx = continuingWithContext ?? initContext();

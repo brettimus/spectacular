@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { actionDependencies } from "@/actions/dependencies";
 import { isError } from "@/types";
 import { handleCancel, handleError } from "@/utils";
+import { handleResult } from "@/utils/result";
 import { confirm, intro, isCancel, outro } from "@clack/prompts";
 import pico from "picocolors";
 import { actionCreateSchema } from "../../actions/create-schema";
@@ -11,8 +13,6 @@ import { SPECTACULAR_TITLE } from "../../const";
 import { type Context, initContext } from "../../context";
 import { promptOpenAiKey } from "../../openai-api-key";
 import { appendToLog, saveGlobalDebugInfo } from "../../utils/credentials";
-import { actionDependencies } from "@/actions/dependencies";
-import { handleResult } from "@/utils/result";
 import { commandCreateApi } from "../create-api";
 
 const __filename = fileURLToPath(import.meta.url);

@@ -1,8 +1,8 @@
-import path from "node:path";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { convertSpecNameToFilename, pathFromInput } from "./utils";
 import * as fs from "node:fs";
 import type { PathLike } from "node:fs";
+import path from "node:path";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { convertSpecNameToFilename, pathFromInput } from "./utils";
 
 // Mock the fs.existsSync function
 vi.mock("node:fs", async () => {

@@ -4,3 +4,6 @@ It makes it possible for the evals in the `cli` package to quickly write a file 
 
 You might wanna periodically clean this directory to remove old runs, since the number of projects will grow quickly...
 
+```bash
+pnpm run clean:eval-repos
+```

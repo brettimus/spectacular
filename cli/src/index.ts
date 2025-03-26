@@ -6,8 +6,8 @@ import {
   commandApiKeyRemove,
   commandApiKeySetDefault,
 } from "./commands/api-keys";
-import { commandCreateSchema } from "./commands/create-schema";
 import { commandCreateApi } from "./commands/create-api";
+import { commandCreateSchema } from "./commands/create-schema";
 import { commandInit } from "./commands/init";
 import { commandViewLogs } from "./commands/logs";
 

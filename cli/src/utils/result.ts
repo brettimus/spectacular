@@ -1,6 +1,6 @@
-import { cancel, isCancel, log } from "@clack/prompts";
-import { CodeGenError, isError } from "@/types";
 import { CANCEL_MESSAGE, HATCH_LOG_LEVEL } from "@/const";
+import { CodeGenError, isError } from "@/types";
+import { cancel, isCancel, log } from "@clack/prompts";
 
 export function handleResult(result: unknown) {
   if (isCancel(result)) {

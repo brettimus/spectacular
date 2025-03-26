@@ -1,9 +1,9 @@
+import { ApiAgentService } from "@/agents/api-agent";
 import type { Context } from "@/context";
 import { note, spinner } from "@clack/prompts";
 import pico from "picocolors";
 import { loadExistingSchema } from "./load-existing-schema";
 import { saveApiCode } from "./save-api-code";
-import { ApiAgentService } from "@/agents/api-agent";
 
 export async function actionCreateApi(context: Context): Promise<void> {
   const s = spinner();
