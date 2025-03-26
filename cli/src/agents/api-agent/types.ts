@@ -1,4 +1,5 @@
 import type { Context } from "@/context";
+import type { ErrorInfo } from "@/utils/typechecking/types";
 
 export interface ApiGenerationOptions {
   schema: string;
@@ -19,6 +20,16 @@ export interface ApiGenerationResult {
   reasoning: string;
 }
 
+export interface ApiErrorAnalysisResult {
+  text: string;
+  sources?: Record<string, unknown>[];
+}
+
+export interface ApiFixResult {
+  code: string;
+  explanation: string;
+}
+
 export interface ApiAgentInterface {
   generateApiRoutes(
     context: Context,
@@ -34,4 +45,16 @@ export interface ApiAgentInterface {
     context: Context,
     options: ApiVerificationOptions,
   ): Promise<ApiVerificationResult>;
+  
+  analyzeApiErrors(
+    context: Context, 
+    apiCode: string, 
+    errors: ErrorInfo[]
+  ): Promise<ApiErrorAnalysisResult | null>;
+  
+  fixApiErrors(
+    context: Context, 
+    fixContent: string, 
+    originalApiCode: string
+  ): Promise<ApiFixResult | null>;
 }

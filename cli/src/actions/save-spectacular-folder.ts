@@ -1,7 +1,7 @@
 import type { Context } from "@/context";
 import { log } from "@clack/prompts";
 import {
-  saveSpectacularDebugInfo,
+  saveSpectacularInitDebugInfo,
   saveSpectacularMetadata,
 } from "../utils/spectacular-dir";
 
@@ -14,7 +14,7 @@ export async function saveSpectacularFolder(ctx: Context) {
     const basePath = process.cwd();
 
     // Save debug information
-    saveSpectacularDebugInfo(basePath, ctx);
+    saveSpectacularInitDebugInfo(basePath, ctx);
 
     // Save metadata
     saveSpectacularMetadata(basePath, ctx.specPath, ctx.sessionId);

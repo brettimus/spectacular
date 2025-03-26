@@ -99,7 +99,7 @@ export function saveSpectacularMetadata(
 /**
  * Save debug information to the spectacular directory
  */
-export function saveSpectacularDebugInfo(path: string, context: Context): void {
+export function saveSpectacularInitDebugInfo(path: string, context: Context): void {
   const spectacularDir = getSpectacularProjectDirPath(path);
   ensureSpectacularDir(path);
 

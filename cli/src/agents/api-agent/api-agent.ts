@@ -9,6 +9,9 @@ import type {
   ApiVerificationOptions,
   ApiVerificationResult,
 } from "./types";
+import type { ErrorInfo } from "@/utils/typechecking/types";
+import { analyzeApiErrors as analyzeErrors } from "./analyze-api-errors";
+import { fixApiErrors as fixErrors } from "./fix-api";
 
 const TEMPLATE_EXAMPLE = `
 import { instrument } from "@fiberplane/hono-otel";
@@ -245,6 +248,22 @@ Things you usually screw up (things to avoid):
       valid: result.object.valid,
       issues: result.object.issues,
     };
+  }
+
+  async analyzeApiErrors(
+    context: Context,
+    apiCode: string,
+    errors: ErrorInfo[]
+  ) {
+    return analyzeErrors(context, apiCode, errors);
+  }
+  
+  async fixApiErrors(
+    context: Context,
+    fixContent: string,
+    originalApiCode: string
+  ) {
+    return fixErrors(context, fixContent, originalApiCode);
   }
 
   private getDrizzleOrmExamples(): string {
