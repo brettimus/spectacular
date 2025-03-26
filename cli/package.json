@@ -16,7 +16,7 @@
     "eval:db:schema": "evalite evals/database-schema/database-schema.eval.ts",
     "eval:db:schema:watch": "evalite watch evals/database-schema/database-schema.eval.ts",
     "format": "biome format . --write",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.evals.json",
     "clean": "rimraf dist",
     "clean:test-apps": "rimraf test-apps/* && touch test-apps/.gitkeep",
     "prepublishOnly": "pnpm build",

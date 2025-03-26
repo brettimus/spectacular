@@ -29,12 +29,17 @@ export type SpectacularSpecFile = {
 };
 
 export function getAllSpectacularSpecFiles(): SpectacularSpecFile[] {
-  return fs
-    .readdirSync(SPECS_DIR)
-    .filter((file) => fs.statSync(path.join(SPECS_DIR, file)).isFile())
-    .map((file) => ({
-      fileName: file,
-      spec: getSpectacularSpecFile(file),
-      fullPath: path.join(SPECS_DIR, file),
-    }));
+  return (
+    fs
+      .readdirSync(SPECS_DIR)
+      // Only include files that are files (not directories)
+      .filter((file) => fs.statSync(path.join(SPECS_DIR, file)).isFile())
+      // Ignore files that start with an underscore
+      .filter((file) => !file.startsWith("_"))
+      .map((file) => ({
+        fileName: file,
+        spec: getSpectacularSpecFile(file),
+        fullPath: path.join(SPECS_DIR, file),
+      }))
+  );
 }
