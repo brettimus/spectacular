@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import type { Context } from "@/context";
 import pico from "picocolors";
+import { initCommandLogSession } from "../../utils/logging";
 import { executeStep } from "./executor";
 import { loadExistingSpec } from "./load-existing-spec";
 import type { SchemaGenerationStep } from "./types";
-import { initCommandLogSession } from "../../utils/logging";
 
 // CURRENT - Implementation of create-schema functionality
 //

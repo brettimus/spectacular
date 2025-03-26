@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createScorer } from "evalite";
 import { validateTypeScript } from "../../../src/utils/typechecking";
+import type { ApiRoutesEvalInput } from "../../api-routes";
 import {
   createNewProject,
   getProjectLogger,
@@ -9,7 +10,6 @@ import {
 } from "../../runner-utils";
 import type { EvalLogger } from "../../runner-utils";
 import type { TypeScriptValidityResult } from "./types";
-import type { ApiRoutesEvalInput } from "../../api-routes";
 
 /**
  * TypeScript Validity scorer that uses the TypeScript compiler to check for errors.

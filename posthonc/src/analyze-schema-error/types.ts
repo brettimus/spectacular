@@ -26,4 +26,4 @@ export interface SchemaData {
   schemaTs: string;
   schemaErrors: SchemaError[];
   reportPath: string;
-} 
+}

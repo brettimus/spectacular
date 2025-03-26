@@ -1,13 +1,13 @@
 import { ApiAgentService } from "@/agents/api-agent";
 import type { Context } from "@/context";
-import { note, spinner } from "@clack/prompts";
-import pico from "picocolors";
-import { loadExistingSchema } from "./load-existing-schema";
-import { saveApiCode } from "./save-api-code";
+import { removeCwd } from "@/utils";
 import { validateTypeScript } from "@/utils/typechecking";
 import type { ErrorInfo } from "@/utils/typechecking/types";
+import { note, spinner } from "@clack/prompts";
+import pico from "picocolors";
 import { initCommandLogSession, logActionExecution } from "../../utils/logging";
-import { removeCwd } from "@/utils";
+import { loadExistingSchema } from "./load-existing-schema";
+import { saveApiCode } from "./save-api-code";
 
 export async function actionCreateApi(context: Context): Promise<void> {
   // Initialize log session for this command

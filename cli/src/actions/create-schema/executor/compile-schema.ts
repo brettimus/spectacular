@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fixSchemaErrors } from "@/agents/schema-agent";
+import { analyzeSchemaErrors } from "@/agents/schema-agent/analyze-typescript-errors";
 import type { Context } from "@/context";
 import { handleError } from "@/utils";
+import { validateTypeScript } from "@/utils/typechecking/typecheck";
 import { log, spinner } from "@clack/prompts";
 import type { SchemaGenerationStep } from "../types";
-import { validateTypeScript } from "@/utils/typechecking/typecheck";
-import { analyzeSchemaErrors } from "@/agents/schema-agent/analyze-typescript-errors";
 
 export async function compileSchema(
   ctx: Context,

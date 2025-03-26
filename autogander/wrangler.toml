@@ -2,6 +2,9 @@ name = "mega-honc"
 compatibility_date = "2025-02-04"
 compatibility_flags = [ "nodejs_compat" ]
 
+[dev]
+port = 4008
+
 [[d1_databases]]
 binding = "DB"
 database_name = "honc-d1-database"

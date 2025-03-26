@@ -3,9 +3,9 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
+import { logAIInteraction } from "../../utils/logging";
 import { createUserMessage } from "../utils";
 import type { SelectedRule } from "./types";
-import { logAIInteraction } from "../../utils/logging";
 
 export const GENERATE_SCHEMA_SYSTEM_PROMPT = `
 You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.

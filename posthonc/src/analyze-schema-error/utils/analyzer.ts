@@ -1,6 +1,6 @@
 import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
-import type { SchemaData, AnalysisResult } from '../types';
+import type { AnalysisResult, SchemaData } from "../types";
 
 /**
  * Generate a prompt for the AI to analyze schema errors
@@ -28,12 +28,14 @@ Please search the internet for the latest Drizzle ORM documentation on how to de
 /**
  * Analyze schema errors using OpenAI and web search
  */
-export async function analyzeSchemaErrors(data: SchemaData): Promise<AnalysisResult | null> {
+export async function analyzeSchemaErrors(
+  data: SchemaData,
+): Promise<AnalysisResult | null> {
   try {
     console.log(`Analyzing schema errors for report: ${data.reportPath}`);
-    
+
     const prompt = generateErrorAnalysisPrompt(data);
-    
+
     const result = await generateText({
       model: openai.responses("gpt-4o"),
       prompt,
@@ -44,10 +46,10 @@ export async function analyzeSchemaErrors(data: SchemaData): Promise<AnalysisRes
 
     return {
       text: result.text,
-      sources: result.sources
+      sources: result.sources,
     };
   } catch (error) {
     console.error("Error analyzing schema errors:", error);
     return null;
   }
-} 
+}

@@ -1,10 +1,10 @@
 import type { Context } from "@/context";
 import { log } from "@clack/prompts";
+import { initCommandLogSession, logActionExecution } from "../utils/logging";
 import {
   saveSpectacularInitDebugInfo,
   saveSpectacularMetadata,
 } from "../utils/spectacular-dir";
-import { initCommandLogSession, logActionExecution } from "../utils/logging";
 
 export async function saveSpectacularFolder(ctx: Context) {
   try {

@@ -14,7 +14,7 @@ CREATE TABLE `fixes` (
 	`original_code` text NOT NULL,
 	`errors` text NOT NULL,
 	`analysis` text NOT NULL,
-	`fix` text NOT NULL,
+	`fixed_code` text,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL
 );
 --> statement-breakpoint

@@ -1,18 +1,18 @@
-import { initContext, type Context } from "@/context";
+import { type Context, initContext } from "@/context";
+import type { ErrorInfo } from "@/utils/typechecking/types";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
+import { logAIInteraction } from "../../utils/logging";
+import { analyzeApiErrors as analyzeErrors } from "./analyze-api-errors";
+import { fixApiErrors as fixErrors } from "./fix-api";
 import type {
   ApiAgentInterface,
   ApiGenerationOptions,
   ApiVerificationOptions,
   ApiVerificationResult,
 } from "./types";
-import type { ErrorInfo } from "@/utils/typechecking/types";
-import { analyzeApiErrors as analyzeErrors } from "./analyze-api-errors";
-import { fixApiErrors as fixErrors } from "./fix-api";
-import { logAIInteraction } from "../../utils/logging";
 
 const TEMPLATE_EXAMPLE = `
 import { instrument } from "@fiberplane/hono-otel";

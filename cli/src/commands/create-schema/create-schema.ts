@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { actionDependencies } from "@/actions/dependencies";
-import { handleResult } from "@/utils/result";
-import { confirm, intro, outro } from "@clack/prompts";
-import pico from "picocolors";
 import { actionCreateSchema } from "@/actions/create-schema";
+import { actionDependencies } from "@/actions/dependencies";
 import { actionDownloadTemplate } from "@/actions/download-template";
 import { SPECTACULAR_TITLE } from "@/const";
 import { type Context, initContext } from "@/context";
 import { promptOpenAiKey } from "@/openai-api-key";
 import { appendToLog, saveGlobalDebugInfo } from "@/utils/credentials";
+import { handleResult } from "@/utils/result";
+import { confirm, intro, outro } from "@clack/prompts";
+import pico from "picocolors";
 import { commandCreateApi } from "../create-api";
 
 const __filename = fileURLToPath(import.meta.url);

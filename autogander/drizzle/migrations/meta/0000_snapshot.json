@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "8b87caa7-12d5-434d-8de9-209936fec5ab",
+  "id": "ae3276d3-7286-4031-af32-5270de372f7c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "fix_rules": {
@@ -109,11 +109,11 @@
           "notNull": true,
           "autoincrement": false
         },
-        "fix": {
-          "name": "fix",
+        "fixed_code": {
+          "name": "fixed_code",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
