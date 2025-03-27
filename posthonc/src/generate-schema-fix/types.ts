@@ -4,4 +4,4 @@ export type Any = any;
 export interface FixedSchema {
   code: string;
   explanation: string;
-} 
+}

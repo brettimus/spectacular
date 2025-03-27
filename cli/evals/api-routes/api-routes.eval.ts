@@ -2,16 +2,16 @@ import path from "node:path";
 import { evalite } from "evalite";
 import { ApiAgentService } from "../../src/agents/api-agent";
 import { getEvalRunProjectDir, getProjectLogger } from "../runner-utils";
+import {
+  getProjectNameFromSchemaFile,
+  getProjectNameFromSpecFile,
+} from "../runner-utils/projects";
 import { ApiTypeScriptValidity } from "../scorers/typescript-validity";
 import {
   getAllSpectacularSchemaFiles,
   getAllSpectacularSpecFiles,
 } from "../utils";
 import type { ApiRoutesEvalInput } from "./types";
-import {
-  getProjectNameFromSchemaFile,
-  getProjectNameFromSpecFile,
-} from "../runner-utils/projects";
 
 // Use a timestamp as the run ID
 const runId = new Date().toISOString().replace(/[:.]/g, "_");

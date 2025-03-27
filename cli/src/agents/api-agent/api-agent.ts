@@ -1,18 +1,18 @@
-import { initContext, type Context } from "@/context";
+import { type Context, initContext } from "@/context";
+import type { ErrorInfo } from "@/utils/typechecking/types";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
+import { logAIInteraction } from "../../utils/logging";
+import { analyzeApiErrors as analyzeErrors } from "./analyze-api-errors";
+import { fixApiErrors as fixErrors } from "./fix-api";
 import type {
   ApiAgentInterface,
   ApiGenerationOptions,
   ApiVerificationOptions,
   ApiVerificationResult,
 } from "./types";
-import type { ErrorInfo } from "@/utils/typechecking/types";
-import { analyzeApiErrors as analyzeErrors } from "./analyze-api-errors";
-import { fixApiErrors as fixErrors } from "./fix-api";
-import { logAIInteraction } from "../../utils/logging";
 
 const TEMPLATE_EXAMPLE = `
 import { instrument } from "@fiberplane/hono-otel";
@@ -408,6 +408,14 @@ const [updatedUser] = await db.update().set({ name: "John" }).where(eq(schema.us
   details: error instanceof Error ? error.message : String(error)
   }, 500);
   }
+</drizzle-orm-example>
+<drizzle-orm-example description="access a json column">
+// ...
+// if a column has { mode: "json" } in the schema, you can access it like this:
+const user = await db.select().from(schema.users).where(eq(schema.users.id, id));
+const userJson = user[0]?.jsonColumn;
+// ...
+// and the json should already be parsed - you don't need to parse it again
 </drizzle-orm-example>
 `.trim();
   }

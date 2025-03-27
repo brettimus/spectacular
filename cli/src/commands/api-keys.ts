@@ -2,6 +2,7 @@
 import { confirm, intro, isCancel, outro, select, text } from "@clack/prompts";
 import pico from "picocolors";
 import { SPECTACULAR_TITLE } from "../const";
+import { initContext } from "../context";
 import { handleCancel } from "../utils";
 import {
   appendToLog,
@@ -10,7 +11,6 @@ import {
   saveApiKey,
   setDefaultApiKey,
 } from "../utils/credentials";
-import { initContext } from "../context";
 import { initCommandLogSession } from "../utils/logging";
 
 export async function commandApiKeyAdd() {

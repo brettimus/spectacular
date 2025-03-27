@@ -1,0 +1,4 @@
+# OpenAI settings
+OPENAI_API_KEY=your_openai_api_key_here
+CLOUDFLARE_ACCOUNT_ID
+CLOUDFLARE_AI_GATEWAY_ID

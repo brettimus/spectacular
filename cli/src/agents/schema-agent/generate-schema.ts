@@ -3,9 +3,9 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
+import { logAIInteraction } from "../../utils/logging";
 import { createUserMessage } from "../utils";
 import type { SelectedRule } from "./types";
-import { logAIInteraction } from "../../utils/logging";
 
 export const GENERATE_SCHEMA_SYSTEM_PROMPT = `
 You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.
@@ -268,6 +268,9 @@ export const users = sqliteTable("users", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   email: text("email"),
+  // This is how you define a json column
+  metadata: text("metadata", { mode: "json" }),
+  // This is how you define timestamp columns
   createdAt: text("created_at").notNull().default(sql\`(CURRENT_TIMESTAMP)\`),
   updatedAt: text("updated_at").notNull().default(sql\`(CURRENT_TIMESTAMP)\`),
 }, (table) => [

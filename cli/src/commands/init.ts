@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import path from "node:path";
 import { confirm, intro, note, outro } from "@clack/prompts";
 import pico from "picocolors";
 import { actionIdeate } from "../actions/ideate";
@@ -16,7 +17,6 @@ import { handleResult, removeCwd } from "../utils";
 import { saveGlobalDebugInfo } from "../utils/credentials";
 import { hasValidSpectacularConfig } from "../utils/spectacular-dir";
 import { commandCreateSchema } from "./create-schema";
-import path from "node:path";
 
 export async function commandInit() {
   console.log("");

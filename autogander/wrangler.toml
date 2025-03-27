@@ -1,0 +1,41 @@
+name = "autogander"
+compatibility_date = "2025-02-04"
+compatibility_flags = [ "nodejs_compat" ]
+
+[dev]
+port = 4008
+
+[[d1_databases]]
+binding = "DB"
+database_name = "autogander-d1-database"
+database_id = "ba717767-a906-4d1f-8dc7-eb5e2afae111"
+migrations_dir = "drizzle/migrations"
+
+[[workflows]]
+name = "autogander-rule-workflow"
+binding = "AUTOGANDER_RULE_WORKFLOW"
+class_name = "RuleWorkflow"
+
+[triggers]
+# Run the rule workflow every 15 mins
+crons = ["*/15 * * * *"]
+
+# [vars]
+# MY_VAR = "my-variable"
+
+# Workers Logs
+# Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
+# Configuration: https://developers.cloudflare.com/workers/observability/logs/workers-logs/#enable-workers-logs
+[observability]
+enabled = true
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+# [ai]
+# binding = "AI"

@@ -1,7 +1,7 @@
 import type { Context } from "@/context";
+import type { ErrorInfo } from "@/utils/typechecking/types";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
-import type { ErrorInfo } from "@/utils/typechecking/types";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { logAIInteraction } from "../../utils/logging";
 

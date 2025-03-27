@@ -1,0 +1,6 @@
+# Database settings for local development
+CLOUDFLARE_ACCOUNT_ID=your_account_id_here
+CLOUDFLARE_AI_GATEWAY_ID=blah
+
+# OpenAI  settings
+OPENAI_API_KEY=your_openai_api_key_here
