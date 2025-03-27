@@ -146,8 +146,49 @@ export const Layout: FC<PropsWithChildren<{ title: string }>> = ({ title, childr
         </header>
         
         <main class="container">
+          {title.includes("Rules") && (
+            <div class="rules-subnav">
+              <nav class="subnav">
+                <a href="/rules" class={title === "All Rules" ? "active" : ""}>All</a>
+                <a href="/rules/pending" class={title === "Pending Rules" ? "active" : ""}>Pending</a>
+                <a href="/rules/approved" class={title === "Approved Rules" ? "active" : ""}>Approved</a>
+                <a href="/rules/rejected" class={title === "Rejected Rules" ? "active" : ""}>Rejected</a>
+              </nav>
+            </div>
+          )}
           {children}
         </main>
+        
+        <style>{`
+          .rules-subnav {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+          }
+          
+          .subnav {
+            display: flex;
+            gap: 1rem;
+            padding-bottom: 0.5rem;
+          }
+          
+          .subnav a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+          }
+          
+          .subnav a:hover {
+            background-color: #f3f4f6;
+          }
+          
+          .subnav a.active {
+            color: var(--primary-color);
+            font-weight: 500;
+            border-bottom: 2px solid var(--primary-color);
+          }
+        `}</style>
       </body>
     </html>
   );

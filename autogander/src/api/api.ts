@@ -197,4 +197,42 @@ app.post("/admin/trigger-rule-workflow", async (c, next) => {
   }
 });
 
+// Endpoint to review (approve/reject) rules
+app.post("/rules/:id/review", async (c) => {
+  const db = drizzle(c.env.DB);
+  const id = c.req.param("id");
+  
+  if (!id) {
+    return c.json({ error: "Missing rule id" }, 400);
+  }
+  
+  // Parse form data
+  const formData = await c.req.parseBody();
+  const action = formData.action as string;
+  const returnUrl = (formData.returnUrl as string) || "/rules";
+  
+  if (!action || (action !== "approve" && action !== "reject")) {
+    return c.json({ error: "Invalid action" }, 400);
+  }
+  
+  const status = action === "approve" ? "approved" : "rejected";
+  
+  try {
+    // Update the rule status
+    await db
+      .update(schema.rules)
+      .set({ status })
+      .where(eq(schema.rules.id, Number.parseInt(id)));
+    
+    // Redirect back to the rules page
+    return c.redirect(returnUrl);
+  } catch (error) {
+    console.error("Error updating rule:", error);
+    return c.json({
+      error: "Failed to update rule",
+      message: error instanceof Error ? error.message : "Unknown error"
+    }, 500);
+  }
+});
+
 export default app;

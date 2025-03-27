@@ -31,6 +31,7 @@ export const rules = sqliteTable("rules", {
   rule: text("rule").notNull(),
   reasoning: text("reasoning"),
   additionalData: text("additional_data", { mode: "json" }), // Assuming JSON is stored as TEXT
+  status: text("status").notNull().default("pending"),
   createdAt: text("created_at").notNull().default(sql`(CURRENT_TIMESTAMP)`),
 });
 

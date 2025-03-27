@@ -1,9 +1,9 @@
-import { CoreMessage } from "ai"
+import type { CoreMessage } from "ai"
 
 export const RULE_GENERATION_SYSTEM_PROMPT = `You are an expert Typescript developer specializing in Hono.js and Drizzle ORM.
 
-You will need to craft an.mdc file to addresses issues in the code, some of which
-may have been fixed.
+You will need to craft markdown rule files to addresses issues in the code, some of which may have been fixed,
+but others may not have been fixed.
 
 You are given:
 - Problematic Hono.js TypeScript code
@@ -12,16 +12,24 @@ You are given:
 - An attempted fix of the code
 - Remaining Typescript compiler errors from the fixed version (if any)
 
-Use this information to generate a.mdc rule file following the Cursor rule file conventions.The output should consist of:
-1.	Frontmatter:
-  * description: A concise summary of the rule's purpose, based on the root issue in the code.
-2.	Body:
+Use this information to generate markdown rule files.
+The output should consist of:
   * Concise, specific markdown instructions that help prevent or fix the issue.
-  * Less than 100 lines if possible
-  * Include actionable coding standards or best practices that would have prevented the original error.
+  * An example of GOOD and BAD code that demonstrates the rule.
+  * Do not go into coding standards or more general pontification.
+  * Be clear and to the point.
+
+Here is an example of a rule file:
+[EXAMPLE RULE]
+${getExampleRule()}
+[END EXAMPLE RULE]
 
 Output only the mdc content. DO NOT explain or include any surrounding text for the mdc file.
 You can provide reasoning in the reasoning field.
+
+Skip rules that are not relevant to using Hono.js and Drizzle ORM.
+Do not share learnings about application logic that is specific to the project,
+instead take this as a moment to teach yourself more about the framework and libraries.
 `
 
 function createRuleGenerationPrompt(
@@ -51,9 +59,7 @@ ${attemptedFix}
 [REMAINING ERRORS]
 ${fixedCompilerErrors}
 [END REMAINING ERRORS]
-***
-  
-  `
+***`
 }
 
 export function createRuleGenerationMessages(
@@ -73,4 +79,28 @@ export function createRuleGenerationMessages(
       content: createRuleGenerationPrompt(code, sourceCompilerErrors, analysis, attemptedFix, fixedCompilerErrors),
     },
   ]
+}
+
+function getExampleRule() {
+  return `To combine multiple conditions in a query, use the and helper from the "drizzle-orm" package.
+
+   \`\`\`typescript
+  import { Hono } from 'hono';
+  import { and } from 'drizzle-orm';
+
+  type Bindings = {
+    DB: D1Database;
+  };
+
+  const app = new Hono<{ Bindings: Bindings }>();
+
+  app.get('/', async (c) => {
+    const db = drizzle(c.env.DB);
+    const result = await db.select().from(schema.goals).where(and(eq(schema.goals.id, 1), eq(schema.goals.title, 'My Goal')));
+    return c.json(result);
+  });
+
+  export default app;
+  \`\`\`
+`
 }

@@ -10,13 +10,21 @@ import { createRuleGenerationMessages } from "./prompts";
 
 // Define OpenAI model type and constants
 type OpenAIModel = Parameters<OpenAIProvider>[0];
-const OPENAI_MODEL: OpenAIModel = "gpt-4o";
+const OPENAI_MODEL: OpenAIModel = "o3-mini";
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 200;
 const BATCH_SIZE = 10;
 
 // biome-ignore lint/complexity/noBannedTypes: There are no params, it is fine
 type Params = {};
+
+// Define type for rule items to be saved
+type RuleToSave = {
+  fixEventId: number;
+  rule: string;
+  reasoning: string | null;
+  additionalData: Record<string, unknown> | null;
+};
 
 /**
  * RuleWorkflow - Generates rules for fixes that don't have associated rules yet
@@ -71,6 +79,9 @@ export class RuleWorkflow extends WorkflowEntrypoint<Bindings, Params> {
       // Process each fix
       let processedCount = 0;
       
+      // Collect all rules to be saved in a batch
+      const rulesToSave: RuleToSave[] = [];
+      
       for (const fixEvent of fixesWithoutRules) {
         // Step 2: Generate rules for the fix
         const ruleResult = await step.do(
@@ -95,16 +106,20 @@ export class RuleWorkflow extends WorkflowEntrypoint<Bindings, Params> {
               );
               
               // Capture the generated MDC content
-              const { object: ruleResult } = await generateObject({
+              const { object: rulesResult } = await generateObject({
                 model: openai(OPENAI_MODEL),
                 schema: z.object({
-                  reasoning: z.string().describe("The reasoning for the rule"),
-                  rule: z.string().describe("The rule in mdc formatting to learn from the fix"),
+                  rules: z.array(
+                    z.object({
+                      reasoning: z.string().describe("The reasoning for the rule"),
+                      rule: z.string().describe("The specific rule in mdc formatting to learn from the fix"),
+                    })
+                  ).describe("The rules in mdc formatting to learn from the fix"),
                 }),
                 messages,
               });
               
-              return ruleResult;
+              return rulesResult;
             } catch (error) {
               console.error("Error in rule generation:", error);
               throw error;
@@ -112,38 +127,46 @@ export class RuleWorkflow extends WorkflowEntrypoint<Bindings, Params> {
           }
         );
         
-        // Step 3: Save the generated rule
-        if (ruleResult.rule) {
-          await step.do(
-            `save-rule-for-fix-${fixEvent.id}`,
-            {
-              retries: {
-                limit: MAX_RETRIES,
-                delay: BASE_DELAY_MS,
-                backoff: "exponential",
-              },
-              timeout: "30 seconds",
-            },
-            async () => {
-              await db.insert(rules).values({
-                fixEventId: fixEvent.id,
-                rule: ruleResult.rule,
-                reasoning: ruleResult.reasoning || null,
-                additionalData: null,
-              });
-              
-              processedCount++;
-              return { fixId: fixEvent.id };
-            }
-          );
+        // Collect rules to be saved in batch
+        if (ruleResult && ruleResult.rules.length > 0) {
+          // Add each rule from the array to our collection
+          for (const ruleItem of ruleResult.rules) {
+            rulesToSave.push({
+              fixEventId: fixEvent.id,
+              rule: ruleItem.rule,
+              reasoning: ruleItem.reasoning || null,
+              additionalData: null,
+            });
+          }
+          processedCount++;
         }
+      }
+      
+      // Step 3: Batch save all collected rules
+      if (rulesToSave.length > 0) {
+        await step.do(
+          "batch-save-rules",
+          {
+            retries: {
+              limit: MAX_RETRIES,
+              delay: BASE_DELAY_MS,
+              backoff: "exponential",
+            },
+            timeout: "30 seconds",
+          },
+          async () => {
+            await db.insert(rules).values(rulesToSave);
+            return { savedRulesCount: rulesToSave.length };
+          }
+        );
       }
       
       // Return summary of the workflow execution
       return {
         processed: processedCount,
         totalFixes: fixesWithoutRules.length,
-        message: `Successfully processed ${processedCount} out of ${fixesWithoutRules.length} fixes`
+        rulesCreated: rulesToSave.length,
+        message: `Successfully processed ${processedCount} out of ${fixesWithoutRules.length} fixes, created ${rulesToSave.length} rules`
       };
     } catch (error) {
       console.error("Error in rule workflow:", error);

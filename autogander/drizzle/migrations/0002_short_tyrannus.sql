@@ -1,0 +1,1 @@
+ALTER TABLE `rules` ADD `status` text DEFAULT 'pending' NOT NULL;
