@@ -2,36 +2,40 @@ import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const fixes = sqliteTable(
-  "fixes",
+export const fixEvents = sqliteTable(
+  "fix_events",
   {
     id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
     sessionId: text("session_id").notNull(),
     type: text("type").notNull(),
-    originalCode: text("original_code").notNull(),
-    errors: text("errors", { mode: "json" }).notNull(), // Assuming JSON is stored as TEXT
+    sourceCode: text("source_code").notNull(),
+    sourceCompilerErrors: text("source_compiler_errors", { mode: "json" }).notNull(), // Assuming JSON is stored as TEXT
     analysis: text("analysis").notNull(),
     fixedCode: text("fixed_code"),
+    fixedCompilerErrors: text("fixed_compiler_errors", { mode: "json" }), // Might be null if fix eliminates all errors
     createdAt: text("created_at").notNull().default(sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [
-    index("fixes_session_id_index").on(table.sessionId),
-    index("fixes_type_index").on(table.type),
+    index("fix_events_session_id_index").on(table.sessionId),
+    index("fix_events_type_index").on(table.type),
   ],
 );
 
-export type Fix = typeof fixes.$inferSelect;
+export type FixEvent = typeof fixEvents.$inferSelect;
 
-export const fixRules = sqliteTable("fix_rules", {
+export const rules = sqliteTable("rules", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-  fixId: integer("fix_id")
+  fixEventId: integer("fix_event_id")
     .notNull()
-    .references(() => fixes.id),
+    .references(() => fixEvents.id),
   rule: text("rule").notNull(),
+  reasoning: text("reasoning"),
   additionalData: text("additional_data", { mode: "json" }), // Assuming JSON is stored as TEXT
   createdAt: text("created_at").notNull().default(sql`(CURRENT_TIMESTAMP)`),
 });
 
-// export const fixesRelations = relations(fixes, ({ many }) => ({
-//   rules: many(fixRules),
+export type Rule = typeof rules.$inferSelect;
+
+// export const fixEventsRelations = relations(fixEvents, ({ many }) => ({
+//   rules: many(rules),
 // }));

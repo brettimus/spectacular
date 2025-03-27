@@ -1,12 +1,5 @@
 import type { FC } from 'hono/jsx';
-
-type Rule = {
-  id: number;
-  fixId: number;
-  rule: string;
-  additionalData: Record<string, unknown> | null;
-  createdAt: string;
-};
+import type { Rule } from '../db/schema';
 
 type RulesListProps = {
   rules: Rule[];
@@ -15,7 +8,7 @@ type RulesListProps = {
 export const RulesList: FC<RulesListProps> = ({ rules }) => {
   return (
     <div class="rules-container">
-      <h1>Fix Rules</h1>
+      <h1>Rules</h1>
       
       <div class="rules-list">
         {rules.length === 0 ? (
@@ -25,7 +18,7 @@ export const RulesList: FC<RulesListProps> = ({ rules }) => {
             <div class="rule-card" key={rule.id}>
               <div class="rule-header">
                 <h3>Rule #{rule.id}</h3>
-                <span class="rule-fix-id">Fix ID: {rule.fixId}</span>
+                <span class="rule-fix-id">Fix Event ID: {rule.fixEventId}</span>
                 <span class="rule-date">{new Date(rule.createdAt).toLocaleString()}</span>
               </div>
               
@@ -34,6 +27,13 @@ export const RulesList: FC<RulesListProps> = ({ rules }) => {
                   <h4>Rule</h4>
                   <pre>{rule.rule}</pre>
                 </div>
+                
+                {rule.reasoning && (
+                  <div class="section">
+                    <h4>Reasoning</h4>
+                    <pre>{rule.reasoning}</pre>
+                  </div>
+                )}
                 
                 {rule.additionalData && (
                   <div class="section">
