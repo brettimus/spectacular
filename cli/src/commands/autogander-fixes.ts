@@ -169,7 +169,7 @@ function getSessionDirectoriesWithErrorFiles(
             sessionInfo.errors = analyzeData.input.errorMessages;
           }
           if (analyzeData.output?.analysis) {
-            sessionInfo.analysis = analyzeData.output.analysis;
+            sessionInfo.analysis = analyzeData.output.text;
           }
         }
       } catch (error) {
