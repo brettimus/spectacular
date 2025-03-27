@@ -51,6 +51,21 @@ function hasSessionBeenSubmitted(
 ): { isSubmitted: boolean; fixId?: string } {
   const trackingFilePath = path.join(dirPath, AUTOGANDER_TRACKING_FILENAME);
 
+  const eventSubmittedFilePath = path.join(dirPath, "action-create-api-autogander-submitted.json");
+
+  if (fs.existsSync(eventSubmittedFilePath)) {
+    let fixId = "0";
+    try {
+      const eventSubmittedData = JSON.parse(
+        fs.readFileSync(eventSubmittedFilePath, "utf-8"),
+      ) as AutoganderTrackingData;
+      fixId = eventSubmittedData.fixId;
+    } catch (error) {
+      console.error(`Error reading event submitted file ${eventSubmittedFilePath}:`, error);
+    }
+    return { isSubmitted: true, fixId };
+  }
+
   if (fs.existsSync(trackingFilePath)) {
     try {
       const trackingData = JSON.parse(
