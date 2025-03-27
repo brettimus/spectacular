@@ -1,10 +1,11 @@
 // Types for the Fix API
-interface FixPayload {
+interface FixEventPayload {
   type: string;
-  originalCode: string;
-  errors: Record<string, unknown>;
+  sourceCode: string;
+  sourceCompilerErrors: Record<string, unknown>;
   analysis: string;
   fixedCode: string;
+  fixedCompilerErrors?: Record<string, unknown>;
 }
 
 // Added more detailed types for error messages
@@ -28,11 +29,11 @@ interface GetFixesParams {
   pageSize?: number;
 }
 
-interface GetFixesResponse {
+interface GetFixEventsResponse {
   page: number;
   pageSize: number;
   total: number;
-  fixes: Record<string, unknown>[];
+  fixEvents: Record<string, unknown>[];
 }
 
 // Use http://localhost:4008 for local development
@@ -69,10 +70,10 @@ export class AutoganderClient {
    */
   async submitFix(
     sessionId: string,
-    payload: FixPayload,
+    payload: FixEventPayload,
   ): Promise<FixResponse> {
     const response = await fetch(
-      `${this.baseUrl}/sessions/${sessionId}/fixes`,
+      `${this.baseUrl}/api/sessions/${sessionId}/fix-events`,
       {
         method: "POST",
         headers: {
@@ -100,7 +101,7 @@ export class AutoganderClient {
   async getFixes(
     sessionId: string,
     params: GetFixesParams = {},
-  ): Promise<GetFixesResponse> {
+  ): Promise<GetFixEventsResponse> {
     const queryParams = new URLSearchParams();
 
     if (params.type) {
@@ -113,7 +114,7 @@ export class AutoganderClient {
       queryParams.append("pageSize", params.pageSize.toString());
     }
 
-    const url = `${this.baseUrl}/sessions/${sessionId}/fixes${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    const url = `${this.baseUrl}/api/sessions/${sessionId}/fix-events${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
 
     const response = await fetch(url);
 
@@ -134,17 +135,19 @@ export class AutoganderClient {
    */
   async submitSchemaFix(
     sessionId: string,
-    originalCode: string,
-    errors: ErrorsInput,
+    sourceCode: string,
+    sourceCompilerErrors: ErrorsInput,
     analysis: string,
     fixedCode: string,
+    fixedCompilerErrors?: ErrorsInput,
   ): Promise<FixResponse> {
     return this.submitFix(sessionId, {
       type: "schemaTs",
-      originalCode,
-      errors: this.normalizeErrors(errors),
+      sourceCode,
+      sourceCompilerErrors: this.normalizeErrors(sourceCompilerErrors),
       analysis,
       fixedCode,
+      fixedCompilerErrors: fixedCompilerErrors ? this.normalizeErrors(fixedCompilerErrors) : undefined,
     });
   }
 
@@ -153,17 +156,19 @@ export class AutoganderClient {
    */
   async submitApiFix(
     sessionId: string,
-    originalCode: string,
-    errors: ErrorsInput,
+    sourceCode: string,
+    sourceCompilerErrors: ErrorsInput,
     analysis: string,
     fixedCode: string,
+    fixedCompilerErrors?: ErrorsInput,
   ): Promise<FixResponse> {
     return this.submitFix(sessionId, {
       type: "indexTs",
-      originalCode,
-      errors: this.normalizeErrors(errors),
+      sourceCode,
+      sourceCompilerErrors: this.normalizeErrors(sourceCompilerErrors),
       analysis,
       fixedCode,
+      fixedCompilerErrors: fixedCompilerErrors ? this.normalizeErrors(fixedCompilerErrors) : undefined,
     });
   }
 }

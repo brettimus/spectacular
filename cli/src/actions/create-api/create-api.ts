@@ -107,6 +107,7 @@ The agent will use this schema to generate API endpoints.`);
   const originalCode = indexTsContent;
   let fixedCode: string | undefined;
   let errorAnalysis: string | undefined;
+  let remainingErrors: ErrorInfo[] | undefined;
 
   if (apiErrors.length === 0) {
     s.stop("TypeScript validation passed successfully");
@@ -236,6 +237,9 @@ The agent will use this schema to generate API endpoints.`);
             })),
           });
 
+          // Store the fixed errors for Autogander submission
+          remainingErrors = fixedApiErrors;
+
           note(
             pico.yellow(
               "Some TypeScript errors could not be automatically fixed. Please review and fix the generated code manually.",
@@ -259,6 +263,15 @@ The agent will use this schema to generate API endpoints.`);
         severity: e.severity,
         location: e.location,
       }));
+      
+      // Format fixed errors if available
+      const formattedFixedErrors = remainingErrors && remainingErrors.length > 0
+        ? remainingErrors.map((e) => ({
+            message: e.message,
+            severity: e.severity,
+            location: e.location,
+          }))
+        : undefined;
 
       // Get analysis text or use a default
       const analysis =
@@ -271,6 +284,7 @@ The agent will use this schema to generate API endpoints.`);
         formattedErrors,
         analysis,
         fixedCode,
+        formattedFixedErrors
       );
 
       s.stop("Fix successfully submitted to Autogander");

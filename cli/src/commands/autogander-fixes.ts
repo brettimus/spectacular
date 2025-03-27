@@ -29,9 +29,10 @@ interface ApiErrorInfo {
   sessionId: string;
   dirName: string;
   specName: string;
-  originalCode?: string;
-  errors?: Record<string, unknown> | Array<Record<string, unknown>>;
+  sourceCode?: string;
+  sourceCompilerErrors?: Record<string, unknown> | Array<Record<string, unknown>>;
   fixedCode?: string;
+  fixedCompilerErrors?: Record<string, unknown> | Array<Record<string, unknown>>;
   analysis?: string;
   isSubmitted?: boolean;
   fixId?: string;
@@ -129,6 +130,10 @@ function getSessionDirectoriesWithErrorFiles(
       "create-api-analyze-errors.json",
     );
     const fixErrorsPath = path.join(dirPath, "create-api-fix-errors.json");
+    const fixedValidationErrorsPath = path.join(
+      dirPath,
+      "action-create-api-fixed-validation-errors.json",
+    );
 
     let sessionId: string | undefined;
     let sessionInfo: ApiErrorInfo | undefined;
@@ -163,17 +168,39 @@ function getSessionDirectoriesWithErrorFiles(
           };
 
           if (analyzeData.input?.apiCode) {
-            sessionInfo.originalCode = analyzeData.input.apiCode;
+            sessionInfo.sourceCode = analyzeData.input.apiCode;
           }
           if (analyzeData.input?.errorMessages) {
-            sessionInfo.errors = analyzeData.input.errorMessages;
+            sessionInfo.sourceCompilerErrors = analyzeData.input.errorMessages;
           }
-          if (analyzeData.output?.analysis) {
-            sessionInfo.analysis = analyzeData.output.text;
+          if (analyzeData.output?.text || analyzeData.output?.analysis) {
+            sessionInfo.analysis = analyzeData.output.text || analyzeData.output.analysis;
+          }
+          if (analyzeData.output?.fixedCode) {
+            sessionInfo.fixedCode = analyzeData.output.fixedCode;
+          }
+          if (analyzeData.output?.fixedErrorMessages) {
+            sessionInfo.fixedCompilerErrors = analyzeData.output.fixedErrorMessages;
           }
         }
       } catch (error) {
         console.error(`Error parsing ${analyzeErrorsPath}:`, error);
+      }
+    }
+
+    // Check for fixed validation errors and extract them (these are the remaining errors after fixing)
+    if (sessionInfo && fs.existsSync(fixedValidationErrorsPath)) {
+      try {
+        const fixedValidationData = JSON.parse(
+          fs.readFileSync(fixedValidationErrorsPath, "utf-8"),
+        );
+        
+        if (fixedValidationData.args?.errors) {
+          // Extract the fixed compiler errors from the validation log
+          sessionInfo.fixedCompilerErrors = fixedValidationData.args.errors;
+        }
+      } catch (error) {
+        console.error(`Error parsing ${fixedValidationErrorsPath}:`, error);
       }
     }
 
@@ -230,8 +257,8 @@ function getSessionDirectoriesWithErrorFiles(
     // Only add sessions that have enough information to submit a fix
     // and filter out already submitted fixes if includeSubmitted is false
     if (
-      sessionInfo?.originalCode &&
-      (sessionInfo.errors || sessionInfo.analysis) &&
+      sessionInfo?.sourceCode &&
+      (sessionInfo.sourceCompilerErrors || sessionInfo.analysis) &&
       sessionInfo.fixedCode &&
       (includeSubmitted || !sessionInfo.isSubmitted)
     ) {
@@ -268,7 +295,7 @@ async function listFixesForSessions(
         results.push({
           sessionId,
           success: true,
-          fixes: result.fixes || [],
+          fixes: result.fixEvents || [],
           total: result.total || 0,
         });
       } catch (error) {
@@ -468,18 +495,19 @@ export async function commandSubmitFixesToAutogander() {
       for (const sessionInfo of sessionInfos) {
         try {
           if (
-            sessionInfo.originalCode &&
-            sessionInfo.errors &&
+            sessionInfo.sourceCode &&
+            sessionInfo.sourceCompilerErrors &&
             sessionInfo.fixedCode
           ) {
             const analysis =
-              sessionInfo.analysis || "Automated fix from spectacular logs";
+              sessionInfo.analysis || "ANALYSIS MISSING";
             const response = await client.submitApiFix(
               sessionInfo.sessionId,
-              sessionInfo.originalCode,
-              normalizeErrorsForSubmission(sessionInfo.errors),
+              sessionInfo.sourceCode,
+              normalizeErrorsForSubmission(sessionInfo.sourceCompilerErrors),
               analysis,
               sessionInfo.fixedCode,
+              normalizeErrorsForSubmission(sessionInfo.fixedCompilerErrors ?? []),
             );
 
             // Get the fix ID from the response
@@ -590,8 +618,8 @@ export async function commandSubmitFixesToAutogander() {
       }
 
       if (
-        !sessionInfo.originalCode ||
-        !sessionInfo.errors ||
+        !sessionInfo.sourceCode ||
+        !sessionInfo.sourceCompilerErrors ||
         !sessionInfo.fixedCode
       ) {
         progress.stop("Error");
@@ -607,8 +635,8 @@ export async function commandSubmitFixesToAutogander() {
           sessionInfo.analysis || "Automated fix from spectacular logs";
         const response = await client.submitApiFix(
           sessionInfo.sessionId,
-          sessionInfo.originalCode,
-          normalizeErrorsForSubmission(sessionInfo.errors),
+          sessionInfo.sourceCode,
+          normalizeErrorsForSubmission(sessionInfo.sourceCompilerErrors),
           analysis,
           sessionInfo.fixedCode,
         );
