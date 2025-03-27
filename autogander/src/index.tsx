@@ -97,6 +97,47 @@ app.get("/", async (c) => {
   }
 });
 
+app.get("/fixes/:id", async (c) => {
+  const db = drizzle(c.env.DB);
+
+  const id = c.req.param("id");
+
+  try {
+    const conditions = [];
+    if (id) {
+      conditions.push(eq(schema.fixes.id, Number(id)));
+    }
+
+
+    // Fixes query
+    const [fix] = await db
+      .select()
+      .from(schema.fixes)
+      .where(and(...conditions));
+
+    if (!fix) {
+      return c.json({ error: "Fix not found" }, 404);
+    }
+
+    return c.html(
+      <Layout title="Fixes">
+        <FixesList fixes={[fix]} total={1} page={1} pageSize={1} />
+      </Layout>
+    );
+  } catch (error) {
+    console.error("Error fetching fixes:", error);
+    return c.html(
+      <Layout title="Error">
+        <div>
+          <h1>Error</h1>
+          <p>Failed to fetch fixes. Please try again later.</p>
+          <pre>{error instanceof Error ? error.message : String(error)}</pre>
+        </div>
+      </Layout>
+    );
+  }
+});
+
 // Web UI - Rules page
 app.get("/rules", async (c) => {
   const db = drizzle(c.env.DB);
