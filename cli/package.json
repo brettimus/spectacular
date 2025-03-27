@@ -4,6 +4,7 @@
   "version": "0.0.13",
   "description": "An interactive CLI to iterate on project specifications with AI",
   "scripts": {
+    "chat": "tsx src/xstate-prototypes/index.ts",
     "build": "pnpm clean && tsup",
     "dev": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js'",
     "dev:init": "pnpm dev",
