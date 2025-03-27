@@ -17,8 +17,8 @@ binding = "AUTOGANDER_RULE_WORKFLOW"
 class_name = "RuleWorkflow"
 
 [triggers]
-# Run the rule workflow every half hour
-crons = ["*/30 * * * *"]
+# Run the rule workflow every 15 mins
+crons = ["*/15 * * * *"]
 
 # [vars]
 # MY_VAR = "my-variable"

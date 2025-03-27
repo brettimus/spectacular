@@ -145,30 +145,21 @@ app.get("/sessions/:id/fixes", async (c) => {
   }
 });
 
-app.get("/openapi.json", (c) => {
-  const spec = createOpenAPISpec(app, {
-    info: { title: "My API", version: "1.0.0" },
-  });
-  return c.json(spec);
-});
-
-app.use(
-  "/fp/*",
-  createFiberplane({
-    app,
-    openapi: {
-      url: "/openapi.json",
-    },
-  }),
-);
-
 // TODO: Future endpoints related to RULES can be implemented here.
 // For streaming or realtime features, please refer to:
 // Streaming: https://hono.dev/docs/helpers/streaming#streaming-helper
 // Realtime: https://developers.cloudflare.com/durable-objects/ and https://fiberplane.com/blog/creating-websocket-server-hono-durable-objects/
 
 // Endpoint to manually trigger the rule workflow (for testing/admin purposes)
-app.post("/admin/trigger-rule-workflow", async (c) => {
+app.post("/admin/trigger-rule-workflow", async (c, next) => {
+  if (!c.env.ADMIN_SECRET) {
+    return c.json({ error: "internal server error" }, 500);
+  }
+  if (c.req.header("Authorization") !== c.env.ADMIN_SECRET) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  await next();
+}, async (c) => {
   try {
     // Get the workflow binding
     const workflow = c.env.AUTOGANDER_RULE_WORKFLOW;
@@ -193,6 +184,24 @@ app.post("/admin/trigger-rule-workflow", async (c) => {
     }, 500);
   }
 });
+
+
+app.get("/openapi.json", (c) => {
+  const spec = createOpenAPISpec(app, {
+    info: { title: "My API", version: "1.0.0" },
+  });
+  return c.json(spec);
+});
+
+app.use(
+  "/fp/*",
+  createFiberplane({
+    app,
+    openapi: {
+      url: "/openapi.json",
+    },
+  }),
+);
 
 export default {
   ...app,
