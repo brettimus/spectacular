@@ -14,6 +14,10 @@ There is also an [Awesome HONC collection](https://github.com/fiberplane/awesome
 ```#
 ├── src
 │   ├── index.ts # Hono app entry point
+│   ├── workflows
+│   │   ├── index.ts # Exports workflows
+│   │   ├── rule-workflow.ts # Rule generation workflow
+│   │   └── README.md # Workflow documentation
 │   └── db
 │       └── schema.ts # Database schema
 ├── .dev.vars.example # Example .dev.vars file
@@ -72,12 +76,10 @@ migrations_dir = "drizzle/migrations"
 Include the following information in a `.prod.vars` file:
 
 ```sh
-CLOUDFLARE_D1_TOKEN="" # An API token with D1 edit permissions. You can create API tokens from your Cloudflare profile
-CLOUDFLARE_ACCOUNT_ID="" # Find your Account id on the Workers & Pages overview (upper right)
-CLOUDFLARE_DATABASE_ID="" # Find the database ID under workers & pages under D1 SQL Database and by selecting the created database
+OPENAI_API_KEY="" # Your OpenAI API key
 ```
 
-If you haven’t generated the latest migration files yet, run:
+If you haven't generated the latest migration files yet, run:
 ```shell
 npm run db:generate
 ```

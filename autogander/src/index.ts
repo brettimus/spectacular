@@ -3,13 +3,7 @@ import { and, count, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import * as schema from "./db/schema";
-
-// Define the Bindings type for Cloudflare D1 database
-// You can add more environment bindings if needed
-
-type Bindings = {
-  DB: D1Database;
-};
+import type { Bindings } from "./types";
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -173,4 +167,53 @@ app.use(
 // Streaming: https://hono.dev/docs/helpers/streaming#streaming-helper
 // Realtime: https://developers.cloudflare.com/durable-objects/ and https://fiberplane.com/blog/creating-websocket-server-hono-durable-objects/
 
-export default app;
+// Endpoint to manually trigger the rule workflow (for testing/admin purposes)
+app.post("/admin/trigger-rule-workflow", async (c) => {
+  try {
+    // Get the workflow binding
+    const workflow = c.env.AUTOGANDER_RULE_WORKFLOW;
+    
+    if (!workflow) {
+      return c.json({ error: "Workflow binding not available" }, 500);
+    }
+    
+    // Trigger the workflow
+    const instance = await workflow.create({});
+    
+    return c.json({ 
+      message: "Rule workflow triggered successfully", 
+      workflowId: instance.id,
+      status: await instance.status()
+    }, 200);
+  } catch (error) {
+    console.error("Error triggering rule workflow:", error);
+    return c.json({ 
+      error: "Failed to trigger rule workflow", 
+      message: error instanceof Error ? error.message : "Unknown error" 
+    }, 500);
+  }
+});
+
+export default {
+  ...app,
+  async scheduled(
+    _controller: ScheduledController,
+    env: Bindings,
+    _ctx: ExecutionContext,
+  ) {
+    console.log("cron processed");
+    try {
+      // Get the workflow binding
+      const workflow = env.AUTOGANDER_RULE_WORKFLOW;
+      // Trigger the workflow
+      const instance = await workflow.create({});
+
+      console.log("Rule workflow triggered successfully. Id:", instance.id);
+      console.log("Rule workflow status:", await instance.status());
+    } catch (error) {
+      console.error("Error triggering rule workflow:", error);
+    }
+  },
+};
+
+export { RuleWorkflow } from "./workflows";

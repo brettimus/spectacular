@@ -11,10 +11,13 @@
     "db:seed:prod": "ENVIRONMENT=production tsx seed.ts",
     "db:setup": "npm run db:touch && npm run db:generate && npm run db:migrate && npm run db:seed",
     "db:studio": "drizzle-kit studio",
+    "db:studio:prod": "ENVIRONMENT=production drizzle-kit studio",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.3.3",
     "@fiberplane/hono": "0.4.4-beta.2",
+    "ai": "^4.2.6",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.39.3",
     "hono": "^4.7.0",
@@ -27,7 +30,7 @@
     "drizzle-kit": "^0.30.4",
     "drizzle-seed": "^0.3.1",
     "tsx": "^4.19.2",
-    "wrangler": "^4.4.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "wrangler": "^4.4.0"
   }
 }
