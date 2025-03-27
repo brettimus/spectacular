@@ -5,6 +5,7 @@ import { validateTypeScript } from "@/utils/typechecking";
 import type { ErrorInfo } from "@/utils/typechecking/types";
 import { note, spinner } from "@clack/prompts";
 import pico from "picocolors";
+import { AutoganderClient } from "../../autogander-client";
 import { initCommandLogSession, logActionExecution } from "../../utils/logging";
 import { loadExistingSchema } from "./load-existing-schema";
 import { saveApiCode } from "./save-api-code";
@@ -102,6 +103,11 @@ The agent will use this schema to generate API endpoints.`);
     e?.location?.includes("index.ts"),
   );
 
+  // Store variables for potential Autogander submission
+  const originalCode = indexTsContent;
+  let fixedCode: string | undefined;
+  let errorAnalysis: string | undefined;
+
   if (apiErrors.length === 0) {
     s.stop("TypeScript validation passed successfully");
 
@@ -130,14 +136,14 @@ The agent will use this schema to generate API endpoints.`);
 
     // Analyze the TypeScript errors
     s.start("Analyzing TypeScript errors");
-    const errorAnalysis = await apiAgent.analyzeApiErrors(
+    const errorAnalysisResult = await apiAgent.analyzeApiErrors(
       context,
       indexTsContent,
       apiErrors,
     );
     s.stop("TypeScript errors analyzed");
 
-    if (!errorAnalysis) {
+    if (!errorAnalysisResult) {
       note(
         pico.red(
           "Failed to analyze TypeScript errors.\nPlease check the generated code manually.",
@@ -149,11 +155,13 @@ The agent will use this schema to generate API endpoints.`);
         timestamp: new Date().toISOString(),
       });
     } else {
+      errorAnalysis = errorAnalysisResult.text;
+
       // Fix the API code
       s.start("Fixing API code");
       const fixResult = await apiAgent.fixApiErrors(
         context,
-        errorAnalysis.text,
+        errorAnalysisResult.text,
         indexTsContent,
       );
       s.stop("Generated fixed API code");
@@ -170,6 +178,8 @@ The agent will use this schema to generate API endpoints.`);
           timestamp: new Date().toISOString(),
         });
       } else {
+        fixedCode = fixResult.code;
+
         // Save the fixed API code
         s.start("Writing fixed API code to index.ts");
         const fixedSaveResult = await saveApiCode(
@@ -233,6 +243,60 @@ The agent will use this schema to generate API endpoints.`);
           );
         }
       }
+    }
+  }
+
+  // Submit fix to Autogander if we have a fix
+  if (fixedCode && originalCode && apiErrors.length > 0) {
+    s.start("Submitting fix to Autogander");
+
+    try {
+      const client = new AutoganderClient();
+
+      // Format errors for submission
+      const formattedErrors = apiErrors.map((e) => ({
+        message: e.message,
+        severity: e.severity,
+        location: e.location,
+      }));
+
+      // Get analysis text or use a default
+      const analysis =
+        errorAnalysis || "Automatically generated fix for API code";
+
+      // Submit the fix
+      const response = await client.submitApiFix(
+        context.sessionId,
+        originalCode,
+        formattedErrors,
+        analysis,
+        fixedCode,
+      );
+
+      s.stop("Fix successfully submitted to Autogander");
+
+      // Log the submission
+      logActionExecution(context, "create-api-autogander-submitted", {
+        fixId: response.result?.id,
+        timestamp: new Date().toISOString(),
+      });
+
+      note(
+        `${pico.green("✓")} API fix submitted to Autogander (Fix ID: ${response.result?.id || "unknown"})`,
+      );
+    } catch (error) {
+      s.stop("Failed to submit fix to Autogander");
+
+      logActionExecution(context, "create-api-autogander-failed", {
+        error: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString(),
+      });
+
+      note(
+        pico.yellow(
+          `Could not submit fix to Autogander: ${error instanceof Error ? error.message : String(error)}`,
+        ),
+      );
     }
   }
 
