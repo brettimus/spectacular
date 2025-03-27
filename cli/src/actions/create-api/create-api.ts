@@ -263,15 +263,16 @@ The agent will use this schema to generate API endpoints.`);
         severity: e.severity,
         location: e.location,
       }));
-      
+
       // Format fixed errors if available
-      const formattedFixedErrors = remainingErrors && remainingErrors.length > 0
-        ? remainingErrors.map((e) => ({
-            message: e.message,
-            severity: e.severity,
-            location: e.location,
-          }))
-        : undefined;
+      const formattedFixedErrors =
+        remainingErrors && remainingErrors.length > 0
+          ? remainingErrors.map((e) => ({
+              message: e.message,
+              severity: e.severity,
+              location: e.location,
+            }))
+          : undefined;
 
       // Get analysis text or use a default
       const analysis =
@@ -284,7 +285,7 @@ The agent will use this schema to generate API endpoints.`);
         formattedErrors,
         analysis,
         fixedCode,
-        formattedFixedErrors
+        formattedFixedErrors,
       );
 
       s.stop("Fix successfully submitted to Autogander");

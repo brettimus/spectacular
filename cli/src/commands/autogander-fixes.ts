@@ -30,9 +30,13 @@ interface ApiErrorInfo {
   dirName: string;
   specName: string;
   sourceCode?: string;
-  sourceCompilerErrors?: Record<string, unknown> | Array<Record<string, unknown>>;
+  sourceCompilerErrors?:
+    | Record<string, unknown>
+    | Array<Record<string, unknown>>;
   fixedCode?: string;
-  fixedCompilerErrors?: Record<string, unknown> | Array<Record<string, unknown>>;
+  fixedCompilerErrors?:
+    | Record<string, unknown>
+    | Array<Record<string, unknown>>;
   analysis?: string;
   isSubmitted?: boolean;
   fixId?: string;
@@ -52,7 +56,10 @@ function hasSessionBeenSubmitted(
 ): { isSubmitted: boolean; fixId?: string } {
   const trackingFilePath = path.join(dirPath, AUTOGANDER_TRACKING_FILENAME);
 
-  const eventSubmittedFilePath = path.join(dirPath, "action-create-api-autogander-submitted.json");
+  const eventSubmittedFilePath = path.join(
+    dirPath,
+    "action-create-api-autogander-submitted.json",
+  );
 
   if (fs.existsSync(eventSubmittedFilePath)) {
     let fixId = "0";
@@ -62,7 +69,10 @@ function hasSessionBeenSubmitted(
       ) as AutoganderTrackingData;
       fixId = eventSubmittedData.fixId;
     } catch (error) {
-      console.error(`Error reading event submitted file ${eventSubmittedFilePath}:`, error);
+      console.error(
+        `Error reading event submitted file ${eventSubmittedFilePath}:`,
+        error,
+      );
     }
     return { isSubmitted: true, fixId };
   }
@@ -174,13 +184,15 @@ function getSessionDirectoriesWithErrorFiles(
             sessionInfo.sourceCompilerErrors = analyzeData.input.errorMessages;
           }
           if (analyzeData.output?.text || analyzeData.output?.analysis) {
-            sessionInfo.analysis = analyzeData.output.text || analyzeData.output.analysis;
+            sessionInfo.analysis =
+              analyzeData.output.text || analyzeData.output.analysis;
           }
           if (analyzeData.output?.fixedCode) {
             sessionInfo.fixedCode = analyzeData.output.fixedCode;
           }
           if (analyzeData.output?.fixedErrorMessages) {
-            sessionInfo.fixedCompilerErrors = analyzeData.output.fixedErrorMessages;
+            sessionInfo.fixedCompilerErrors =
+              analyzeData.output.fixedErrorMessages;
           }
         }
       } catch (error) {
@@ -194,7 +206,7 @@ function getSessionDirectoriesWithErrorFiles(
         const fixedValidationData = JSON.parse(
           fs.readFileSync(fixedValidationErrorsPath, "utf-8"),
         );
-        
+
         if (fixedValidationData.args?.errors) {
           // Extract the fixed compiler errors from the validation log
           sessionInfo.fixedCompilerErrors = fixedValidationData.args.errors;
@@ -499,15 +511,16 @@ export async function commandSubmitFixesToAutogander() {
             sessionInfo.sourceCompilerErrors &&
             sessionInfo.fixedCode
           ) {
-            const analysis =
-              sessionInfo.analysis || "ANALYSIS MISSING";
+            const analysis = sessionInfo.analysis || "ANALYSIS MISSING";
             const response = await client.submitApiFix(
               sessionInfo.sessionId,
               sessionInfo.sourceCode,
               normalizeErrorsForSubmission(sessionInfo.sourceCompilerErrors),
               analysis,
               sessionInfo.fixedCode,
-              normalizeErrorsForSubmission(sessionInfo.fixedCompilerErrors ?? []),
+              normalizeErrorsForSubmission(
+                sessionInfo.fixedCompilerErrors ?? [],
+              ),
             );
 
             // Get the fix ID from the response

@@ -147,7 +147,9 @@ export class AutoganderClient {
       sourceCompilerErrors: this.normalizeErrors(sourceCompilerErrors),
       analysis,
       fixedCode,
-      fixedCompilerErrors: fixedCompilerErrors ? this.normalizeErrors(fixedCompilerErrors) : undefined,
+      fixedCompilerErrors: fixedCompilerErrors
+        ? this.normalizeErrors(fixedCompilerErrors)
+        : undefined,
     });
   }
 
@@ -168,7 +170,9 @@ export class AutoganderClient {
       sourceCompilerErrors: this.normalizeErrors(sourceCompilerErrors),
       analysis,
       fixedCode,
-      fixedCompilerErrors: fixedCompilerErrors ? this.normalizeErrors(fixedCompilerErrors) : undefined,
+      fixedCompilerErrors: fixedCompilerErrors
+        ? this.normalizeErrors(fixedCompilerErrors)
+        : undefined,
     });
   }
 }
