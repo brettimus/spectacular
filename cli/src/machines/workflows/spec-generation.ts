@@ -16,17 +16,20 @@ interface SpecGenerationContext extends BaseMachineContext {
   specPath?: string;
 }
 
-type SpecGenerationEvents = 
-  | { type: 'DESCRIBE_PROJECT' }
-  | { type: 'IDEATE' }
-  | { type: 'SAVE_SPEC' }
-  | { type: 'COMPLETE' }
+type SpecGenerationEvents =
+  | { type: "DESCRIBE_PROJECT" }
+  | { type: "IDEATE" }
+  | { type: "SAVE_SPEC" }
+  | { type: "COMPLETE" }
   | CommonEvents;
 
 // Create the spec generation machine
 export const createSpecGenerationMachine = (cliContext: CliContext) => {
   // Get the base machine with common functionality
-  const baseMachine = createBaseMachine<SpecGenerationContext, SpecGenerationEvents>();
+  const baseMachine = createBaseMachine<
+    SpecGenerationContext,
+    SpecGenerationEvents
+  >();
 
   return setup({
     ...baseMachine,
@@ -42,138 +45,149 @@ export const createSpecGenerationMachine = (cliContext: CliContext) => {
       idle: {
         on: {
           DESCRIBE_PROJECT: {
-            target: 'describing',
-            actions: 'recordStartTime',
+            target: "describing",
+            actions: "recordStartTime",
           },
         },
       },
       describing: {
         invoke: {
-          src: 'promptForDescription',
+          src: "promptForDescription",
           onDone: {
-            target: 'ideating',
+            target: "ideating",
             actions: assign({
               description: ({ event }) => event.output,
             }),
           },
           onError: {
-            target: 'error',
-            actions: 'recordError',
+            target: "error",
+            actions: "recordError",
           },
         },
       },
       ideating: {
-        entry: 'sendIdeateAnalytics',
+        entry: "sendIdeateAnalytics",
         invoke: {
-          src: 'ideateProject',
+          src: "ideateProject",
           onDone: {
-            target: 'savingSpec',
+            target: "savingSpec",
             actions: assign({
               specificationContent: ({ event }) => event.output,
             }),
           },
           onError: {
-            target: 'error',
-            actions: 'recordError',
+            target: "error",
+            actions: "recordError",
           },
         },
       },
       savingSpec: {
-        entry: 'sendSaveSpecAnalytics',
+        entry: "sendSaveSpecAnalytics",
         invoke: {
-          src: 'saveSpec',
+          src: "saveSpec",
           onDone: {
-            target: 'done',
+            target: "done",
             actions: [
               assign({
                 specPath: ({ event }) => event.output,
               }),
-              'recordEndTime',
+              "recordEndTime",
             ],
           },
           onError: {
-            target: 'error',
-            actions: 'recordError',
+            target: "error",
+            actions: "recordError",
           },
         },
       },
       done: {
-        type: 'final',
-        entry: 'sendCompletionAnalytics',
+        type: "final",
+        entry: "sendCompletionAnalytics",
         output: ({ context }) => ({
           specPath: context.specPath,
-          duration: context.endTime ? context.endTime - (context.startTime || 0) : 0,
+          duration: context.endTime
+            ? context.endTime - (context.startTime || 0)
+            : 0,
         }),
       },
       error: {
-        entry: 'sendErrorAnalytics',
+        entry: "sendErrorAnalytics",
       },
     },
-    initial: 'idle',
+    initial: "idle",
   }).implement({
     actors: {
       // Implement the services using our existing actions
       promptForDescription: () => async () => {
         return await promptDescription();
       },
-      ideateProject: ({ context }) => async () => {
-        if (!context.description) {
-          throw new Error("Description is required for ideation");
-        }
-        return await actionIdeate(context.description, context.cliContext);
-      },
-      saveSpec: ({ context }) => async () => {
-        if (!context.specificationContent) {
-          throw new Error("Specification content is required to save");
-        }
-        
-        // Ensure .spectacular folder exists
-        await saveSpectacularFolder(context.cliContext);
-        
-        // Save the specification
-        return await actionSaveSpec(context.specificationContent, context.cliContext);
-      },
+      ideateProject:
+        ({ context }) =>
+        async () => {
+          if (!context.description) {
+            throw new Error("Description is required for ideation");
+          }
+          return await actionIdeate(context.description, context.cliContext);
+        },
+      saveSpec:
+        ({ context }) =>
+        async () => {
+          if (!context.specificationContent) {
+            throw new Error("Specification content is required to save");
+          }
+
+          // Ensure .spectacular folder exists
+          await saveSpectacularFolder(context.cliContext);
+
+          // Save the specification
+          return await actionSaveSpec(
+            context.specificationContent,
+            context.cliContext,
+          );
+        },
     },
     actions: {
       // Analytics events
       sendIdeateAnalytics: ({ context }) => {
         const event = {
-          type: 'ANALYTICS',
-          action: 'ideate_started',
+          type: "ANALYTICS",
+          action: "ideate_started",
           data: {
             descriptionLength: context.description?.length || 0,
           },
         };
         // Use XState's built-in event sending
-        return { type: 'xstate.send', event };
+        return { type: "xstate.send", event };
       },
       sendSaveSpecAnalytics: () => {
         const event = {
-          type: 'ANALYTICS',
-          action: 'save_spec_started',
+          type: "ANALYTICS",
+          action: "save_spec_started",
           data: {},
         };
-        return { type: 'xstate.send', event };
+        return { type: "xstate.send", event };
       },
       sendCompletionAnalytics: ({ context }) => {
         const event = {
-          type: 'ANALYTICS',
-          action: 'spec_generation_completed',
+          type: "ANALYTICS",
+          action: "spec_generation_completed",
           data: {
-            duration: context.endTime ? context.endTime - (context.startTime || 0) : 0,
+            duration: context.endTime
+              ? context.endTime - (context.startTime || 0)
+              : 0,
           },
         };
-        return { type: 'xstate.send', event };
+        return { type: "xstate.send", event };
       },
       sendErrorAnalytics: ({ context }) => {
         const event = {
-          type: 'ANALYTICS',
-          action: 'spec_generation_error',
+          type: "ANALYTICS",
+          action: "spec_generation_error",
           data: {
             error: context.error?.message,
           },
         };
-        return { type: 'xstate.send', event };
+        return { type: "xstate.send", event };
       },
     },
   });
@@ -183,4 +197,4 @@ export const createSpecGenerationMachine = (cliContext: CliContext) => {
 export const createSpecGenerationActor = (cliContext: CliContext) => {
   const machine = createSpecGenerationMachine(cliContext);
   return createActor(machine);
-}; 
+};

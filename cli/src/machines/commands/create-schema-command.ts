@@ -8,12 +8,12 @@ import { handleResult } from "../../utils/result";
 import { saveGlobalDebugInfo } from "../../utils/credentials";
 
 /**
- * Command that uses the schema generation workflow machine to generate 
+ * Command that uses the schema generation workflow machine to generate
  * a schema for a Cloudflare project
  */
 export async function commandCreateSchemaMachine(
   specPath?: string,
-  skipIntro = false
+  skipIntro = false,
 ): Promise<{ success: boolean; schemaPath?: string }> {
   if (!skipIntro) {
     intro(pico.bold(SPECTACULAR_TITLE));
@@ -21,18 +21,20 @@ export async function commandCreateSchemaMachine(
 
   // Initialize the CLI context
   const ctx = await initContext();
-  
+
   // Make sure we have an OpenAI API key
   await promptOpenAiKey(ctx);
-  
+
   // Record debugging info
   saveGlobalDebugInfo({ ctx, _meta: { command: "create-schema" } });
 
   // If no spec path provided, ask if user wants to continue
-  const shouldContinue = specPath ? true : await confirm({
-    message: "Do you want to generate a schema without a specification?",
-    initialValue: false,
-  });
+  const shouldContinue = specPath
+    ? true
+    : await confirm({
+        message: "Do you want to generate a schema without a specification?",
+        initialValue: false,
+      });
 
   if (!shouldContinue) {
     outro("Cancelled schema generation");
@@ -41,11 +43,11 @@ export async function commandCreateSchemaMachine(
 
   // Create and start the schema generation actor
   const schemaActor = createSchemaGenerationActor(ctx, specPath || "");
-  
+
   // Set up a spinner to show progress
   const spin = spinner();
   spin.start("Generating schema...");
-  
+
   // Subscribe to machine state changes to update the spinner
   const subscription = schemaActor.subscribe((state) => {
     if (state.matches("downloadingTemplate")) {
@@ -57,33 +59,35 @@ export async function commandCreateSchemaMachine(
     } else if (state.matches("validatingSchema")) {
       spin.message("Validating schema...");
     } else if (state.matches("healing")) {
-      spin.message(`Healing schema (attempt ${state.context.healingAttempt})...`);
+      spin.message(
+        `Healing schema (attempt ${state.context.healingAttempt})...`,
+      );
     }
-    
+
     // Log any errors
     if (state.context.error) {
       console.error("Error:", state.context.error);
     }
   });
-  
+
   // Start the machine with the START event
   schemaActor.start();
   schemaActor.send({ type: "START", specPath: specPath || "" });
-  
+
   try {
     // Wait for the machine to finish
     const result = await schemaActor.getSnapshot().output;
     subscription.unsubscribe(); // Proper way to unsubscribe
-    
+
     if (result.success) {
       spin.stop("Schema generation completed successfully!");
       outro(`Schema saved to: ${pico.green(result.schemaFilePath)}`);
       return {
         success: true,
-        schemaPath: result.schemaFilePath
+        schemaPath: result.schemaFilePath,
       };
     }
-    
+
     spin.stop("Schema generation failed");
     outro("Failed to generate schema.");
     return { success: false };
@@ -93,4 +97,4 @@ export async function commandCreateSchemaMachine(
     handleResult({ error });
     return { success: false };
   }
-} 
+}

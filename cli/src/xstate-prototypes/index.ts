@@ -2,13 +2,16 @@ import { createActor } from "xstate";
 import { chatMachine } from "./actors/chat";
 
 const actor = createActor(chatMachine, {
+  input: {
+    cwd: process.cwd(),
+  },
   inspect: (_inspectionEvent) => {
     // type: '@xstate.actor' or
     // type: '@xstate.snapshot' or
     // type: '@xstate.event'
     // console.log("----->", inspectionEvent);
   },
-})
+});
 
 actor.subscribe((snapshot) => {
   console.log("=== Received chatMachine snapshot ===");
@@ -25,5 +28,5 @@ actor.start();
 
 actor.send({
   type: "promptReceived",
-  prompt: "api for geese"
-})
+  prompt: "api for geese",
+});

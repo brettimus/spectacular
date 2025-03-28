@@ -1,0 +1,94 @@
+import { setup, assign } from "xstate";
+import type { QuestionTextStreamResult } from "../types";
+import type { ResponseMessage } from "./types";
+import { consumeStreamActor } from "./consume";
+
+type QuestionTextStreamOutput = {
+  // e.g., `await (streamText(...).response)`
+  //        this contains the messages from the response
+  //        for some reason, the Ai SDK does not export this type
+  responseMessages: ResponseMessage[];
+};
+
+// Create a state machine to handle the streaming process
+export const textStreamMachine = setup({
+  types: {
+    context: {} as {
+      chunks: string[];
+      fullContent: string;
+      error: Error | null;
+      streamResponse: QuestionTextStreamResult;
+      responseMessages: ResponseMessage[];
+    },
+    input: {} as {
+      streamResponse: QuestionTextStreamResult;
+    },
+    events: {} as
+      | { type: "CHUNK"; content: string }
+      | { type: "STREAM_COMPLETE" }
+      | { type: "STREAM_ERROR"; error: Error },
+    output: {} as QuestionTextStreamOutput,
+  },
+  actors: {
+    consumeStream: consumeStreamActor,
+  },
+}).createMachine({
+  id: "streamProcessor",
+  initial: "processing",
+  context: ({ input }) => ({
+    chunks: [],
+    fullContent: "",
+    error: null,
+    streamResponse: input.streamResponse,
+    responseMessages: [],
+  }),
+
+  states: {
+    processing: {
+      invoke: {
+        src: "consumeStream",
+        input: ({ context }) => ({ streamResponse: context.streamResponse }),
+      },
+
+      on: {
+        CHUNK: {
+          actions: assign({
+            chunks: ({ context, event }) => [...context.chunks, event.content],
+            fullContent: ({ context, event }) =>
+              context.fullContent + event.content,
+          }),
+        },
+        STREAM_COMPLETE: {
+          target: "complete",
+        },
+        STREAM_ERROR: {
+          target: "failed",
+          actions: assign({
+            error: ({ event }) => event.error,
+            responseMessages: ({ context }) => context.responseMessages,
+          }),
+        },
+      },
+    },
+
+    complete: {
+      type: "final",
+      output: ({ context }) => ({
+        success: true,
+        content: context.fullContent,
+        chunks: context.chunks,
+        responseMessages: context.responseMessages,
+      }),
+    },
+
+    failed: {
+      type: "final",
+      output: ({ context }) => ({
+        success: false,
+        error: context.error,
+        content: context.fullContent,
+        responseMessages: context.responseMessages,
+      }),
+    },
+  },
+});

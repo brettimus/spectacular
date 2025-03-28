@@ -37,12 +37,7 @@
     "test:typechecking:manual": "tsx src/utils/typechecking/manual-test.ts"
   },
   "exports": "./dist/index.js",
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE",
-    ".gitignore"
-  ],
+  "files": ["dist", "README.md", "LICENSE", ".gitignore"],
   "bin": {
     "spectacular": "dist/index.js",
     "spectacular-machine": "dist/machines/commands/cli-entry.js"

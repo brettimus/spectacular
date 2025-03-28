@@ -16,22 +16,22 @@ export interface BaseMachineContext {
 
 // Analytics event types
 export interface AnalyticsEvent extends BaseEvent {
-  type: 'ANALYTICS';
+  type: "ANALYTICS";
   action: string;
   data: Record<string, unknown>;
 }
 
-// Logging event types 
+// Logging event types
 export interface LogEvent extends BaseEvent {
-  type: 'LOG';
-  level: 'info' | 'warn' | 'error' | 'debug';
+  type: "LOG";
+  level: "info" | "warn" | "error" | "debug";
   message: string;
   data?: Record<string, unknown>;
 }
 
 // Healing event types
 export interface HealingEvent extends BaseEvent {
-  type: 'HEALING';
+  type: "HEALING";
   errors: string[];
   file: string;
   solution?: string;
@@ -39,11 +39,11 @@ export interface HealingEvent extends BaseEvent {
 }
 
 // Common machine events
-export type CommonEvents = 
-  | { type: 'NEXT' }
-  | { type: 'BACK' }
-  | { type: 'CANCEL' }
-  | { type: 'ERROR', error: Error }
+export type CommonEvents =
+  | { type: "NEXT" }
+  | { type: "BACK" }
+  | { type: "CANCEL" }
+  | { type: "ERROR"; error: Error }
   | AnalyticsEvent
   | LogEvent
   | HealingEvent;
@@ -52,4 +52,4 @@ export type CommonEvents =
 export type MachineRef<T> = ActorRefFrom<T>;
 
 // Generic type for machine state snapshot
-export type MachineSnapshot<T> = SnapshotFrom<T>; 
+export type MachineSnapshot<T> = SnapshotFrom<T>;

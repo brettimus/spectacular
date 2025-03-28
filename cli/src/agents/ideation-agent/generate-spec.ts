@@ -154,7 +154,7 @@ const GeneratedPlanSchema = z.object({
     .describe(
       "A detailed implementation plan / handoff document for a developer to implement the project (in markdown).",
     ),
-})
+});
 
 export type GeneratedPlan = z.infer<typeof GeneratedPlanSchema>;
 

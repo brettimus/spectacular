@@ -11,49 +11,55 @@ import type { AnalyticsEvent, LogEvent, HealingEvent } from "../core/types";
  */
 export class EventHandler {
   private logsDir: string;
-  
+
   constructor(cwd: string) {
     this.logsDir = path.join(cwd, ".spectacular", "logs");
   }
-  
+
   /**
    * Handle analytics events
    */
   async handleAnalyticsEvent(event: AnalyticsEvent): Promise<void> {
     const { action, data } = event;
-    
+
     const analyticsData = {
       timestamp: new Date().toISOString(),
       action,
       data,
     };
-    
+
     // Log to file
-    await this.appendToLogFile("analytics.json", `${JSON.stringify(analyticsData)}\n`);
-    
+    await this.appendToLogFile(
+      "analytics.json",
+      `${JSON.stringify(analyticsData)}\n`,
+    );
+
     // In the future, we could send to an analytics API
     // await fetch('https://api.example.com/analytics', {
     //   method: 'POST',
     //   body: JSON.stringify(analyticsData),
     // });
   }
-  
+
   /**
    * Handle logging events
    */
   async handleLogEvent(event: LogEvent): Promise<void> {
     const { level, message, data } = event;
-    
+
     const logData = {
       timestamp: new Date().toISOString(),
       level,
       message,
       data,
     };
-    
+
     // Log to file
-    await this.appendToLogFile("machine-logs.json", `${JSON.stringify(logData)}\n`);
-    
+    await this.appendToLogFile(
+      "machine-logs.json",
+      `${JSON.stringify(logData)}\n`,
+    );
+
     // Also log to console based on level
     switch (level) {
       case "info":
@@ -70,14 +76,14 @@ export class EventHandler {
         break;
     }
   }
-  
+
   /**
    * Handle healing events
    * These are especially important to track for improving the system
    */
   async handleHealingEvent(event: HealingEvent): Promise<void> {
     const { errors, file, solution, successful } = event;
-    
+
     const healingData = {
       timestamp: new Date().toISOString(),
       file,
@@ -85,15 +91,20 @@ export class EventHandler {
       solution,
       successful,
     };
-    
+
     // Log to dedicated healing log file
-    await this.appendToLogFile("healing-events.json", `${JSON.stringify(healingData)}\n`);
+    await this.appendToLogFile(
+      "healing-events.json",
+      `${JSON.stringify(healingData)}\n`,
+    );
   }
-  
+
   /**
    * Handle any event by type
    */
-  async handleEvent(event: AnalyticsEvent | LogEvent | HealingEvent): Promise<void> {
+  async handleEvent(
+    event: AnalyticsEvent | LogEvent | HealingEvent,
+  ): Promise<void> {
     switch (event.type) {
       case "ANALYTICS":
         return this.handleAnalyticsEvent(event as AnalyticsEvent);
@@ -103,11 +114,14 @@ export class EventHandler {
         return this.handleHealingEvent(event as HealingEvent);
     }
   }
-  
+
   /**
    * Append to a log file
    */
-  private async appendToLogFile(filename: string, content: string): Promise<void> {
+  private async appendToLogFile(
+    filename: string,
+    content: string,
+  ): Promise<void> {
     appendToLog(this.logsDir, filename, content);
   }
 }
@@ -131,7 +145,7 @@ export function getEventHandler(cwd: string): EventHandler {
 export function sendAnalyticsEvent(
   cwd: string,
   action: string,
-  data: Record<string, unknown> = {}
+  data: Record<string, unknown> = {},
 ): void {
   const handler = getEventHandler(cwd);
   const event: AnalyticsEvent = {
@@ -149,7 +163,7 @@ export function sendLogEvent(
   cwd: string,
   level: "info" | "warn" | "error" | "debug",
   message: string,
-  data: Record<string, unknown> = {}
+  data: Record<string, unknown> = {},
 ): void {
   const handler = getEventHandler(cwd);
   const event: LogEvent = {
@@ -169,7 +183,7 @@ export function sendHealingEvent(
   errors: string[],
   file: string,
   solution?: string,
-  successful?: boolean
+  successful?: boolean,
 ): void {
   const handler = getEventHandler(cwd);
   const event: HealingEvent = {
@@ -180,4 +194,4 @@ export function sendHealingEvent(
     successful,
   };
   handler.handleEvent(event).catch(console.error);
-} 
+}
