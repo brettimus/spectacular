@@ -23,6 +23,7 @@
     "dev:autogander": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js autogander'",
     "dev:autogander:clear": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js autogander:clear'",
     "clear-fix-tracking": "pnpm build && node dist/index.js autogander:clear",
+    "dev:inspector": "tsx src/xstate-inspector/server.ts",
     "eval:dev": "evalite watch",
     "eval:db:schema": "evalite evals/database-schema/database-schema.eval.ts",
     "eval:db:schema:watch": "evalite watch evals/database-schema/database-schema.eval.ts",
@@ -37,7 +38,12 @@
     "test:typechecking:manual": "tsx src/utils/typechecking/manual-test.ts"
   },
   "exports": "./dist/index.js",
-  "files": ["dist", "README.md", "LICENSE", ".gitignore"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    ".gitignore"
+  ],
   "bin": {
     "spectacular": "dist/index.js",
     "spectacular-machine": "dist/machines/commands/cli-entry.js"
@@ -64,10 +70,13 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@hono/node-server": "^1.14.0",
+    "@statelyai/inspect": "^0.4.0",
     "@types/commander": "^2.12.5",
     "@types/node": "^22.2.0",
     "autoevals": "^0.0.124",
     "evalite": "^0.9.1",
+    "hono": "^4.7.0",
     "rimraf": "^6.0.1",
     "tsup": "^8.2.3",
     "tsx": "^4.19.2",
