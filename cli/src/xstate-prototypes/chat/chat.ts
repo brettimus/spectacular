@@ -4,9 +4,9 @@ import { createUserMessage } from "@/agents/utils";
 
 import { routeRequestActor } from "./router";
 import type { RouterResponse, QuestionTextStreamResult } from "./types";
-import { generatePlanActor } from "./generate-plan";
-import { askNextQuestionActor } from "./next-question";
-import { savePlanToDiskActor } from "./save-plan-to-disk";
+import { generatePlanActor } from "./actors/generate-plan";
+import { askNextQuestionActor } from "./actors/next-question";
+import { savePlanToDiskActor } from "./actors/save-plan-to-disk";
 import { pathFromInput } from "@/utils/utils";
 import { textStreamMachine } from "./streaming/text-stream-machine";
 import type { ResponseMessage } from "./streaming/types";
@@ -164,13 +164,17 @@ const chatMachine = setup({
     savingPlan: {
       invoke: {
         src: "savePlanToDisk",
-        input: ({ context }) => ({
-          // HACK - We can't strongly type the `plan` here without adding
-          //        a lot of complexity to the onDone handler of the
-          //        savePlanToDisk actor
-          spec: context.spec ?? "",
-          specLocation: pathFromInput(context.title, context.cwd),
-        }),
+        input: ({ context, event }) => {
+          console.log("--> event that triggered saving plan to disk:", event);
+
+          return {
+            // HACK - We can't strongly type the `plan` here without adding
+            //        a lot of complexity to the onDone handler of the
+            //        savePlanToDisk actor
+            spec: context.spec ?? "",
+            specLocation: pathFromInput(context.title, context.cwd),
+          }
+        },
         onDone: {
           target: "done",
           actions: assign({

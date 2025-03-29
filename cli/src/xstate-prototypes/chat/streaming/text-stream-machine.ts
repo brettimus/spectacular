@@ -4,9 +4,9 @@ import type { ResponseMessage } from "./types";
 import { consumeStreamActor } from "./consume";
 
 type QuestionTextStreamOutput = {
-  // e.g., `await (streamText(...).response)`
-  //        this contains the messages from the response
-  //        for some reason, the Ai SDK does not export this type
+  // ResponseMessage[] is the type of `await (streamText(...).response).messages`
+  // and it contains the final array of messages from the response
+  // for some reason, the Ai SDK does not export this type
   responseMessages: ResponseMessage[];
 };
 

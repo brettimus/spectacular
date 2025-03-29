@@ -2,7 +2,7 @@ import { streamText } from "ai";
 import type { Message } from "ai";
 import { ollama } from "ollama-ai-provider";
 import { fromPromise } from "xstate";
-import type { QuestionTextStreamResult } from "./types";
+import type { QuestionTextStreamResult } from "../types";
 
 function askOllama(messages: Message[]) {
   const model = ollama("gemma3:4b");
