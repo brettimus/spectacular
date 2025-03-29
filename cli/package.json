@@ -22,6 +22,7 @@
     "dev:autogander:list": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js autogander:list'",
     "dev:autogander": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js autogander'",
     "dev:autogander:clear": "tsup --watch --onSuccess 'SPECTACULAR_CWD=$INIT_CWD node dist/index.js autogander:clear'",
+    "dev:xstate:inspect": "vite --config vite.ui.config.ts",
     "clear-fix-tracking": "pnpm build && node dist/index.js autogander:clear",
     "eval:dev": "evalite watch",
     "eval:db:schema": "evalite evals/database-schema/database-schema.eval.ts",
@@ -37,7 +38,12 @@
     "test:typechecking:manual": "tsx src/utils/typechecking/manual-test.ts"
   },
   "exports": "./dist/index.js",
-  "files": ["dist", "README.md", "LICENSE", ".gitignore"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    ".gitignore"
+  ],
   "bin": {
     "spectacular": "dist/index.js",
     "spectacular-machine": "dist/machines/commands/cli-entry.js"
@@ -64,14 +70,17 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@statelyai/inspect": "^0.4.0",
     "@types/commander": "^2.12.5",
     "@types/node": "^22.2.0",
     "autoevals": "^0.0.124",
     "evalite": "^0.9.1",
+    "memfs": "^4.17.0",
     "rimraf": "^6.0.1",
     "tsup": "^8.2.3",
     "tsx": "^4.19.2",
-    "vite": "^6.2.0",
+    "vite": "^6.2.2",
+    "vite-plugin-node-polyfills": "^0.23.0",
     "vitest": "3.0.7"
   },
   "engines": {
