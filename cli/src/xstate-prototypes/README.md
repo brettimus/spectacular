@@ -53,6 +53,8 @@ xstate-prototypes/
 
 ### The Inspector
 
+Docs: https://stately.ai/docs/inspector
+
 > For our implementation, see the folder: [`../../inspector-ui`](../../inspector-ui)
 
 **One of the main benefits of xstate is the ability to visually document and inspect the state of the machine, but this is kinda hacky to do when you're not running machines in the browser.**
