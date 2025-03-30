@@ -9,7 +9,6 @@ import { askNextQuestionActor } from "./actors/next-question";
 import { savePlanToDiskActor } from "./actors/save-plan-to-disk";
 import { pathFromInput } from "@/utils/utils";
 import { textStreamMachine } from "./streaming/text-stream-machine";
-import { withLogging } from "../utils/with-logging";
 import type { ResponseMessage } from "./streaming/types";
 
 interface ChatMachineInput {
@@ -47,18 +46,18 @@ const chatMachine = setup({
     },
   },
   actions: {
-    logProcessQuestionStreamDone: () => {
-      console.log("Process question stream done");
-    },
     updateMessagesWithQuestionResponse: assign({
       messages: (
         { context },
         params: { responseMessages: ResponseMessage[] },
-      ) =>
-        appendResponseMessages({
+      ) => {
+        // console.log("--> context.streamResponse:", context.messages);
+        // console.log("--> appending response messages:", params.responseMessages[0].content);
+        return appendResponseMessages({
           messages: context.messages,
           responseMessages: params.responseMessages,
-        }),
+        });
+      },
       streamResponse: null, // Clear the streaming response
     }),
   },
@@ -144,20 +143,17 @@ const chatMachine = setup({
         onDone: {
           target: "idle",
           actions: [
-            { type: "logProcessQuestionStreamDone" },
             {
               type: "updateMessagesWithQuestionResponse",
               params: ({ event }) => {
-                console.log("--> event that triggered updateMessagesWithQuestionResponse:", event);
-                return ({
+                return {
                   responseMessages: event.output.responseMessages,
-                })
+                };
               },
             },
           ],
         },
       },
-      // TODO - Implement this by consuming the streaming response, progressively updating
     },
     generatingPlan: {
       invoke: {
@@ -188,7 +184,7 @@ const chatMachine = setup({
             //        savePlanToDisk actor
             spec: context.spec ?? "",
             specLocation: pathFromInput(context.title, context.cwd),
-          }
+          };
         },
         onDone: {
           target: "done",

@@ -10,51 +10,56 @@ export class ChatCliAdapter {
   private loadingSpinner: ReturnType<typeof spinner> | null = null;
 
   constructor() {
+    // TODO - Try to provide a `processQuestionStream` actor that can
+    //        stream the response to the CLI
     this.actor = createActor(chatMachine, {
       input: {
         cwd: process.cwd(),
       },
       // Add inspection to debug actor lifecycle
       inspect: (event) => {
-        if (event.type === '@xstate.actor') {
+        if (event.type === "@xstate.actor") {
           // console.log('Actor lifecycle event:', event);
-          console.log('Actor lifecycle event:');
+          console.log("Actor lifecycle event:");
         }
-      }
+      },
     });
     // Listen for state changes to provide UI feedback
     this.actor.subscribe((snapshot) => {
       // console.log("Snapshot received:", snapshot);
-      const currentState = typeof snapshot.value === 'string' 
-        ? snapshot.value 
-        : Object.keys(snapshot.value)[0];
-      
+      const currentState =
+        typeof snapshot.value === "string"
+          ? snapshot.value
+          : Object.keys(snapshot.value)[0];
+
       console.log(`State transition to -> ${currentState}`);
-      
+
       // Handle different states with appropriate UI feedback
       switch (currentState) {
-        case 'idle':
+        case "idle":
           this.stopSpinner();
           break;
-        case 'routing':
+        case "routing":
           this.startSpinner("Thinking...");
           break;
-        case 'followingUp':
+        case "followingUp":
           this.updateSpinner("Preparing follow-up question...");
           break;
-        case 'yieldingQuestionStream':
+        case "yieldingQuestionStream":
           if (this.loadingSpinner) {
             this.stopSpinner("Question:");
           }
-          // this.streamQuestion(snapshot.context.streamResponse as QuestionTextStreamResult)
+          this.streamQuestion(
+            snapshot.context.streamResponse as QuestionTextStreamResult,
+          );
           break;
-        case 'generatingPlan':
+        case "generatingPlan":
           this.updateSpinner("Generating implementation plan...");
           break;
-        case 'savingPlan':
+        case "savingPlan":
           this.updateSpinner("Saving plan to disk...");
           break;
-        case 'done':
+        case "done":
           if (this.loadingSpinner) {
             this.stopSpinner("Complete!");
           }
@@ -70,7 +75,7 @@ export class ChatCliAdapter {
     log.info(pico.cyan("🤖 Spectacular AI Chat Session"));
     log.info(pico.dim("Type your question or idea to get started."));
     log.info("");
-    
+
     let userPrompt: string | symbol | null = await text({
       message: pico.italic("What would you like me to help with?"),
       placeholder: "Type your project idea or request...",
@@ -101,22 +106,23 @@ export class ChatCliAdapter {
         log.info("Exiting chat session");
         break;
       }
-      
+
       // Send prompt to state machine
       this.actor.send({
         type: "promptReceived",
         prompt: userPrompt as string,
       });
 
-      await waitFor(this.actor, (state) => {
-        const shouldContinue = state.matches("done") || state.matches("idle");
-        console.log("shouldContinue", shouldContinue);
-        return shouldContinue;
-      }, { timeout: 20000 });
+      await waitFor(
+        this.actor,
+        (state) => {
+          const shouldContinue = state.matches("done") || state.matches("idle");
+          return shouldContinue;
+        },
+        // { timeout: 20000 },
+      );
 
       userPrompt = null;
-
-      console.log("User prompt set to null");
     }
   }
 
@@ -149,14 +155,14 @@ export class ChatCliAdapter {
     //     let previousLength = 0;
     //     let attemptCount = 0;
     //     const maxAttempts = 100; // 10 seconds max wait
-        
+
     //     while (attemptCount < maxAttempts) {
     //       // Check if we have new chunks
     //       if (allChunks.length > previousLength) {
     //         // Process only the new chunks
     //         for (let i = previousLength; i < allChunks.length; i++) {
     //           const chunk = allChunks[i];
-              
+
     //           // First chunk gets special formatting
     //           if (i === 0 && !hasFirstChunkBeenProcessed) {
     //             hasFirstChunkBeenProcessed = true;
@@ -165,16 +171,16 @@ export class ChatCliAdapter {
     //             yield chunk;
     //           }
     //         }
-            
+
     //         // Update our position
     //         previousLength = allChunks.length;
     //       }
-          
+
     //       // Check if the streaming is complete
     //       try {
     //         const state = textStreamActorRef.getSnapshot();
     //         // console.log("Current actor state value:", state.value);
-            
+
     //         if ('value' in state) {
     //           const value = state.value;
     //           const stateValue = typeof value === 'string' ? value : Object.keys(value)[0];
@@ -187,23 +193,23 @@ export class ChatCliAdapter {
     //         console.error("Error checking stream state:", error);
     //         break;
     //       }
-          
+
     //       // Small delay to prevent CPU spinning
     //       await new Promise(resolve => setTimeout(resolve, 100));
     //       attemptCount++;
-          
+
     //       // If we've been waiting a while with no chunks, add a hint
     //       if (attemptCount === 20 && allChunks.length === 0) {
     //         console.log("No chunks received after 2 seconds, adding hint");
     //         allChunks.push("I'm thinking about how to respond...");
     //       }
     //     }
-        
+
     //     // If we timed out with no real response, add a message
     //     if (attemptCount >= maxAttempts && allChunks.length <= 1) {
     //       yield "\n  Sorry, I'm having trouble generating a response. Please try again.";
     //     }
-        
+
     //     // Clean up
     //     subscription.unsubscribe();
     //   })()
@@ -221,12 +227,12 @@ export class ChatCliAdapter {
         return undefined;
       },
     });
-    
+
     if (userAnswer === null) {
       log.error("User cancelled input");
       return;
     }
-    
+
     // Send the user's answer as a new prompt
     this.actor.send({
       type: "promptReceived",
@@ -267,4 +273,4 @@ export class ChatCliAdapter {
 export async function startCliChatSession() {
   const cli = new ChatCliAdapter();
   await cli.start();
-} 
+}

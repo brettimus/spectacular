@@ -11,8 +11,6 @@ function askOllama(messages: Message[]) {
     system: "You are a goose, behave like a goose. BUT BE VERY CONCISE",
     messages,
   });
-  // response.textStream
-  // response.response.messages
   return response;
 }
 

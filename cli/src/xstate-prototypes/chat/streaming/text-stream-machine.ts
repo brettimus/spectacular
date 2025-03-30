@@ -32,11 +32,6 @@ export const textStreamMachine = setup({
   actors: {
     consumeStream: consumeStreamActor,
   },
-  actions: {
-    logTextStreamDone: () => {
-      console.log("Text stream done");
-    },
-  },
 }).createMachine({
   id: "streamProcessor",
   initial: "processing",
@@ -52,7 +47,12 @@ export const textStreamMachine = setup({
     processing: {
       invoke: {
         src: "consumeStream",
-        input: ({ context, self }) => ({ streamResponse: context.streamResponse, parent: self }),
+        input: ({ context, self }) => ({
+          streamResponse: context.streamResponse,
+          parent: self,
+        }),
+        // FIXME
+        //
         // onError: {
         //   target: "failed",
         //   actions: assign({
@@ -64,9 +64,9 @@ export const textStreamMachine = setup({
           target: "complete",
           actions: [
             assign({
+              // FIXME
               responseMessages: ({ event }) => event.output.responseMessages,
-              }),
-            { type: "logTextStreamDone" },
+            }),
           ],
         },
       },
@@ -94,25 +94,11 @@ export const textStreamMachine = setup({
 
     complete: {
       type: "final",
-      entry: [
-        ({context}) => {
-          console.log("Text stream complete, context:", context);
-        }
-      ],
-
     },
-
 
     failed: {
       type: "final",
-      output: ({ context }) => ({
-        success: false,
-        error: context.error,
-        content: context.fullContent,
-        responseMessages: context.responseMessages,
-      }),
     },
-
   },
   output: ({ context }) => ({
     success: true, // FIXME

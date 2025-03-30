@@ -8,9 +8,8 @@ export type ConsumeStreamOutput =
 
 export const consumeStreamActor = fromPromise<
   ConsumeStreamOutput,
-  { streamResponse: QuestionTextStreamResult, parent: AnyActorRef }
+  { streamResponse: QuestionTextStreamResult; parent: AnyActorRef }
 >(async ({ input }) => {
-  console.log("Consume stream actor");
   try {
     // Extract the textStream from the StreamingTextResponse
     const textStream = input.streamResponse.textStream;
@@ -20,21 +19,21 @@ export const consumeStreamActor = fromPromise<
     }
 
     for await (const chunk of textStream) {
-      console.log("Consume stream actor chunk", chunk);
       input.parent.send({ type: "CHUNK", content: chunk });
     }
 
     // NOTE - Do not send the STREAM_COMPLETE event here,
-    //        because the textStreamMachine needs to pass 
-    //        its output to the parent actor
+    //        because the textStreamMachine needs to pass
+    //        the response to the parent actor to trigger the transition to its final state
     // input.parent.send({ type: "STREAM_COMPLETE" });
 
     const response = await input.streamResponse.response;
-    console.log("Consume stream actor response", response);
     return { success: true, responseMessages: response.messages };
   } catch (error) {
     // Handle any errors
     console.error("Error processing stream:", error);
+    // FIXME
+    // NOTE - We could skip this and implement the onError in the parent text stream machien
     input.parent.send({
       type: "STREAM_ERROR",
       error: error instanceof Error ? error : new Error(String(error)),
