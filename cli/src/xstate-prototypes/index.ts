@@ -1,4 +1,4 @@
-import { ChatCliAdapter } from "./cli-adapter";
+import { ChatCliAdapter } from "./adapters";
 
 const cli = new ChatCliAdapter();
 
