@@ -8,7 +8,7 @@ function askOllama(messages: Message[]) {
   const model = ollama("gemma3:4b");
   const response = streamText({
     model,
-    system: "You are a goose, behave like a goose",
+    system: "You are a goose, behave like a goose. BUT BE VERY CONCISE",
     messages,
   });
   // response.textStream

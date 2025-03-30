@@ -9,6 +9,7 @@ import { askNextQuestionActor } from "./actors/next-question";
 import { savePlanToDiskActor } from "./actors/save-plan-to-disk";
 import { pathFromInput } from "@/utils/utils";
 import { textStreamMachine } from "./streaming/text-stream-machine";
+import { withLogging } from "../utils/with-logging";
 import type { ResponseMessage } from "./streaming/types";
 
 interface ChatMachineInput {
@@ -46,6 +47,9 @@ const chatMachine = setup({
     },
   },
   actions: {
+    logProcessQuestionStreamDone: () => {
+      console.log("Process question stream done");
+    },
     updateMessagesWithQuestionResponse: assign({
       messages: (
         { context },
@@ -87,6 +91,7 @@ const chatMachine = setup({
     },
     routing: {
       invoke: {
+        id: "routing",
         src: "routeRequest",
         input: ({ context }) => ({ messages: context.messages }),
         onDone: [
@@ -113,6 +118,7 @@ const chatMachine = setup({
     },
     followingUp: {
       invoke: {
+        id: "following-up",
         src: "nextQuestion",
         input: ({ context }) => ({ messages: context.messages }),
         onDone: {
@@ -129,6 +135,7 @@ const chatMachine = setup({
     },
     yieldingQuestionStream: {
       invoke: {
+        id: "process-question-stream",
         src: "processQuestionStream",
         input: ({ context }) => ({
           // HACK - It's hard to strongly type this stuff without adding a lot of complexity
@@ -136,18 +143,25 @@ const chatMachine = setup({
         }),
         onDone: {
           target: "idle",
-          actions: {
-            type: "updateMessagesWithQuestionResponse",
-            params: ({ event }) => ({
-              responseMessages: event.output.responseMessages,
-            }),
-          },
+          actions: [
+            { type: "logProcessQuestionStreamDone" },
+            {
+              type: "updateMessagesWithQuestionResponse",
+              params: ({ event }) => {
+                console.log("--> event that triggered updateMessagesWithQuestionResponse:", event);
+                return ({
+                  responseMessages: event.output.responseMessages,
+                })
+              },
+            },
+          ],
         },
       },
       // TODO - Implement this by consuming the streaming response, progressively updating
     },
     generatingPlan: {
       invoke: {
+        id: "generate-plan",
         src: "generatePlan",
         input: ({ context }) => ({ messages: context.messages }),
         onDone: {
@@ -163,6 +177,7 @@ const chatMachine = setup({
     },
     savingPlan: {
       invoke: {
+        id: "save-plan-to-disk",
         src: "savePlanToDisk",
         input: ({ context, event }) => {
           console.log("--> event that triggered saving plan to disk:", event);

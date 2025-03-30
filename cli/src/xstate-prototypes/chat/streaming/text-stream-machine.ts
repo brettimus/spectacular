@@ -32,6 +32,11 @@ export const textStreamMachine = setup({
   actors: {
     consumeStream: consumeStreamActor,
   },
+  actions: {
+    logTextStreamDone: () => {
+      console.log("Text stream done");
+    },
+  },
 }).createMachine({
   id: "streamProcessor",
   initial: "processing",
@@ -47,7 +52,23 @@ export const textStreamMachine = setup({
     processing: {
       invoke: {
         src: "consumeStream",
-        input: ({ context }) => ({ streamResponse: context.streamResponse }),
+        input: ({ context, self }) => ({ streamResponse: context.streamResponse, parent: self }),
+        // onError: {
+        //   target: "failed",
+        //   actions: assign({
+        //     error: ({ event }) => event.error,
+        //     responseMessages: ({ context }) => context.responseMessages,
+        //   }),
+        // },
+        onDone: {
+          target: "complete",
+          actions: [
+            assign({
+              responseMessages: ({ event }) => event.output.responseMessages,
+              }),
+            { type: "logTextStreamDone" },
+          ],
+        },
       },
 
       on: {
@@ -58,9 +79,9 @@ export const textStreamMachine = setup({
               context.fullContent + event.content,
           }),
         },
-        STREAM_COMPLETE: {
-          target: "complete",
-        },
+        // STREAM_COMPLETE: {
+        //   target: "complete",
+        // },
         STREAM_ERROR: {
           target: "failed",
           actions: assign({
@@ -73,13 +94,14 @@ export const textStreamMachine = setup({
 
     complete: {
       type: "final",
-      output: ({ context }) => ({
-        success: true,
-        content: context.fullContent,
-        chunks: context.chunks,
-        responseMessages: context.responseMessages,
-      }),
+      entry: [
+        ({context}) => {
+          console.log("Text stream complete, context:", context);
+        }
+      ],
+
     },
+
 
     failed: {
       type: "final",
@@ -90,5 +112,13 @@ export const textStreamMachine = setup({
         responseMessages: context.responseMessages,
       }),
     },
+
   },
+  output: ({ context }) => ({
+    success: true, // FIXME
+    error: context.error, // FIXME
+    content: context.fullContent,
+    chunks: context.chunks,
+    responseMessages: context.responseMessages, // FIXME?
+  }),
 });

@@ -1,6 +1,32 @@
-import { ChatCliAdapter } from "./cli-adapter";
+import { createActor } from "xstate";
+import { chatMachine } from "./chat";
 
-const cli = new ChatCliAdapter();
+const actor = createActor(chatMachine, {
+  input: {
+    cwd: process.cwd(),
+  },
+  inspect: (_inspectionEvent) => {
+    // type: '@xstate.actor' or
+    // type: '@xstate.snapshot' or
+    // type: '@xstate.event'
+    // console.log("----->", inspectionEvent);
+  },
+});
 
-cli.start();
+actor.subscribe((snapshot) => {
+  console.log("=== Received chatMachine snapshot ===");
+  // console.log("snapshot", snapshot);
+  console.log("-> chatMachine.snapshot.value", snapshot.value);
 
+  // Only for terminal state
+  if (snapshot.output) {
+    console.log("-> chatMachine.snapshot.output", snapshot.output);
+  }
+});
+
+actor.start();
+
+actor.send({
+  type: "promptReceived",
+  prompt: "api for geese",
+});
