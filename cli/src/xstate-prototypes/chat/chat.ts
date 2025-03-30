@@ -8,7 +8,7 @@ import { generatePlanActor } from "./actors/generate-plan";
 import { askNextQuestionActor } from "./actors/next-question";
 import { savePlanToDiskActor } from "./actors/save-plan-to-disk";
 import { pathFromInput } from "@/utils/utils";
-import { textStreamMachine } from "../streaming/text-stream-machine";
+import { aiTextStreamMachine } from "../streaming/ai-text-stream-machine";
 import type { QuestionTextStreamResult, ResponseMessage } from "../streaming/types";
 
 interface ChatMachineInput {
@@ -35,7 +35,7 @@ const chatMachine = setup({
     nextQuestion: askNextQuestionActor,
     generatePlan: generatePlanActor,
     savePlanToDisk: savePlanToDiskActor,
-    processQuestionStream: textStreamMachine,
+    processQuestionStream: aiTextStreamMachine,
   },
   guards: {
     shouldAskFollowUp: (_context, routerResponse: RouterResponse) => {

@@ -1,2 +1,2 @@
 export type { QuestionTextStreamResult, ResponseMessage } from "./types";
-export { textStreamMachine } from "./text-stream-machine";
+export { aiTextStreamMachine } from "./ai-text-stream-machine";

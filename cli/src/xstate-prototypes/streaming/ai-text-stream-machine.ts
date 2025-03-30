@@ -11,7 +11,7 @@ type QuestionTextStreamOutput = {
 };
 
 // Create a state machine to handle the streaming process
-export const textStreamMachine = setup({
+export const aiTextStreamMachine = setup({
   types: {
     context: {} as {
       chunks: string[];
