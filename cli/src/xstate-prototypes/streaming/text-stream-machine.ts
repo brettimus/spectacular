@@ -1,5 +1,5 @@
 import { setup, assign } from "xstate";
-import type { QuestionTextStreamResult } from "../types";
+import type { QuestionTextStreamResult } from "./types";
 import type { ResponseMessage } from "./types";
 import { consumeStreamActor } from "./consume";
 
@@ -65,6 +65,7 @@ export const textStreamMachine = setup({
           actions: [
             assign({
               // FIXME
+              // @ts-expect-error - Need to handle onError separately
               responseMessages: ({ event }) => event.output.responseMessages,
             }),
           ],

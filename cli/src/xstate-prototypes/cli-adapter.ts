@@ -3,7 +3,7 @@ import { chatMachine } from "./chat/chat";
 import { spinner, text, log, stream, isCancel } from "@clack/prompts";
 import pico from "picocolors";
 import type { Message } from "ai";
-import type { QuestionTextStreamResult } from "./chat/types";
+import type { QuestionTextStreamResult } from "./streaming/types";
 
 export class ChatCliAdapter {
   private actor: ActorRefFrom<typeof chatMachine>;
@@ -147,96 +147,6 @@ export class ChatCliAdapter {
         }
       })(),
     );
-
-    // Stream the content using Clack's async generator
-    // await stream.info(
-    //   (async function* () {
-    //     let previousLength = 0;
-    //     let attemptCount = 0;
-    //     const maxAttempts = 100; // 10 seconds max wait
-
-    //     while (attemptCount < maxAttempts) {
-    //       // Check if we have new chunks
-    //       if (allChunks.length > previousLength) {
-    //         // Process only the new chunks
-    //         for (let i = previousLength; i < allChunks.length; i++) {
-    //           const chunk = allChunks[i];
-
-    //           // First chunk gets special formatting
-    //           if (i === 0 && !hasFirstChunkBeenProcessed) {
-    //             hasFirstChunkBeenProcessed = true;
-    //             yield `  ${chunk}`;
-    //           } else {
-    //             yield chunk;
-    //           }
-    //         }
-
-    //         // Update our position
-    //         previousLength = allChunks.length;
-    //       }
-
-    //       // Check if the streaming is complete
-    //       try {
-    //         const state = textStreamActorRef.getSnapshot();
-    //         // console.log("Current actor state value:", state.value);
-
-    //         if ('value' in state) {
-    //           const value = state.value;
-    //           const stateValue = typeof value === 'string' ? value : Object.keys(value)[0];
-    //           if (stateValue === 'complete' || stateValue === 'failed') {
-    //             console.log("Stream actor completed with state:", stateValue);
-    //             break;
-    //           }
-    //         }
-    //       } catch (error) {
-    //         console.error("Error checking stream state:", error);
-    //         break;
-    //       }
-
-    //       // Small delay to prevent CPU spinning
-    //       await new Promise(resolve => setTimeout(resolve, 100));
-    //       attemptCount++;
-
-    //       // If we've been waiting a while with no chunks, add a hint
-    //       if (attemptCount === 20 && allChunks.length === 0) {
-    //         console.log("No chunks received after 2 seconds, adding hint");
-    //         allChunks.push("I'm thinking about how to respond...");
-    //       }
-    //     }
-
-    //     // If we timed out with no real response, add a message
-    //     if (attemptCount >= maxAttempts && allChunks.length <= 1) {
-    //       yield "\n  Sorry, I'm having trouble generating a response. Please try again.";
-    //     }
-
-    //     // Clean up
-    //     subscription.unsubscribe();
-    //   })()
-    // );
-  }
-
-  private async promptUserClarification() {
-    const userAnswer = await text({
-      message: pico.italic("Your response:"),
-      defaultValue: "",
-      validate: (value) => {
-        if (value === "") {
-          return pico.italic("Give me something to work with here!");
-        }
-        return undefined;
-      },
-    });
-
-    if (userAnswer === null) {
-      log.error("User cancelled input");
-      return;
-    }
-
-    // Send the user's answer as a new prompt
-    this.actor.send({
-      type: "promptReceived",
-      prompt: userAnswer as string,
-    });
   }
 
   private startSpinner(message: string): void {

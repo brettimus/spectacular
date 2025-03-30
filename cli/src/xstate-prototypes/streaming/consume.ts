@@ -1,6 +1,5 @@
 import { fromPromise } from "xstate";
-import type { QuestionTextStreamResult } from "../types";
-import type { ResponseMessage } from "./types";
+import type { QuestionTextStreamResult, ResponseMessage } from "./types";
 import type { AnyActorRef } from "xstate";
 export type ConsumeStreamOutput =
   | { success: true; responseMessages: ResponseMessage[] }

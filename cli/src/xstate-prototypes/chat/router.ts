@@ -7,7 +7,6 @@ export const routeRequestActor = fromPromise<
   RouterResponse,
   { messages: Message[] }
 >(async ({ input, signal }) => {
-  // console.log("-->routing user input! i have this many messages:", input.messages.length)
   const model = ollama("gemma3:4b");
   const response = await generateText({
     model,

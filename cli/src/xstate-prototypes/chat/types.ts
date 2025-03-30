@@ -1,5 +1,5 @@
 import type { GeneratedPlan } from "@/agents/ideation-agent/generate-spec";
-import type { Message, ToolSet, StreamTextResult } from "ai";
+import type { Message } from "ai";
 
 export type RouterResponseType =
   | "ask_follow_up_question"
@@ -18,4 +18,3 @@ export type RouterResponse = {
   reasoning: string;
 };
 
-export type QuestionTextStreamResult = StreamTextResult<ToolSet, never>;

@@ -3,13 +3,13 @@ import { setup, assign } from "xstate";
 import { createUserMessage } from "@/agents/utils";
 
 import { routeRequestActor } from "./router";
-import type { RouterResponse, QuestionTextStreamResult } from "./types";
+import type { RouterResponse } from "./types";
 import { generatePlanActor } from "./actors/generate-plan";
 import { askNextQuestionActor } from "./actors/next-question";
 import { savePlanToDiskActor } from "./actors/save-plan-to-disk";
 import { pathFromInput } from "@/utils/utils";
-import { textStreamMachine } from "./streaming/text-stream-machine";
-import type { ResponseMessage } from "./streaming/types";
+import { textStreamMachine } from "../streaming/text-stream-machine";
+import type { QuestionTextStreamResult, ResponseMessage } from "../streaming/types";
 
 interface ChatMachineInput {
   cwd: string;
