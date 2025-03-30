@@ -9,7 +9,10 @@ import { askNextQuestionActor } from "./actors/next-question";
 import { savePlanToDiskActor } from "./actors/save-plan-to-disk";
 import { pathFromInput } from "@/utils/utils";
 import { aiTextStreamMachine } from "../streaming/ai-text-stream-machine";
-import type { QuestionTextStreamResult, ResponseMessage } from "../streaming/types";
+import type {
+  QuestionTextStreamResult,
+  ResponseMessage,
+} from "../streaming/types";
 
 interface ChatMachineInput {
   cwd: string;

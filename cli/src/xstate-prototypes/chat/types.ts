@@ -17,4 +17,3 @@ export type RouterResponse = {
   nextStep: RouterResponseType;
   reasoning: string;
 };
-
