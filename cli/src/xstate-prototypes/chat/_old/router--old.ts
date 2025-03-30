@@ -21,10 +21,6 @@ type RouterResponse = {
 
 const routeRequestActor = fromPromise<RouterResponse, { messages: Message[] }>(
   async ({ input }) => {
-    console.log(
-      "routing user input! i have this many messages:",
-      input.messages.length,
-    );
     await new Promise((r) => setTimeout(r, 2000));
     return { nextStep: "ask_follow_up_question", reasoning: "hardcoded" };
   },

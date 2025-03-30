@@ -20,7 +20,6 @@ export class ChatCliAdapter {
       inspect: (event) => {
         if (event.type === "@xstate.actor") {
           // console.log('Actor lifecycle event:', event);
-          console.log("Actor lifecycle event:");
         }
       },
     });
@@ -32,7 +31,7 @@ export class ChatCliAdapter {
           ? snapshot.value
           : Object.keys(snapshot.value)[0];
 
-      console.log(`State transition to -> ${currentState}`);
+      // console.log(`State transition to -> ${currentState}`);
 
       // Handle different states with appropriate UI feedback
       switch (currentState) {

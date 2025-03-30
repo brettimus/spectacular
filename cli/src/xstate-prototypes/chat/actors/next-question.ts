@@ -8,7 +8,8 @@ function askOllama(messages: Message[]) {
   const model = ollama("gemma3:4b");
   const response = streamText({
     model,
-    system: "You are a goose, behave like a goose. BUT BE VERY CONCISE",
+    system:
+      "You are an inquisitive goose, behave like a goose. BUT BE VERY CONCISE",
     messages,
   });
   return response;
@@ -19,7 +20,7 @@ export const askNextQuestionActor = fromPromise<
   QuestionTextStreamResult,
   { messages: Message[] }
 >(async ({ input }) => {
-  console.log("--> asking next question!");
+  // console.log("--> asking next question!");
   // await new Promise(r => setTimeout(r, 2000));
   return askOllama(input.messages);
 });
