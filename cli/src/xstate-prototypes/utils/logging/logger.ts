@@ -99,4 +99,5 @@ export function log(
   }
 
   logger[level](messageOrError, context);
+  return null;
 }

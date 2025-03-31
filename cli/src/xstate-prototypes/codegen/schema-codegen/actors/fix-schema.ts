@@ -1,4 +1,3 @@
-import { type Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
@@ -8,11 +7,11 @@ import type { SchemaFixOptions, SchemaFixResult } from "./types";
 
 export const fixSchemaActor = fromPromise<
   SchemaFixResult | null,
-  { context: Context; options: SchemaFixOptions }
+  { apiKey: string; options: SchemaFixOptions }
 >(async ({ input, signal }) => {
   try {
-    const { context, options } = input;
-    const openai = createOpenAI({ apiKey: context.apiKey });
+    const { apiKey, options } = input;
+    const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("gpt-4o"));
 
     log("debug", "Fixing schema errors", {

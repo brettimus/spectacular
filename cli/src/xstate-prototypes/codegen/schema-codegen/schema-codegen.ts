@@ -1,5 +1,4 @@
 import { setup, assign } from "xstate";
-import type { Context } from "@/context";
 import type { ErrorInfo } from "@/utils/typechecking/types";
 import type { SelectedRule } from "@/agents/schema-agent/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
@@ -14,24 +13,24 @@ import {
 } from "./actors";
 
 interface SchemaCodegenMachineInput {
-  context: Context;
+  apiKey: string;
   spec?: string;
 }
 
 interface SchemaCodegenMachineContext {
-  context: Context;
+  apiKey: string;
   spec: string;
   schemaSpecification: string;
-  reasoning: string;
   relevantRules: SelectedRule[];
   dbSchemaTs: string;
-  explanation: string;
   errors: ErrorInfo[];
   errorAnalysis: SchemaErrorAnalysisResult | null;
   fixedSchema: string | null;
   valid: boolean;
   issues: string[];
   suggestions: string[];
+  /** What went wrong with the machine */
+  machineError: null | Error | string;
 }
 
 export const schemaCodegenMachine = setup({
@@ -55,22 +54,22 @@ export const schemaCodegenMachine = setup({
     fixSchema: fixSchemaActor,
   },
 }).createMachine({
-  id: "schema-codegen",
+  id: "db-schema-codegen",
+  description: "generate db/schema.ts file",
   initial: "idle",
   context: ({ input }) => ({
-    context: input.context,
+    apiKey: input.apiKey,
     spec: input.spec || "",
     schemaSpecification: "",
-    reasoning: "",
     relevantRules: [],
     dbSchemaTs: "",
-    explanation: "",
     errors: [],
     errorAnalysis: null,
     fixedSchema: null,
     valid: false,
     issues: [],
     suggestions: [],
+    machineError: null,
   }),
   states: {
     idle: {
@@ -90,7 +89,7 @@ export const schemaCodegenMachine = setup({
         id: "analyze-tables",
         src: "analyzeTables",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           options: {
             specContent: context.spec,
           },
@@ -100,16 +99,26 @@ export const schemaCodegenMachine = setup({
           actions: assign({
             schemaSpecification: ({ event }) =>
               event.output?.schemaSpecification || "",
-            reasoning: ({ event }) => event.output?.reasoning || "",
           }),
         },
         onError: {
           target: "failed",
-          actions: ({ event }) => {
-            if (event.error) {
-              log("error", "Failed to analyze tables", { error: event.error });
-            }
-          },
+          actions: [
+            ({ event }) => {
+              if (event.error) {
+                log("error", "Failed to analyze tables", { error: event.error });
+              }
+            },
+            assign({
+              machineError: ({ event }) => {
+                const { error } = event;
+                if (error instanceof Error) {
+                  return error;
+                }
+                return "Unknown error"
+              }
+            })
+          ],
         },
       },
     },
@@ -122,8 +131,12 @@ export const schemaCodegenMachine = setup({
         id: "identify-rules",
         src: "identifyRules",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           schemaSpecification: context.schemaSpecification,
+          /**
+           * NOTE - This `noop` flag skips rule selection from a knowledge base, since we don't have a knowledge base yet
+           */
+          noop: true,
         }),
         onDone: {
           target: "generatingSchema",
@@ -154,7 +167,7 @@ export const schemaCodegenMachine = setup({
         id: "generate-schema",
         src: "generateSchema",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           options: {
             schemaSpecification: context.schemaSpecification,
             relevantRules: context.relevantRules,
@@ -164,7 +177,6 @@ export const schemaCodegenMachine = setup({
           target: "verifyingSchema",
           actions: assign({
             dbSchemaTs: ({ event }) => event.output?.dbSchemaTs || "",
-            explanation: ({ event }) => event.output?.explanation || "",
           }),
         },
         onError: {
@@ -177,50 +189,8 @@ export const schemaCodegenMachine = setup({
         },
       },
     },
-    verifyingSchema: {
-      entry: () =>
-        log("info", "Verifying generated schema", {
-          stage: "schema-verification",
-        }),
-      invoke: {
-        id: "verify-schema",
-        src: "verifySchema",
-        input: ({ context }) => ({
-          context: context.context,
-          options: {
-            schema: context.dbSchemaTs,
-          },
-        }),
-        onDone: [
-          {
-            target: "success",
-            guard: ({ event }) => event.output?.isValid === true,
-            actions: assign({
-              valid: ({ event }) => event.output?.isValid || false,
-              issues: ({ event }) => event.output?.issues || [],
-              suggestions: ({ event }) => event.output?.suggestions || [],
-            }),
-          },
-          {
-            target: "waitingForErrors",
-            guard: ({ event }) => event.output?.isValid !== true,
-            actions: assign({
-              valid: ({ event }) => event.output?.isValid || false,
-              issues: ({ event }) => event.output?.issues || [],
-              suggestions: ({ event }) => event.output?.suggestions || [],
-            }),
-          },
-        ],
-        onError: {
-          target: "failed",
-          actions: ({ event }) => {
-            if (event.error) {
-              log("error", "Failed to verify schema", { error: event.error });
-            }
-          },
-        },
-      },
-    },
+    // TODO - Can shell out to an actor that does typescript compilation here
+    //        Then allow others to provide alternative implementations on derived machine instances
     waitingForErrors: {
       entry: () =>
         log(
@@ -244,8 +214,9 @@ export const schemaCodegenMachine = setup({
         id: "analyze-schema-errors",
         src: "analyzeErrors",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           options: {
+            schemaSpecification: context.schemaSpecification,
             schema: context.dbSchemaTs,
             errors: context.errors,
           },
@@ -274,7 +245,7 @@ export const schemaCodegenMachine = setup({
         id: "fix-schema-errors",
         src: "fixSchema",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           options: {
             fixContent: context.errorAnalysis?.text || "",
             originalSchema: context.dbSchemaTs,
@@ -298,56 +269,7 @@ export const schemaCodegenMachine = setup({
         },
       },
     },
-    verifyingFixedSchema: {
-      entry: () =>
-        log("info", "Verifying fixed schema", { stage: "verification-fixed" }),
-      invoke: {
-        id: "verify-fixed-schema",
-        src: "verifySchema",
-        input: ({ context }) => ({
-          context: context.context,
-          options: {
-            schema: context.fixedSchema || context.dbSchemaTs,
-          },
-        }),
-        onDone: [
-          {
-            target: "success",
-            guard: ({ event }) => event.output?.isValid === true,
-            actions: [
-              assign({
-                valid: ({ event }) => event.output?.isValid || false,
-                issues: ({ event }) => event.output?.issues || [],
-                suggestions: ({ event }) => event.output?.suggestions || [],
-                dbSchemaTs: ({ context }) =>
-                  context.fixedSchema || context.dbSchemaTs,
-              }),
-              () =>
-                log("info", "Schema fixed and verified", { stage: "success" }),
-            ],
-          },
-          {
-            target: "failedToFix",
-            guard: ({ event }) => event.output?.isValid !== true,
-            actions: assign({
-              valid: ({ event }) => event.output?.isValid || false,
-              issues: ({ event }) => event.output?.issues || [],
-              suggestions: ({ event }) => event.output?.suggestions || [],
-            }),
-          },
-        ],
-        onError: {
-          target: "failed",
-          actions: ({ event }) => {
-            if (event.error) {
-              log("error", "Failed to verify fixed schema", {
-                error: event.error,
-              });
-            }
-          },
-        },
-      },
-    },
+
     success: {
       type: "final",
       entry: () =>
@@ -372,12 +294,20 @@ export const schemaCodegenMachine = setup({
     },
     failed: {
       type: "final",
-      entry: () =>
-        log("error", "Schema generation process failed", { stage: "error" }),
-      output: ({ context }) => ({
-        error: "Failed to generate schema",
-        dbSchemaTs: context.dbSchemaTs,
-      }),
+      entry: [
+        () => log("error", "Schema generation process failed", { stage: "error" }),
+        assign({
+          machineError: ({ context }) => context.machineError ?? "Failed to generate schema",
+        })
+      ],
     },
   },
+
+  output: ({ context }) => ({
+    dbSchemaTs: context.fixedSchema || context.dbSchemaTs,
+    error: context.machineError,
+    valid: context.valid,
+    issues: context.issues,
+    suggestions: context.suggestions,
+  }),
 });

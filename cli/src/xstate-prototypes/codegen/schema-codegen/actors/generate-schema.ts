@@ -1,4 +1,3 @@
-import { type Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
@@ -6,6 +5,97 @@ import { z } from "zod";
 import { fromPromise } from "xstate";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { SchemaGenerationOptions, SchemaGenerationResult } from "./types";
+
+// System prompt for schema generation
+const GENERATE_SCHEMA_SYSTEM_PROMPT = `
+You are a world class software engineer, and an expert in Typescript and Drizzle ORM, a relational database query building library written in Typescript.
+
+I will give you a written plan for a database schema, and you should turn it into Drizzle typescript code for a Cloudflare D1 (sqlite) database schema.
+
+Here is a simple Drizzle database schema example for D1:
+
+${getD1SchemaExample()}
+
+Here are some additional code references:
+
+${getDrizzleSchemaExamples()}
+
+[IMPORTANT]
+
+${getD1AdditionalTips()}
+
+[ADDITIONAL INSTRUCTIONS]
+- Make sure all dependencies were properly imported
+`;
+
+export const generateSchemaActor = fromPromise<
+  SchemaGenerationResult,
+  { apiKey: string; options: SchemaGenerationOptions }
+>(async ({ input, signal }) => {
+  try {
+    const { apiKey, options } = input;
+    const openai = createOpenAI({ apiKey });
+    const model = traceAISDKModel(openai("gpt-4o"));
+
+    log("debug", "Generating schema", {
+      specLength: options.schemaSpecification.length,
+      rulesCount: options.relevantRules.length,
+    });
+
+    const result = await generateObject({
+      model,
+      schema: z.object({
+        explanation: z
+          .string()
+          .describe("Explanation of your schema design decisions"),
+        dbSchemaTs: z
+          .string()
+          .describe("The generated Drizzle typescript schema definition."),
+      }),
+      messages: [
+        {
+          role: "user",
+          content: `Generate Drizzle ORM schema code for the following tables:
+ 
+[BEGIN DATA]
+************
+[specification]:
+${options.schemaSpecification}
+************
+[Additional context]:
+${JSON.stringify(options.relevantRules, null, 2)}
+************
+[END DATA]
+
+Use the additional context to help you generate the schema.
+
+This is important to my career.`,
+        },
+      ],
+      system: GENERATE_SCHEMA_SYSTEM_PROMPT,
+      temperature: 0.2,
+      abortSignal: signal,
+    });
+
+    log("info", "Schema generation complete", {
+      explanationLength: result.object.explanation.length,
+      schemaLength: result.object.dbSchemaTs.length,
+    });
+
+    return {
+      explanation: result.object.explanation,
+      dbSchemaTs: result.object.dbSchemaTs,
+    };
+  } catch (error) {
+    log(
+      "error",
+      error instanceof Error
+        ? error
+        : new Error("Unknown error in generate schema"),
+    );
+    throw error;
+  }
+});
 
 // Helper functions for providing examples
 export function getD1SchemaExample() {
@@ -210,21 +300,8 @@ function getDrizzleRelationsExample() {
 </example>`;
 }
 
-// System prompt for schema generation
-const GENERATE_SCHEMA_SYSTEM_PROMPT = `
-You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.
-
-I will give you a written plan for a database schema, and you should turn it into code.
-
-Here is a simple Drizzle database schema example for D1:
-
-${getD1SchemaExample()}
-
-Here are some additional code references:
-
-${getDrizzleSchemaExamples()}
-
-[IMPORTANT]
+export function getD1AdditionalTips() {
+  return `
 If you need the \`sql\` function, you must import it from \`drizzle-orm\`,
 not \`drizzle-orm/sqlite-core\`.
 
@@ -237,82 +314,43 @@ import {  sql } from 'drizzle-orm'
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 \`\`\`
 
-[Additional Instructions]
+If you use an autoincrementing primary key, pass the \`autoIncrement\` option to \`.primaryKey\`
 
-Things you usually screw up (things to avoid):
-- \`.primaryKey().autoIncrement()\` is NOT VALID for D1
-  BETTER: use \`.primaryKey({ autoIncrement: true })\` instead
-- Make sure all dependencies were properly imported
-- IMPORTANT: \`import { sql } from "drizzle-orm"\`, not from \`drizzle-orm/sqlite-core'\`
-`;
+\`\`\`
+import { sql } from "drizzle-orm";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
 
-export const generateSchemaActor = fromPromise<
-  SchemaGenerationResult,
-  { context: Context; options: SchemaGenerationOptions }
->(async ({ input, signal }) => {
-  try {
-    const { context, options } = input;
-    const openai = createOpenAI({ apiKey: context.apiKey });
-    const model = traceAISDKModel(openai("gpt-4o"));
-
-    log("debug", "Generating schema", {
-      specLength: options.schemaSpecification.length,
-      rulesCount: options.relevantRules.length,
-    });
-
-    const result = await generateObject({
-      model,
-      schema: z.object({
-        explanation: z
-          .string()
-          .describe("Explanation of the schema design decisions"),
-        dbSchemaTs: z
-          .string()
-          .describe("The generated Drizzle typescript schema definition."),
-      }),
-      messages: [
-        {
-          role: "user",
-          content: `Generate Drizzle ORM schema code for the following tables:
- 
-[BEGIN DATA]
-************
-[specification]:
-${options.schemaSpecification}
-************
-[Additional context]:
-${JSON.stringify(options.relevantRules, null, 2)}
-************
-[END DATA]
-
-Things you usually screw up (things to avoid):
-- \`.primaryKey().autoIncrement()\` is NOT VALID for D1
-  BETTER: use \`.primaryKey({ autoIncrement: true })\` instead
-
-Use the additional context to help you generate the schema. This is important to my career.`,
-        },
-      ],
-      system: GENERATE_SCHEMA_SYSTEM_PROMPT,
-      temperature: 0.2,
-      abortSignal: signal,
-    });
-
-    log("info", "Schema generation complete", {
-      explanationLength: result.object.explanation.length,
-      schemaLength: result.object.dbSchemaTs.length,
-    });
-
-    return {
-      explanation: result.object.explanation,
-      dbSchemaTs: result.object.dbSchemaTs,
-    };
-  } catch (error) {
-    log(
-      "error",
-      error instanceof Error
-        ? error
-        : new Error("Unknown error in generate schema"),
-    );
-    throw error;
-  }
+// INCORRECT - autoIncrement is NOT a function
+export const users = sqliteTable("users", {
+  id: integer("id", { mode: "number" }).primaryKey().autoIncrement(),
 });
+
+// CORRECT - autoIncrement is passed as an option
+export const users = sqliteTable("users", {
+  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+});
+\`\`\`
+
+
+You can export types for insert operations using \`.inferSelect\`
+
+\`\`\`
+import { sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+export const events = sqliteTable(
+  "events",
+  {
+    id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+    jsonData: text("json_data", { mode: "json" }).notNull(),
+    createdAt: text("created_at").notNull().default(sql\`(CURRENT_TIMESTAMP)\`),
+  }
+);
+
+// This is the type for data to be inserted into the database
+export type EventSelect = typeof events.$inferSelect;
+\`\`\`
+`;
+}

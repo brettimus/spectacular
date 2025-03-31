@@ -1,4 +1,3 @@
-import { type Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
@@ -17,16 +16,20 @@ A rule is a guideline or pattern for implementing specific database features lik
 
 export const identifyRulesActor = fromPromise<
   { relevantRules: SelectedRule[] },
-  { context: Context; schemaSpecification: string }
+  { apiKey: string; schemaSpecification: string, noop: boolean }
 >(async ({ input, signal }) => {
+  if (input.noop) {
+    return { relevantRules: [] as SelectedRule[], reasoning: "N/A" };
+  }
   try {
-    const { context, schemaSpecification } = input;
-    const openai = createOpenAI({ apiKey: context.apiKey });
+    const { apiKey, schemaSpecification } = input;
+    const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("gpt-4o"));
 
     // In a real implementation, you would load rules from a directory
     // For this prototype, we'll assume a fixed set of example rules
-    const rules = ["authentication", "real-time", "audit-trail", "versioning"];
+    // const rules = ["authentication", "real-time", "audit-trail", "versioning"];
+    const rules: Array<string> = [];
 
     log("debug", "Identifying rules for schema", {
       schemaSpecLength: schemaSpecification.length,
@@ -42,7 +45,6 @@ export const identifyRulesActor = fromPromise<
         selectedRules: z.array(
           z.object({
             ruleName: z.string().describe("Name of the rule to apply"),
-            priority: z.number().describe("Priority order (1 is highest)"),
             reason: z.string().describe("Why this rule is relevant"),
           }),
         ),

@@ -1,4 +1,3 @@
-import { type Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
@@ -23,6 +22,7 @@ The schema should follow best practices for relational database design:
 The output should be a markdown document describing the tables and their relationships.
 
 Use the following outline:
+
 [Outline]
 # <name of the project> Database Schema
 
@@ -69,11 +69,11 @@ Be thorough and detailed. This is important to my career.
 
 export const analyzeTablesActor = fromPromise<
   SchemaAnalysisResult,
-  { context: Context; options: SchemaAnalysisOptions }
+  { apiKey: string; options: SchemaAnalysisOptions }
 >(async ({ input, signal }) => {
   try {
-    const { context, options } = input;
-    const openai = createOpenAI({ apiKey: context.apiKey });
+    const { apiKey, options } = input;
+    const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("gpt-4o"));
 
     // Ensure we have the spec content

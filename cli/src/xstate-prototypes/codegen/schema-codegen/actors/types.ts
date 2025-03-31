@@ -1,4 +1,3 @@
-import type { Context } from "@/context";
 import type { ErrorInfo } from "@/utils/typechecking/types";
 import type { SelectedRule } from "@/agents/schema-agent/types";
 
@@ -22,6 +21,7 @@ export interface SchemaFixOptions {
 
 export interface TypescriptErrorAnalysisOptions {
   schema: string;
+  schemaSpecification: string;
   errors: ErrorInfo[];
 }
 
@@ -49,36 +49,4 @@ export interface SchemaErrorAnalysisResult {
 
 export interface SchemaFixResult {
   code: string;
-}
-
-export interface SchemaAgentInterface {
-  analyzeTables(
-    context: Context,
-    options: SchemaAnalysisOptions,
-  ): Promise<SchemaAnalysisResult>;
-
-  identifyRules(
-    context: Context,
-    schemaSpecification: string,
-  ): Promise<{ relevantRules: SelectedRule[] }>;
-
-  generateSchema(
-    context: Context,
-    options: SchemaGenerationOptions,
-  ): Promise<SchemaGenerationResult>;
-
-  verifySchema(
-    context: Context,
-    options: SchemaVerificationOptions,
-  ): Promise<SchemaVerificationResult>;
-
-  analyzeErrors(
-    context: Context,
-    options: TypescriptErrorAnalysisOptions,
-  ): Promise<SchemaErrorAnalysisResult | null>;
-
-  fixSchema(
-    context: Context,
-    options: SchemaFixOptions,
-  ): Promise<SchemaFixResult | null>;
 }

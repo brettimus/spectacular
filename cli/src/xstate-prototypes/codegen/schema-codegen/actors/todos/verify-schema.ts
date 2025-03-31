@@ -1,4 +1,3 @@
-import { type Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
@@ -8,11 +7,12 @@ import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type {
   SchemaVerificationOptions,
   SchemaVerificationResult,
-} from "./types";
+} from "../types";
 import {
+  getD1AdditionalTips,
   getD1SchemaExample,
   getDrizzleSchemaExamples,
-} from "./generate-schema";
+} from "../generate-schema";
 
 // System prompt for schema verification
 const SCHEMA_VERIFICATION_SYSTEM_PROMPT = `
@@ -28,22 +28,22 @@ Here are some additional code references:
 
 ${getDrizzleSchemaExamples()}
 
+[IMPORTANT]
+
+${getD1AdditionalTips()}
+
 [Additional Instructions]
 
-Things you usually screw up (things to avoid):
-- \`.primaryKey().autoIncrement()\` is NOT VALID for D1
-  BETTER: use \`.primaryKey({ autoIncrement: true })\` instead
 - Make sure all dependencies were properly imported
-- IMPORTANT: \`import { sql } from "drizzle-orm"\`, not from \`drizzle-orm/sqlite-core'\`
 `;
 
 export const verifySchemaActor = fromPromise<
   SchemaVerificationResult,
-  { context: Context; options: SchemaVerificationOptions }
+  { apiKey: string; options: SchemaVerificationOptions }
 >(async ({ input, signal }) => {
   try {
-    const { context, options } = input;
-    const openai = createOpenAI({ apiKey: context.apiKey });
+    const { apiKey, options } = input;
+    const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("o3-mini"));
 
     log("debug", "Verifying schema", {
