@@ -1,4 +1,5 @@
 import type { AnyActorLogic } from "xstate";
+import { log } from "./logger";
 
 /**
  * Wraps an actor logic function with logging of the state and event.
@@ -10,7 +11,8 @@ export function withLogging<T extends AnyActorLogic>(actorLogic: T) {
   const enhancedLogic = {
     ...actorLogic,
     transition: (state, event, actorCtx) => {
-      console.log("State:", state.value);
+      log("info", `State: ${state.value}`);
+      log("info", `Event: ${event}`);
       return actorLogic.transition(state, event, actorCtx);
     },
   } satisfies T;

@@ -69,3 +69,10 @@ Regarding the inspector that fires WebSocket events, which you can forward to St
 - Related issue (see last comment) https://github.com/statelyai/inspect/issues/6
 - I hit this issue in the first makeshift webpage I spun up: https://github.com/statelyai/inspect/issues/41
 - The only thing that worked after a few hours of experimentation was to just run the machine in the browser.
+
+
+## Logging
+
+Tried looking into Pino, but it isn't supported in Cloudflare Workers out of the box so nixed that. I liked log layer as a general solution so we could swap out the transport layer easily, but they don't have support for.... logtape! 
+
+Went with logtape since we're using it in Cloudflare Workers already.
