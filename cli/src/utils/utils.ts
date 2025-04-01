@@ -7,7 +7,7 @@ import path from "node:path";
  */
 export function convertSpecNameToFilename(specName: string) {
   // Double escape the path separator for Windows
-  const escapedSep = path.sep === '\\' ? '\\\\' : path.sep;
+  const escapedSep = path.sep === "\\" ? "\\\\" : path.sep;
 
   const filename = specName
     .replace(new RegExp(`[\\s${escapedSep}]+`, "g"), "-")

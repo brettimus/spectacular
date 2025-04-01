@@ -1,6 +1,6 @@
-import type { GeneratedPlan } from "@/agents/ideation-agent/generate-spec";
 import type { Message } from "ai";
 import { fromPromise } from "xstate";
+import type { GeneratedPlan } from "../types";
 
 export const generatePlanActor = fromPromise<
   GeneratedPlan,

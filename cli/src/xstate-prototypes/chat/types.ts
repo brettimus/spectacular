@@ -1,5 +1,16 @@
-import type { GeneratedPlan } from "@/agents/ideation-agent/generate-spec";
 import type { Message } from "ai";
+import { z } from "zod";
+
+const GeneratedPlanSchema = z.object({
+  title: z.string().describe("A title for the project."),
+  plan: z
+    .string()
+    .describe(
+      "A detailed implementation plan / handoff document for a developer to implement the project (in markdown).",
+    ),
+});
+
+export type GeneratedPlan = z.infer<typeof GeneratedPlanSchema>;
 
 export type RouterResponseType =
   | "ask_follow_up_question"

@@ -1,29 +1,58 @@
-import { generateText, type Message } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateObject, type Message } from "ai";
+import { z } from "zod";
 import { fromPromise } from "xstate";
-import { ollama } from "ollama-ai-provider";
-import type { RouterResponse, RouterResponseType } from "./types";
+import type { RouterResponse } from "./types";
+
+const ROUTER_SYSTEM_PROMPT = `You are an expert AI assistant that helps iterate on coding ideas in order to inform an _eventual_ software specification to implement a software project.
+
+The user has approached you with an idea for a software project.
+
+Look at the conversation history and determine what we need to do next.
+
+Either we have sufficient information to generate an implementation plan, or we need to ask the user a follow-up question.
+
+Consider the user's intent, as well as the following:
+
+- Do we have a clear idea of the domain of the project?
+- Have we asked about user authentication yet? We should always ask about auth, just to be sure, unless it's obvious that the user doesn't need it.
+- Do we have an idea of features like auth, email, realtime, etc?`;
 
 export const routeRequestActor = fromPromise<
   RouterResponse,
-  { messages: Message[] }
+  { apiKey: string; messages: Message[] }
 >(async ({ input, signal }) => {
-  const model = ollama("gemma3:4b");
-  const response = await generateText({
+  return routeRequest(input.apiKey, input.messages, signal);
+});
+
+export async function routeRequest(
+  apiKey: string,
+  messages: Message[],
+  signal?: AbortSignal,
+) {
+  const openai = createOpenAI({ apiKey });
+  const model = openai("gpt-4o-mini");
+
+  const { object: classification } = await generateObject({
     model,
-    system:
-      "You are a router. Only respond with one of two responses: 'ask_follow_up_question' or 'generate_implementation_plan'. Do not include quotes.",
-    messages: input.messages,
+    schema: z.object({
+      reasoning: z
+        .string()
+        .describe(
+          "A brief explanation of your reasoning for the classification.",
+        ),
+      nextStep: z.enum([
+        "ask_follow_up_question",
+        "generate_implementation_plan",
+      ]),
+    }),
+    messages: messages,
+    system: ROUTER_SYSTEM_PROMPT,
     abortSignal: signal,
   });
-  let nextStep = response.text?.trim() as RouterResponseType;
-  if (
-    nextStep !== "ask_follow_up_question" &&
-    nextStep !== "generate_implementation_plan"
-  ) {
-    console.error("Invalid response from router:", nextStep);
-    nextStep = "ask_follow_up_question";
-  }
-  return { nextStep, reasoning: "TODO" };
 
-  // return { nextStep: "ask_follow_up_question", reasoning: "TODO" };
-});
+  return {
+    nextStep: classification.nextStep,
+    reasoning: classification.reasoning,
+  };
+}
