@@ -6,8 +6,11 @@ import path from "node:path";
  * If a file with the same name already exists, adds a version suffix (v0, v1, etc.).
  */
 export function convertSpecNameToFilename(specName: string) {
+  // Double escape the path separator for Windows
+  const escapedSep = path.sep === '\\' ? '\\\\' : path.sep;
+
   const filename = specName
-    .replace(new RegExp(`[\\s${path.sep}]+`, "g"), "-")
+    .replace(new RegExp(`[\\s${escapedSep}]+`, "g"), "-")
     .toLowerCase();
   const baseFilename = filename.endsWith(".md") ? filename : `${filename}.md`;
 
