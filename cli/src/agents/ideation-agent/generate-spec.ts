@@ -147,6 +147,17 @@ Remember, the specification is for a HONC-stack project:
 This is important to my career.
 `;
 
+const GeneratedPlanSchema = z.object({
+  title: z.string().describe("A title for the project."),
+  plan: z
+    .string()
+    .describe(
+      "A detailed implementation plan / handoff document for a developer to implement the project (in markdown).",
+    ),
+});
+
+export type GeneratedPlan = z.infer<typeof GeneratedPlanSchema>;
+
 export async function generateImplementationPlan(ctx: Context) {
   const openai = createOpenAI({ apiKey: ctx.apiKey });
 
@@ -155,14 +166,7 @@ export async function generateImplementationPlan(ctx: Context) {
     system: IMPLEMENTATION_PLAN_SYSTEM_PROMPT,
     messages: ctx.messages,
     mode: "json",
-    schema: z.object({
-      title: z.string().describe("A title for the project."),
-      plan: z
-        .string()
-        .describe(
-          "A detailed implementation plan / handoff document for a developer to implement the project (in markdown).",
-        ),
-    }),
+    schema: GeneratedPlanSchema,
     temperature: 0.35,
   });
 }

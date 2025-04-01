@@ -11,6 +11,5 @@ export interface TableField {
 
 export interface SelectedRule {
   ruleName: string;
-  priority: number;
   reason: string;
 }

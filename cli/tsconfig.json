@@ -2,14 +2,14 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "skipLibCheck": true,
+    "skipLibCheck": true, // Needed for xstate
     "esModuleInterop": true,
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "strict": true,
+    "strict": true, // Needed for xstate
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
