@@ -115,7 +115,9 @@ export class ChatCliAdapter {
       await waitFor(
         this.actor,
         (state) => {
-          const shouldContinue = state.matches("done") || state.matches("idle");
+          const isDone = state.matches("done");
+          const isIdle = state.matches("idle");
+          const shouldContinue = isIdle || isDone;
           return shouldContinue;
         },
         // { timeout: 20000 },

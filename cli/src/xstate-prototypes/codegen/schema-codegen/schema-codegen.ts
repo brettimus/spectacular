@@ -106,7 +106,9 @@ export const schemaCodegenMachine = setup({
           actions: [
             ({ event }) => {
               if (event.error) {
-                log("error", "Failed to analyze tables", { error: event.error });
+                log("error", "Failed to analyze tables", {
+                  error: event.error,
+                });
               }
             },
             assign({
@@ -115,9 +117,9 @@ export const schemaCodegenMachine = setup({
                 if (error instanceof Error) {
                   return error;
                 }
-                return "Unknown error"
-              }
-            })
+                return "Unknown error";
+              },
+            }),
           ],
         },
       },
@@ -295,10 +297,12 @@ export const schemaCodegenMachine = setup({
     failed: {
       type: "final",
       entry: [
-        () => log("error", "Schema generation process failed", { stage: "error" }),
+        () =>
+          log("error", "Schema generation process failed", { stage: "error" }),
         assign({
-          machineError: ({ context }) => context.machineError ?? "Failed to generate schema",
-        })
+          machineError: ({ context }) =>
+            context.machineError ?? "Failed to generate schema",
+        }),
       ],
     },
   },

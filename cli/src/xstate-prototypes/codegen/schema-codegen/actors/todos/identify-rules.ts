@@ -16,7 +16,7 @@ A rule is a guideline or pattern for implementing specific database features lik
 
 export const identifyRulesActor = fromPromise<
   { relevantRules: SelectedRule[] },
-  { apiKey: string; schemaSpecification: string, noop: boolean }
+  { apiKey: string; schemaSpecification: string; noop: boolean }
 >(async ({ input, signal }) => {
   if (input.noop) {
     return { relevantRules: [] as SelectedRule[], reasoning: "N/A" };

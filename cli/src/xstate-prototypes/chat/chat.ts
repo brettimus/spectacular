@@ -22,9 +22,19 @@ interface ChatMachineContext {
   messages: Message[];
   cwd: string;
   spec: string | null;
+  projectDir: string | null;
   specLocation: string | null;
   title: string;
   streamResponse: QuestionTextStreamResult | null;
+}
+
+interface ChatMachineOutput {
+  messages: Message[];
+  cwd: string;
+  spec: string | null;
+  specLocation: string | null;
+  title: string;
+  projectDir: string;
 }
 
 const chatMachine = setup({
@@ -32,6 +42,7 @@ const chatMachine = setup({
     context: {} as ChatMachineContext,
     input: {} as ChatMachineInput,
     events: {} as { type: "promptReceived"; prompt: string },
+    output: {} as ChatMachineOutput,
   },
   actors: {
     routeRequest: routeRequestActor,
@@ -74,6 +85,8 @@ const chatMachine = setup({
     specLocation: null,
     title: "spec.md",
     streamResponse: null,
+    // TODO - set project dir
+    projectDir: input.cwd,
   }),
   states: {
     idle: {
@@ -202,6 +215,16 @@ const chatMachine = setup({
       type: "final",
     },
   },
+  output: ({ context }) => ({
+    spec: context.spec,
+    specLocation: context.specLocation,
+    messages: context.messages,
+    cwd: context.cwd,
+    // HACK - Default to emptystring
+    // IMPROVEMENT - If missing necessary data, return a different output type
+    projectDir: context.projectDir ?? "",
+    title: context.title,
+  }),
 });
 
 export { chatMachine };
