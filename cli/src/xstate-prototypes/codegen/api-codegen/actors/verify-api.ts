@@ -12,7 +12,7 @@ import type { ApiVerificationOptions, ApiVerificationResult } from "./types";
 export async function verifyApi(
   apiKey: string,
   options: ApiVerificationOptions,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<ApiVerificationResult> {
   try {
     const openai = createOpenAI({ apiKey });
@@ -103,8 +103,4 @@ export const verifyApiActor = fromPromise<
     apiKey: string;
     options: ApiVerificationOptions;
   }
->(({ input, signal }) => verifyApi(
-  input.apiKey,
-  input.options,
-  signal
-));
+>(({ input, signal }) => verifyApi(input.apiKey, input.options, signal));

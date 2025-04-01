@@ -73,7 +73,7 @@ Be thorough and detailed. This is important to my career.
 export async function analyzeTables(
   apiKey: string,
   options: SchemaAnalysisOptions,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<SchemaAnalysisResult> {
   try {
     const openai = createOpenAI({ apiKey });
@@ -138,8 +138,4 @@ ${options.specContent}`,
 export const analyzeTablesActor = fromPromise<
   SchemaAnalysisResult,
   { apiKey: string; options: SchemaAnalysisOptions }
->(({ input, signal }) => analyzeTables(
-  input.apiKey,
-  input.options,
-  signal
-));
+>(({ input, signal }) => analyzeTables(input.apiKey, input.options, signal));

@@ -15,7 +15,7 @@ export async function fixApiErrors(
   apiKey: string,
   fixContent: string,
   originalApiCode: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<ApiFixResult | null> {
   try {
     const openai = createOpenAI({ apiKey });
@@ -100,9 +100,6 @@ export const fixApiErrorsActor = fromPromise<
     fixContent: string;
     originalApiCode: string;
   }
->(({ input, signal }) => fixApiErrors(
-  input.apiKey,
-  input.fixContent,
-  input.originalApiCode,
-  signal
-));
+>(({ input, signal }) =>
+  fixApiErrors(input.apiKey, input.fixContent, input.originalApiCode, signal),
+);

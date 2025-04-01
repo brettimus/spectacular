@@ -43,7 +43,7 @@ ${getD1AdditionalTips()}
 export async function verifySchema(
   apiKey: string,
   options: SchemaVerificationOptions,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<SchemaVerificationResult> {
   try {
     const openai = createOpenAI({ apiKey });
@@ -106,8 +106,4 @@ ${options.schema}
 export const verifySchemaActor = fromPromise<
   SchemaVerificationResult,
   { apiKey: string; options: SchemaVerificationOptions }
->(({ input, signal }) => verifySchema(
-  input.apiKey,
-  input.options,
-  signal
-));
+>(({ input, signal }) => verifySchema(input.apiKey, input.options, signal));

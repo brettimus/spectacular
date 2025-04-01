@@ -11,7 +11,7 @@ import type { SchemaFixOptions, SchemaFixResult } from "./types";
 export async function fixSchema(
   apiKey: string,
   options: SchemaFixOptions,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<SchemaFixResult | null> {
   try {
     const openai = createOpenAI({ apiKey });
@@ -89,8 +89,4 @@ Return only the fixed schema code. It should be valid TypeScript code. DO NOT IN
 export const fixSchemaActor = fromPromise<
   SchemaFixResult | null,
   { apiKey: string; options: SchemaFixOptions }
->(({ input, signal }) => fixSchema(
-  input.apiKey,
-  input.options,
-  signal
-));
+>(({ input, signal }) => fixSchema(input.apiKey, input.options, signal));

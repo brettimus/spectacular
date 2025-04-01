@@ -18,7 +18,7 @@ interface ChatMachineInput {
   cwd: string;
 }
 
-interface ChatMachineContext {
+export interface ChatMachineContext {
   messages: Message[];
   cwd: string;
   spec: string | null;

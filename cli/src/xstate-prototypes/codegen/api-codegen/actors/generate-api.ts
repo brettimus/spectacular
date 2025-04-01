@@ -87,7 +87,7 @@ export async function generateApi(
   apiKey: string,
   spec: string,
   schema: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<ApiGenerationResult> {
   try {
     const openai = createOpenAI({ apiKey });
@@ -255,9 +255,6 @@ export const generateApiActor = fromPromise<
     apiKey: string;
     options: ApiGenerationOptions;
   }
->(({ input, signal }) => generateApi(
-  input.apiKey,
-  input.options.spec,
-  input.options.schema,
-  signal
-));
+>(({ input, signal }) =>
+  generateApi(input.apiKey, input.options.spec, input.options.schema, signal),
+);

@@ -1,1 +1,2 @@
-export { ChatCliAdapter } from "./cli-adapter";
+export { ChatCliAdapter } from "./chat-cli-adapter";
+export { SpectacularCliAdapter } from "./spectacular-cli-adapter";

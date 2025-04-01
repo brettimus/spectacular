@@ -13,7 +13,7 @@ export async function analyzeApiErrors(
   apiKey: string,
   apiCode: string,
   errors: ErrorInfo[],
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<ApiErrorAnalysisResult | null> {
   try {
     const openai = createOpenAI({ apiKey });
@@ -62,12 +62,9 @@ export const analyzeApiErrorsActor = fromPromise<
     apiCode: string;
     errors: ErrorInfo[];
   }
->(({ input, signal }) => analyzeApiErrors(
-  input.apiKey,
-  input.apiCode,
-  input.errors,
-  signal
-));
+>(({ input, signal }) =>
+  analyzeApiErrors(input.apiKey, input.apiCode, input.errors, signal),
+);
 
 /**
  * Generate a prompt for the AI to analyze API errors

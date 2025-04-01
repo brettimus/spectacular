@@ -26,22 +26,11 @@ interface SpectacularMachineOutput {
   apiCode: string;
 }
 
-// Define the output type of the schema machine to help with type checking
-interface SchemaCodegenOutput {
-  dbSchemaTs: string;
-  error?: Error | string | null;
-  valid: boolean;
-  issues: string[];
-  suggestions: string[];
-}
-
 export const spectacularMachine = setup({
   types: {
     context: {} as SpectacularMachineContext,
     input: {} as SpectacularMachineInput,
-    events: {} as 
-      | { type: "promptReceived"; prompt: string }
-      | { type: "GENERATE_API"; schema: string; spec: string },
+    events: {} as { type: "promptReceived"; prompt: string },
     output: {} as SpectacularMachineOutput,
   },
   actors: {
@@ -73,17 +62,17 @@ export const spectacularMachine = setup({
         onDone: {
           target: "generatingSchema",
           actions: assign({
-            spec: ({ event }) => event.output?.spec || "",
-            projectDir: ({ event }) => event.output?.projectDir || "",
-            messages: ({ event }) => event.output?.messages || [],
-            title: ({ event }) => event.output?.title || "spec.md",
+            spec: ({ event }) => event.output.spec || "",
+            projectDir: ({ event }) => event.output.projectDir,
+            messages: ({ event }) => event.output.messages,
+            title: ({ event }) => event.output.title,
           }),
         },
       },
       on: {
         promptReceived: {
           actions: ({ self, event }) => {
-            self.send({ type: "promptReceived", prompt: event.prompt });
+            self.getSnapshot().children.ideation?.send(event);
           },
         },
       },
@@ -99,8 +88,7 @@ export const spectacularMachine = setup({
         onDone: {
           target: "generatingApi",
           actions: assign({
-            // Type assertion to handle the output type
-            dbSchemaTs: ({ event }) => (event.output as SchemaCodegenOutput)?.dbSchemaTs || "",
+            dbSchemaTs: ({ event }) => event.output?.dbSchemaTs || "",
           }),
         },
       },
@@ -117,14 +105,19 @@ export const spectacularMachine = setup({
         onDone: {
           target: "done",
           actions: assign({
-            apiCode: ({ context }) => context.apiCode,
+            apiCode: ({ context }) => {
+              // The API codegen machine doesn't directly output apiCode
+              // Using a placeholder or accessing it from context if available
+              return context.apiCode;
+            },
           }),
         },
       },
       entry: ({ self, context }) => {
         // When entering this state, we'll send the GENERATE_API event
         // to ensure the API generation begins
-        self.send({
+        // HACK
+        self.getSnapshot().children.apiGenerationActor?.send({
           type: "GENERATE_API",
           schema: context.dbSchemaTs,
           spec: context.spec,

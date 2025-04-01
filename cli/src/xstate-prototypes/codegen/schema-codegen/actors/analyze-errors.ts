@@ -15,7 +15,7 @@ import type { ErrorInfo } from "@/utils/typechecking/types";
 export async function analyzeErrors(
   apiKey: string,
   options: TypescriptErrorAnalysisOptions,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<SchemaErrorAnalysisResult | null> {
   const { schemaSpecification, schema, errors } = options;
   try {
@@ -64,15 +64,11 @@ export async function analyzeErrors(
 
 export const analyzeErrorsActor = fromPromise<
   SchemaErrorAnalysisResult | null,
-  { 
+  {
     apiKey: string;
     options: TypescriptErrorAnalysisOptions;
   }
->(({ input, signal }) => analyzeErrors(
-  input.apiKey,
-  input.options,
-  signal
-));
+>(({ input, signal }) => analyzeErrors(input.apiKey, input.options, signal));
 
 /**
  * Generate a prompt for the AI to analyze schema errors

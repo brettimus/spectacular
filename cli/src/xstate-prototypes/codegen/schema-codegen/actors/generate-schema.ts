@@ -34,7 +34,7 @@ ${getD1AdditionalTips()}
 export async function generateSchema(
   apiKey: string,
   options: SchemaGenerationOptions,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<SchemaGenerationResult> {
   try {
     const openai = createOpenAI({ apiKey });
@@ -103,11 +103,7 @@ This is important to my career.`,
 export const generateSchemaActor = fromPromise<
   SchemaGenerationResult,
   { apiKey: string; options: SchemaGenerationOptions }
->(({ input, signal }) => generateSchema(
-  input.apiKey,
-  input.options,
-  signal
-));
+>(({ input, signal }) => generateSchema(input.apiKey, input.options, signal));
 
 // Helper functions for providing examples
 export function getD1SchemaExample() {

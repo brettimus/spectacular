@@ -21,7 +21,7 @@ export async function identifyRules(
   apiKey: string,
   schemaSpecification: string,
   noop: boolean,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<{ relevantRules: SelectedRule[] }> {
   if (noop) {
     return { relevantRules: [] };
@@ -91,14 +91,11 @@ ${rules.join(", ")}
 
 export const identifyRulesActor = fromPromise<
   { relevantRules: SelectedRule[] },
-  { 
-    apiKey: string; 
-    schemaSpecification: string; 
-    noop: boolean 
+  {
+    apiKey: string;
+    schemaSpecification: string;
+    noop: boolean;
   }
->(({ input, signal }) => identifyRules(
-  input.apiKey,
-  input.schemaSpecification,
-  input.noop,
-  signal
-));
+>(({ input, signal }) =>
+  identifyRules(input.apiKey, input.schemaSpecification, input.noop, signal),
+);

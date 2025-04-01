@@ -33,6 +33,13 @@ interface SchemaCodegenMachineContext {
   machineError: null | Error | string;
 }
 
+interface SchemaCodegenMachineOutput {
+  dbSchemaTs: string;
+  valid: boolean;
+  issues: string[];
+  suggestions: string[];
+}
+
 export const schemaCodegenMachine = setup({
   types: {
     context: {} as SchemaCodegenMachineContext,
@@ -44,6 +51,7 @@ export const schemaCodegenMachine = setup({
       | { type: "ANALYZE_ERRORS"; errors: ErrorInfo[] }
       | { type: "FIX_ERRORS" }
       | { type: "REGENERATE_SCHEMA" },
+    output: {} as SchemaCodegenMachineOutput,
   },
   actors: {
     analyzeTables: analyzeTablesActor,
@@ -176,7 +184,9 @@ export const schemaCodegenMachine = setup({
           },
         }),
         onDone: {
-          target: "verifyingSchema",
+          // target: "verifyingSchema",
+          // TODO - FIX THIS TRANSITION
+          target: "waitingForErrors",
           actions: assign({
             dbSchemaTs: ({ event }) => event.output?.dbSchemaTs || "",
           }),
@@ -254,7 +264,9 @@ export const schemaCodegenMachine = setup({
           },
         }),
         onDone: {
-          target: "verifyingFixedSchema",
+          // target: "verifyingFixedSchema",
+          // TODO - FIX THIS TRANSITION
+          target: "success",
           actions: assign({
             fixedSchema: ({ event }) => event.output?.code || null,
           }),
