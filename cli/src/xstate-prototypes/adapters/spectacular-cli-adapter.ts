@@ -1,4 +1,9 @@
-import { createActor, type SnapshotFrom, waitFor, type ActorRefFrom } from "xstate";
+import {
+  createActor,
+  type SnapshotFrom,
+  waitFor,
+  type ActorRefFrom,
+} from "xstate";
 import { spinner, text, log, stream, isCancel } from "@clack/prompts";
 import pico from "picocolors";
 import type { Message } from "ai";
