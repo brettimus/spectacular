@@ -1,4 +1,3 @@
-import type { Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
@@ -12,17 +11,14 @@ import type { ApiFixResult } from "./types";
  * NOTE - Cannot use experimental predictive outputs with a tool call,
  *        so we just use generateText
  */
-export const fixApiErrorsActor = fromPromise<
-  ApiFixResult | null,
-  {
-    context: Context;
-    fixContent: string;
-    originalApiCode: string;
-  }
->(async ({ input, signal }) => {
+export async function fixApiErrors(
+  apiKey: string,
+  fixContent: string,
+  originalApiCode: string,
+  signal?: AbortSignal
+): Promise<ApiFixResult | null> {
   try {
-    const { context, fixContent, originalApiCode } = input;
-    const openai = createOpenAI({ apiKey: context.apiKey });
+    const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("gpt-4o"));
 
     log("debug", "Fixing API errors", {
@@ -95,4 +91,18 @@ Return only the fixed code. It should be valid TypeScript code. DO NOT INCLUDE A
     );
     return null;
   }
-});
+}
+
+export const fixApiErrorsActor = fromPromise<
+  ApiFixResult | null,
+  {
+    apiKey: string;
+    fixContent: string;
+    originalApiCode: string;
+  }
+>(({ input, signal }) => fixApiErrors(
+  input.apiKey,
+  input.fixContent,
+  input.originalApiCode,
+  signal
+));

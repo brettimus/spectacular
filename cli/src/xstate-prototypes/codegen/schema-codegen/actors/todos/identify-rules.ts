@@ -14,15 +14,19 @@ Your task is to analyze a list of database tables and operations and determine w
 A rule is a guideline or pattern for implementing specific database features like authentication, real-time data, etc.
 `;
 
-export const identifyRulesActor = fromPromise<
-  { relevantRules: SelectedRule[] },
-  { apiKey: string; schemaSpecification: string; noop: boolean }
->(async ({ input, signal }) => {
-  if (input.noop) {
-    return { relevantRules: [] as SelectedRule[], reasoning: "N/A" };
+/**
+ * Identify relevant rules from schema specification using AI
+ */
+export async function identifyRules(
+  apiKey: string,
+  schemaSpecification: string,
+  noop: boolean,
+  signal?: AbortSignal
+): Promise<{ relevantRules: SelectedRule[] }> {
+  if (noop) {
+    return { relevantRules: [] };
   }
   try {
-    const { apiKey, schemaSpecification } = input;
     const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("gpt-4o"));
 
@@ -83,4 +87,18 @@ ${rules.join(", ")}
     );
     throw error;
   }
-});
+}
+
+export const identifyRulesActor = fromPromise<
+  { relevantRules: SelectedRule[] },
+  { 
+    apiKey: string; 
+    schemaSpecification: string; 
+    noop: boolean 
+  }
+>(({ input, signal }) => identifyRules(
+  input.apiKey,
+  input.schemaSpecification,
+  input.noop,
+  signal
+));

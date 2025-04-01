@@ -67,12 +67,15 @@ Use the following outline:
 Be thorough and detailed. This is important to my career.
 `;
 
-export const analyzeTablesActor = fromPromise<
-  SchemaAnalysisResult,
-  { apiKey: string; options: SchemaAnalysisOptions }
->(async ({ input, signal }) => {
+/**
+ * Analyze tables from specification using AI
+ */
+export async function analyzeTables(
+  apiKey: string,
+  options: SchemaAnalysisOptions,
+  signal?: AbortSignal
+): Promise<SchemaAnalysisResult> {
   try {
-    const { apiKey, options } = input;
     const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("gpt-4o"));
 
@@ -130,4 +133,13 @@ ${options.specContent}`,
     );
     throw error;
   }
-});
+}
+
+export const analyzeTablesActor = fromPromise<
+  SchemaAnalysisResult,
+  { apiKey: string; options: SchemaAnalysisOptions }
+>(({ input, signal }) => analyzeTables(
+  input.apiKey,
+  input.options,
+  signal
+));

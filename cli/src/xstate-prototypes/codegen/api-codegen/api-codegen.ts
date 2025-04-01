@@ -1,5 +1,4 @@
 import { setup, assign } from "xstate";
-import type { Context } from "@/context";
 import type { ErrorInfo } from "@/utils/typechecking/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
@@ -14,13 +13,13 @@ import {
 } from "./actors";
 
 interface ApiCodegenMachineInput {
-  context: Context;
+  apiKey: string;
   schema?: string;
   spec?: string;
 }
 
 interface ApiCodegenMachineContext {
-  context: Context;
+  apiKey: string;
   schema: string;
   spec: string;
   apiCode: string;
@@ -53,7 +52,7 @@ export const apiCodegenMachine = setup({
   id: "api-codegen",
   initial: "idle",
   context: ({ input }) => ({
-    context: input.context,
+    apiKey: input.apiKey,
     schema: input.schema || "",
     spec:
       input.spec ||
@@ -84,11 +83,11 @@ export const apiCodegenMachine = setup({
         id: "generate-api",
         src: "generateApi",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           options: {
             schema: context.schema,
+            spec: context.spec,
           },
-          spec: context.spec,
         }),
         onDone: {
           target: "verifyingApi",
@@ -113,7 +112,7 @@ export const apiCodegenMachine = setup({
         id: "verify-api",
         src: "verifyApi",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           options: {
             schema: context.schema,
             apiCode: context.apiCode,
@@ -168,7 +167,7 @@ export const apiCodegenMachine = setup({
         id: "analyze-api-errors",
         src: "analyzeApiErrors",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           apiCode: context.apiCode,
           errors: context.errors,
         }),
@@ -196,7 +195,7 @@ export const apiCodegenMachine = setup({
         id: "fix-api-errors",
         src: "fixApiErrors",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           fixContent: context.errorAnalysis?.text || "",
           originalApiCode: context.apiCode,
         }),
@@ -225,7 +224,7 @@ export const apiCodegenMachine = setup({
         id: "verify-fixed-api",
         src: "verifyApi",
         input: ({ context }) => ({
-          context: context.context,
+          apiKey: context.apiKey,
           options: {
             schema: context.schema,
             apiCode: context.fixedApiCode || context.apiCode,

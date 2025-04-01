@@ -1,4 +1,3 @@
-import type { Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
@@ -7,16 +6,16 @@ import { fromPromise } from "xstate";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { ApiVerificationOptions, ApiVerificationResult } from "./types";
 
-export const verifyApiActor = fromPromise<
-  ApiVerificationResult,
-  {
-    context: Context;
-    options: ApiVerificationOptions;
-  }
->(async ({ input, signal }) => {
+/**
+ * Verify API code using AI
+ */
+export async function verifyApi(
+  apiKey: string,
+  options: ApiVerificationOptions,
+  signal?: AbortSignal
+): Promise<ApiVerificationResult> {
   try {
-    const { context, options } = input;
-    const openai = createOpenAI({ apiKey: context.apiKey });
+    const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("o3-mini"));
 
     const VERIFICATION_PROMPT = `
@@ -96,4 +95,16 @@ Rate the overall quality of the generated API on a scale of 1-5 and explain your
     );
     throw error;
   }
-});
+}
+
+export const verifyApiActor = fromPromise<
+  ApiVerificationResult,
+  {
+    apiKey: string;
+    options: ApiVerificationOptions;
+  }
+>(({ input, signal }) => verifyApi(
+  input.apiKey,
+  input.options,
+  signal
+));

@@ -5,12 +5,15 @@ import { fromPromise } from "xstate";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { SchemaFixOptions, SchemaFixResult } from "./types";
 
-export const fixSchemaActor = fromPromise<
-  SchemaFixResult | null,
-  { apiKey: string; options: SchemaFixOptions }
->(async ({ input, signal }) => {
+/**
+ * Fix schema errors using AI
+ */
+export async function fixSchema(
+  apiKey: string,
+  options: SchemaFixOptions,
+  signal?: AbortSignal
+): Promise<SchemaFixResult | null> {
   try {
-    const { apiKey, options } = input;
     const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("gpt-4o"));
 
@@ -81,4 +84,13 @@ Return only the fixed schema code. It should be valid TypeScript code. DO NOT IN
     );
     return null;
   }
-});
+}
+
+export const fixSchemaActor = fromPromise<
+  SchemaFixResult | null,
+  { apiKey: string; options: SchemaFixOptions }
+>(({ input, signal }) => fixSchema(
+  input.apiKey,
+  input.options,
+  signal
+));

@@ -3,6 +3,7 @@ import type { ErrorInfo } from "@/utils/typechecking/types";
 
 export interface ApiGenerationOptions {
   schema: string;
+  spec: string;
 }
 
 export interface ApiVerificationOptions {

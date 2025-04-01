@@ -1,4 +1,3 @@
-import { type Context } from "@/context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
@@ -81,20 +80,20 @@ const getCommonHonoMistakes = () => {
 `;
 };
 
-export const generateApiActor = fromPromise<
-  ApiGenerationResult,
-  {
-    context: Context;
-    options: ApiGenerationOptions;
-    spec: string;
-  }
->(async ({ input, signal }) => {
+/**
+ * Generate API code using AI
+ */
+export async function generateApi(
+  apiKey: string,
+  spec: string,
+  schema: string,
+  signal?: AbortSignal
+): Promise<ApiGenerationResult> {
   try {
-    const { context, options, spec } = input;
-    const openai = createOpenAI({ apiKey: context.apiKey });
+    const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("o3-mini"));
 
-    const dbSchema = options.schema;
+    const dbSchema = schema;
     const apiPlan =
       spec ||
       "Create a simple REST API with CRUD operations for all tables in the schema.";
@@ -248,4 +247,17 @@ Things you usually screw up (things to avoid):
     );
     throw error;
   }
-});
+}
+
+export const generateApiActor = fromPromise<
+  ApiGenerationResult,
+  {
+    apiKey: string;
+    options: ApiGenerationOptions;
+  }
+>(({ input, signal }) => generateApi(
+  input.apiKey,
+  input.options.spec,
+  input.options.schema,
+  signal
+));

@@ -37,12 +37,15 @@ ${getD1AdditionalTips()}
 - Make sure all dependencies were properly imported
 `;
 
-export const verifySchemaActor = fromPromise<
-  SchemaVerificationResult,
-  { apiKey: string; options: SchemaVerificationOptions }
->(async ({ input, signal }) => {
+/**
+ * Verify schema using AI
+ */
+export async function verifySchema(
+  apiKey: string,
+  options: SchemaVerificationOptions,
+  signal?: AbortSignal
+): Promise<SchemaVerificationResult> {
   try {
-    const { apiKey, options } = input;
     const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("o3-mini"));
 
@@ -98,4 +101,13 @@ ${options.schema}
     );
     throw error;
   }
-});
+}
+
+export const verifySchemaActor = fromPromise<
+  SchemaVerificationResult,
+  { apiKey: string; options: SchemaVerificationOptions }
+>(({ input, signal }) => verifySchema(
+  input.apiKey,
+  input.options,
+  signal
+));

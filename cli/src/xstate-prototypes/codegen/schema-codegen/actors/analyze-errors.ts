@@ -9,24 +9,28 @@ import type {
 } from "./types";
 import type { ErrorInfo } from "@/utils/typechecking/types";
 
-export const analyzeErrorsActor = fromPromise<
-  SchemaErrorAnalysisResult | null,
-  { apiKey: string; options: TypescriptErrorAnalysisOptions }
->(async ({ input, signal }) => {
+/**
+ * Analyze schema errors using AI
+ */
+export async function analyzeErrors(
+  apiKey: string,
+  options: TypescriptErrorAnalysisOptions,
+  signal?: AbortSignal
+): Promise<SchemaErrorAnalysisResult | null> {
+  const { schemaSpecification, schema, errors } = options;
   try {
-    const { apiKey, options } = input;
     const openai = createOpenAI({ apiKey });
     // Use the responses api from openai to do web search
     const model = traceAISDKModel(openai.responses("gpt-4o"));
 
     log("debug", "Analyzing schema errors", {
-      errorsCount: options.errors.length,
+      errorsCount: errors.length,
     });
 
     const prompt = generateErrorAnalysisPrompt(
-      options.schemaSpecification,
-      options.schema,
-      options.errors,
+      schemaSpecification,
+      schema,
+      errors,
     );
 
     const result = await generateText({
@@ -56,7 +60,19 @@ export const analyzeErrorsActor = fromPromise<
     );
     return null;
   }
-});
+}
+
+export const analyzeErrorsActor = fromPromise<
+  SchemaErrorAnalysisResult | null,
+  { 
+    apiKey: string;
+    options: TypescriptErrorAnalysisOptions;
+  }
+>(({ input, signal }) => analyzeErrors(
+  input.apiKey,
+  input.options,
+  signal
+));
 
 /**
  * Generate a prompt for the AI to analyze schema errors

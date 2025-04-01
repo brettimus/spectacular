@@ -1,4 +1,3 @@
-// TODO - Use named exports
 export * from "./types";
 export * from "./analyze-tables";
 export * from "./todos/identify-rules";

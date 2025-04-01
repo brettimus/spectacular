@@ -1,6 +1,6 @@
 // Export all actors and types
-export * from "./types";
-export * from "./generate-api";
-export * from "./verify-api";
-export * from "./analyze-api-errors";
-export * from "./fix-api";
+export { analyzeApiErrors, analyzeApiErrorsActor } from "./analyze-api-errors";
+export { fixApiErrors, fixApiErrorsActor } from "./fix-api";
+export { generateApi, generateApiActor } from "./generate-api";
+export { verifyApi, verifyApiActor } from "./verify-api";
+export type { ApiErrorAnalysisResult } from "./types";

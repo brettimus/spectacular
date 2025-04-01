@@ -28,12 +28,15 @@ ${getD1AdditionalTips()}
 - Make sure all dependencies were properly imported
 `;
 
-export const generateSchemaActor = fromPromise<
-  SchemaGenerationResult,
-  { apiKey: string; options: SchemaGenerationOptions }
->(async ({ input, signal }) => {
+/**
+ * Generate schema using AI
+ */
+export async function generateSchema(
+  apiKey: string,
+  options: SchemaGenerationOptions,
+  signal?: AbortSignal
+): Promise<SchemaGenerationResult> {
   try {
-    const { apiKey, options } = input;
     const openai = createOpenAI({ apiKey });
     const model = traceAISDKModel(openai("gpt-4o"));
 
@@ -95,7 +98,16 @@ This is important to my career.`,
     );
     throw error;
   }
-});
+}
+
+export const generateSchemaActor = fromPromise<
+  SchemaGenerationResult,
+  { apiKey: string; options: SchemaGenerationOptions }
+>(({ input, signal }) => generateSchema(
+  input.apiKey,
+  input.options,
+  signal
+));
 
 // Helper functions for providing examples
 export function getD1SchemaExample() {
