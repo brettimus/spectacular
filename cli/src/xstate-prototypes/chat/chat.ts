@@ -15,10 +15,12 @@ import type {
 } from "../streaming/types";
 
 interface ChatMachineInput {
+  apiKey: string;
   cwd: string;
 }
 
 export interface ChatMachineContext {
+  apiKey: string;
   messages: Message[];
   cwd: string;
   spec: string | null;
@@ -79,6 +81,7 @@ const chatMachine = setup({
   id: "ideation-agent",
   initial: "idle",
   context: ({ input }) => ({
+    apiKey: input.apiKey,
     messages: [],
     cwd: input.cwd,
     spec: null,
@@ -108,7 +111,10 @@ const chatMachine = setup({
       invoke: {
         id: "routing",
         src: "routeRequest",
-        input: ({ context }) => ({ messages: context.messages }),
+        input: ({ context }) => ({
+          apiKey: context.apiKey,
+          messages: context.messages,
+        }),
         onDone: [
           {
             // Transition to asking a follow up question depending on the router actor's response

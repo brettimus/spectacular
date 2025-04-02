@@ -10,10 +10,16 @@ export class ChatCliAdapter {
   private loadingSpinner: ReturnType<typeof spinner> | null = null;
 
   constructor() {
+    const apiKey = process.env.OPENAI_API_KEY;
+    // TODO - Look up API key from config dir
+    if (!apiKey) {
+      throw new Error("OPENAI_API_KEY is not set");
+    }
     // TODO - Try to provide a `processQuestionStream` actor that can
     //        stream the response to the CLI
     this.actor = createActor(chatMachine, {
       input: {
+        apiKey,
         cwd: process.cwd(),
       },
       // Add inspection to debug actor lifecycle
