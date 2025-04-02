@@ -1,18 +1,12 @@
 import { appendResponseMessages, type Message } from "ai";
 import { setup, assign } from "xstate";
-import { createUserMessage } from "@/agents/utils";
+import { pathFromInput } from "@/utils/utils";
 
 import { routeRequestActor } from "./actors/router";
-import type { RouterResponse } from "./types";
-import { generateSpecActor } from "./actors/generate-spec";
-import { askNextQuestionActor } from "./actors/next-question";
-import { savePlanToDiskActor } from "./actors/save-plan-to-disk";
-import { aiTextStreamMachine } from "../streaming/ai-text-stream-machine";
-import { pathFromInput } from "@/utils/utils";
-import type {
-  QuestionTextStreamResult,
-  ResponseMessage,
-} from "../streaming/types";
+import type { RouterResponse } from "./actors";
+import { generateSpecActor, askNextQuestionActor, savePlanToDiskActor } from "./actors";
+import { aiTextStreamMachine, type QuestionTextStreamResult, type ResponseMessage } from "../streaming";
+import { createUserMessage } from "../utils";
 
 interface ChatMachineInput {
   apiKey: string;

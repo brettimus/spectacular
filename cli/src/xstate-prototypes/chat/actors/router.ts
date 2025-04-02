@@ -2,7 +2,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject, type Message } from "ai";
 import { z } from "zod";
 import { fromPromise } from "xstate";
-import type { RouterResponse } from "../types";
+import type { RouterResponse } from "./types";
 
 const ROUTER_SYSTEM_PROMPT = `You are an expert AI assistant that helps iterate on coding ideas in order to inform an _eventual_ software specification to implement a software project.
 

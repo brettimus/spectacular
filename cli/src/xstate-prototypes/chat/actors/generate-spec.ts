@@ -2,8 +2,18 @@ import type { Message } from "ai";
 import { generateObject } from "ai";
 import { fromPromise } from "xstate";
 import { createOpenAI } from "@ai-sdk/openai";
+import { z } from "zod";
 
-import { GeneratedPlanSchema, type GeneratedPlan } from "../types";
+export const GeneratedPlanSchema = z.object({
+  title: z.string().describe("A title for the project."),
+  plan: z
+    .string()
+    .describe(
+      "A detailed implementation plan / handoff document for a developer to implement the project (in markdown).",
+    ),
+});
+
+export type GeneratedPlan = z.infer<typeof GeneratedPlanSchema>;
 
 // https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
 const IMPLEMENTATION_PLAN_SYSTEM_PROMPT = `

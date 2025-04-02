@@ -1,8 +1,8 @@
 import type { Message } from "ai";
 import { fromPromise } from "xstate";
-import type { GeneratedPlan } from "../types";
+import type { GeneratedPlan } from "./generate-spec";
 
-export const generatePlanActor = fromPromise<
+export const generateSpecActor = fromPromise<
   GeneratedPlan,
   { messages: Message[] }
 >(async () => {

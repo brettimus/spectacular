@@ -1,7 +1,7 @@
 import { generateText, type Message } from "ai";
 import { fromPromise } from "xstate";
 import { ollama } from "ollama-ai-provider";
-import type { RouterResponse, RouterResponseType } from "../types";
+import type { RouterResponse, RouterResponseType } from "./types";
 
 export const routeRequestActor = fromPromise<
   RouterResponse,
