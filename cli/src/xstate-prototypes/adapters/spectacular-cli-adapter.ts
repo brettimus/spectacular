@@ -63,9 +63,9 @@ export class SpectacularCliAdapter {
               this.startSpinner("Thinking...");
             } else if (childState === "FollowingUp") {
               this.updateSpinner("Preparing follow-up question...");
-            } else if (childState === "GeneratingPlan") {
+            } else if (childState === "GeneratingSpec") {
               this.updateSpinner("Generating implementation plan...");
-            } else if (childState === "SavingPlan") {
+            } else if (childState === "SavingSpec") {
               this.updateSpinner("Saving plan to disk...");
             }
           } else {
@@ -133,17 +133,17 @@ export class SpectacularCliAdapter {
           snapshot.context.streamResponse as AiTextStreamResult,
         );
         break;
-      case "GeneratingPlan":
+      case "GeneratingSpec":
         this.updateSpinner("Generating implementation plan...");
         break;
-      case "SavingPlan":
-        this.updateSpinner("Saving plan to disk...");
+      case "SavingSpec":
+        this.updateSpinner("Saving spec to disk...");
         break;
       case "Done":
         if (this.loadingSpinner) {
           this.stopSpinner("Complete!");
         }
-        log.success(`Plan saved to: ${snapshot.context.specLocation}`);
+        log.success(`Spec saved to: ${snapshot.context.specLocation}`);
         break;
     }
   }

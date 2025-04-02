@@ -7,7 +7,7 @@ import type { RouterResponse } from "./actors";
 import {
   generateSpecActor,
   askNextQuestionActor,
-  savePlanToDiskActor,
+  saveSpecToDiskActor,
 } from "./actors";
 import {
   aiTextStreamMachine,
@@ -51,15 +51,15 @@ const chatMachine = setup({
   actors: {
     routeRequest: routeRequestActor,
     askNextQuestion: askNextQuestionActor,
-    generatePlan: generateSpecActor,
-    savePlan: savePlanToDiskActor,
+    generateSpec: generateSpecActor,
+    saveSpec: saveSpecToDiskActor,
     processQuestionStream: aiTextStreamMachine,
   },
   guards: {
     shouldAskFollowUp: (_context, routerResponse: RouterResponse) => {
       return routerResponse.nextStep === "ask_follow_up_question";
     },
-    shouldGeneratePlan: (_context, routerResponse: RouterResponse) => {
+    shouldGenerateSpec: (_context, routerResponse: RouterResponse) => {
       return routerResponse.nextStep === "generate_implementation_plan";
     },
   },
@@ -70,7 +70,7 @@ const chatMachine = setup({
         createUserMessage(params.prompt),
       ],
     }),
-    updateMessagesWithQuestionResponse: assign({
+    updateAssistantMessages: assign({
       messages: (
         { context },
         params: { responseMessages: AiResponseMessage[] },
@@ -103,7 +103,7 @@ const chatMachine = setup({
     Idle: {
       on: {
         "user.message": {
-          // Transition to "responding"
+          description: "The user has sent a message to the chat agent",
           target: "Routing",
           // Update the internal messages state
           actions: {
@@ -130,7 +130,7 @@ const chatMachine = setup({
             // Transition to asking a follow up question depending on the router actor's response
             //
             // NOTE - This does not give a type error even if you remove the corresponding state
-            // TODO - Look up if we can cause type errors for targeting undefined states!
+            // TODO - Look up if we can cause type errors for targeting not-defined states!
             target: "FollowingUp",
             guard: {
               type: "shouldAskFollowUp",
@@ -138,9 +138,10 @@ const chatMachine = setup({
             },
           },
           {
-            target: "GeneratingPlan",
+            // Transition to generating a spec depending on the router actor's response
+            target: "GeneratingSpec",
             guard: {
-              type: "shouldGeneratePlan",
+              type: "shouldGenerateSpec",
               params: ({ event }) => event.output,
             },
           },
@@ -157,29 +158,27 @@ const chatMachine = setup({
         }),
         onDone: {
           target: "YieldingQuestionStream",
-          // TODO - Refactor to use dynamic params
-          // params: ({ event }) => ({
-          //   streamResponse: event.output,
-          // }),
           actions: assign({
             streamResponse: ({ event }) => event.output,
           }),
         },
+        // TODO - Add onError handler
       },
     },
     YieldingQuestionStream: {
       invoke: {
-        id: "process-question-stream",
+        id: "processQuestionStream",
         src: "processQuestionStream",
         input: ({ context }) => ({
           // HACK - It's hard to strongly type this stuff without adding a lot of complexity
+          // TODO - Investigate if we can assert the type on `entry` somehow
           streamResponse: context.streamResponse as AiTextStreamResult,
         }),
         onDone: {
           target: "Idle",
           actions: [
             {
-              type: "updateMessagesWithQuestionResponse",
+              type: "updateAssistantMessages",
               params: ({ event }) => {
                 return {
                   responseMessages: event.output.responseMessages,
@@ -188,12 +187,13 @@ const chatMachine = setup({
             },
           ],
         },
+        // TODO - Add onError handler
       },
     },
-    GeneratingPlan: {
+    GeneratingSpec: {
       invoke: {
-        id: "generate-plan",
-        src: "generatePlan",
+        id: "generateSpec",
+        src: "generateSpec",
         input: ({ context }) => ({
           apiKey: context.apiKey,
           messages: context.messages,
@@ -205,14 +205,14 @@ const chatMachine = setup({
               title: ({ event }) => event.output.title,
             }),
           ],
-          target: "SavingPlan",
+          target: "SavingSpec",
         },
       },
     },
-    SavingPlan: {
+    SavingSpec: {
       invoke: {
-        id: "save-plan",
-        src: "savePlan",
+        id: "saveSpec",
+        src: "saveSpec",
         input: ({ context }) => {
           return {
             // HACK - We can't strongly type the `plan` here without adding
