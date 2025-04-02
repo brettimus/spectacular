@@ -40,6 +40,7 @@ export const spectacularMachine = setup({
   },
 }).createMachine({
   id: "spectacular",
+  description: "A state machine for generating a spec, schema, and API",
   initial: "Ideating",
   context: ({ input }) => ({
     cwd: input.cwd,
