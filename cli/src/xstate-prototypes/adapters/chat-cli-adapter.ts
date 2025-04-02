@@ -2,8 +2,11 @@ import { createActor, waitFor, type ActorRefFrom } from "xstate";
 import { spinner, text, log, stream, isCancel } from "@clack/prompts";
 import pico from "picocolors";
 import type { Message } from "ai";
+import { config } from "dotenv";
 import { chatMachine } from "../chat";
 import type { QuestionTextStreamResult } from "../streaming/types";
+
+config();
 
 export class ChatCliAdapter {
   private actor: ActorRefFrom<typeof chatMachine>;

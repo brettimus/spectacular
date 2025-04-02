@@ -50,7 +50,7 @@ const chatMachine = setup({
     routeRequest: routeRequestActor,
     nextQuestion: askNextQuestionActor,
     generatePlan: generatePlanActor,
-    savePlanToDisk: savePlanToDiskActor,
+    savePlan: savePlanToDiskActor,
     processQuestionStream: aiTextStreamMachine,
   },
   guards: {
@@ -195,15 +195,13 @@ const chatMachine = setup({
     },
     savingPlan: {
       invoke: {
-        id: "save-plan-to-disk",
-        src: "savePlanToDisk",
-        input: ({ context, event }) => {
-          console.log("--> event that triggered saving plan to disk:", event);
-
+        id: "save-plan",
+        src: "savePlan",
+        input: ({ context }) => {
           return {
             // HACK - We can't strongly type the `plan` here without adding
             //        a lot of complexity to the onDone handler of the
-            //        savePlanToDisk actor
+            //        savePlan actor
             spec: context.spec ?? "",
             specLocation: pathFromInput(context.title, context.cwd),
           };
