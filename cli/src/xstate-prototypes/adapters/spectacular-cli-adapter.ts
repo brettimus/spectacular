@@ -203,15 +203,11 @@ export class SpectacularCliAdapter {
       await waitFor(
         ideationActor as ActorRefFrom<typeof chatMachine>,
         (state) => {
-          const isIdle = state.matches("Idle");
+          const isAwaitingUserInput = state.matches("AwaitingUserInput");
           const isDone = state.matches("Done");
-          // HACK
-          // const isChildDone = state.children?.ideation?.getSnapshot()?.matches("done") ?? false;
-
-          // const isIdle = state.matches("idle");
-          console.log("isIdle", isIdle);
-          console.log("isDone", isDone);
-          return isIdle || isDone;
+          // console.log("isAwaitingUserInput", isAwaitingUserInput);
+          // console.log("isDone", isDone);
+          return isAwaitingUserInput || isDone;
         },
       );
 

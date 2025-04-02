@@ -87,7 +87,7 @@ const chatMachine = setup({
   id: "ideation-agent",
   description:
     "A chat agent that ideates on a software project idea to produce a spec",
-  initial: "Idle",
+  initial: "AwaitingUserInput",
   context: ({ input }) => ({
     apiKey: input.apiKey,
     messages: [],
@@ -100,7 +100,7 @@ const chatMachine = setup({
     projectDir: input.cwd,
   }),
   states: {
-    Idle: {
+    AwaitingUserInput: {
       on: {
         "user.message": {
           description: "The user has sent a message to the chat agent",
@@ -157,7 +157,7 @@ const chatMachine = setup({
           messages: context.messages,
         }),
         onDone: {
-          target: "YieldingQuestionStream",
+          target: "ProcessingAiResponse",
           actions: assign({
             streamResponse: ({ event }) => event.output,
           }),
@@ -165,7 +165,7 @@ const chatMachine = setup({
         // TODO - Add onError handler
       },
     },
-    YieldingQuestionStream: {
+    ProcessingAiResponse: {
       invoke: {
         id: "processQuestionStream",
         src: "processQuestionStream",
@@ -175,7 +175,7 @@ const chatMachine = setup({
           streamResponse: context.streamResponse as AiTextStreamResult,
         }),
         onDone: {
-          target: "Idle",
+          target: "AwaitingUserInput",
           actions: [
             {
               type: "updateAssistantMessages",

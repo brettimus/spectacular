@@ -125,8 +125,8 @@ export class ChatCliAdapter {
         this.actor,
         (state) => {
           const isDone = state.matches("Done");
-          const isIdle = state.matches("Idle");
-          const shouldContinue = isIdle || isDone;
+          const isAwaitingUserInput = state.matches("AwaitingUserInput");
+          const shouldContinue = isAwaitingUserInput || isDone;
           return shouldContinue;
         },
         // { timeout: 20000 },
