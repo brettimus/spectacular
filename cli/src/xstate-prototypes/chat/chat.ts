@@ -141,7 +141,10 @@ const chatMachine = setup({
       invoke: {
         id: "following-up",
         src: "nextQuestion",
-        input: ({ context }) => ({ messages: context.messages }),
+        input: ({ context }) => ({
+          apiKey: context.apiKey,
+          messages: context.messages,
+        }),
         onDone: {
           target: "yieldingQuestionStream",
           // TODO - Refactor to use dynamic params
