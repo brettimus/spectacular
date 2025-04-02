@@ -22,14 +22,14 @@ xstate-prototypes/
 ├── chat/             # Chat-related state machines and utilities
 │   └── actors/       # Actor logic for the chat machine (manages child requests to LLMs, filesystem, etc)
 │
+├── codegen/          # Codegen-related state machines and utilities
+│
 ├── streaming/        # Streaming machines for `streamText`
 │
-└── utils/            # Higher order functs to add logic to actors
+└── utils/            # Includes logging (logtape), and higher order functions to add logic to actors
 ```
 
 ## Notes
-
-**I STILL HAVE NOT TRIED OUT THE AGENT-SPECIFIC XSTATE STUFF!**
 
 ### Initial Impressions
 
