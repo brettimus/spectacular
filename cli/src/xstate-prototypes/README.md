@@ -76,3 +76,48 @@ Regarding the inspector that fires WebSocket events, which you can forward to St
 Tried looking into Pino, but it isn't supported in Cloudflare Workers out of the box so nixed that. I liked log layer as a general solution so we could swap out the transport layer easily, but they don't have support for.... logtape! 
 
 Went with logtape since we're using it in Cloudflare Workers already.
+
+## Naming conventions
+
+### State Names
+Using PascalCase (capitalized state names) is considered good practice for XState state machines. 
+
+The official ESLint plugin for XState supports this convention, though XState itself doesn't enforce any particular format. 
+
+While camelCase is used in some official XState documentation, PascalCase helps visually distinguish states in our code.
+
+### Event Names
+For event names, the recommended convention in XState v5 is to use `"dot.case"`. This style is strongly encouraged because it enables the new wildcard transitions feature in v5, where you can match multiple related events like `battery.*`.
+
+This dot notation creates a visual distinction from other names in the state machine, which is nice.
+
+### Actor Naming
+
+Use camelCase for actor (function) names.
+
+```ts
+const routeRequestActor = createActor(routeRequestMachine, {
+  input: {
+    apiKey: "...",
+  },
+});
+```
+
+When `invoke`ing an actor, it's perfectly fine to use the same name for the `id` and `src` properties.
+
+The `src` just needs to uniquely identify the actor within the state machine. The `name` should be unique for all spawned actors and invoked services.
+
+```ts
+    FollowingUp: {
+      invoke: {
+        id: "askNextQuestion",
+        src: "askNextQuestion",
+        input: ({ context }) => ({
+          apiKey: context.apiKey,
+          messages: context.messages,
+        }),
+      },
+    },
+```
+
+If you don't provide a name argument to a spawned actor, XState will automatically generate a unique name. For maintainability, it's better to provide meaningful names.

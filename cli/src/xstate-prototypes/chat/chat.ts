@@ -43,12 +43,12 @@ const chatMachine = setup({
   types: {
     context: {} as ChatMachineContext,
     input: {} as ChatMachineInput,
-    events: {} as { type: "userMessage"; prompt: string },
+    events: {} as { type: "user.message"; prompt: string },
     output: {} as ChatMachineOutput,
   },
   actors: {
     routeRequest: routeRequestActor,
-    nextQuestion: askNextQuestionActor,
+    askNextQuestion: askNextQuestionActor,
     generatePlan: generatePlanActor,
     savePlan: savePlanToDiskActor,
     processQuestionStream: aiTextStreamMachine,
@@ -73,14 +73,12 @@ const chatMachine = setup({
         { context },
         params: { responseMessages: ResponseMessage[] },
       ) => {
-        // console.log("--> context.streamResponse:", context.messages);
-        // console.log("--> appending response messages:", params.responseMessages[0].content);
         return appendResponseMessages({
           messages: context.messages,
           responseMessages: params.responseMessages,
         });
       },
-      streamResponse: null, // Clear the streaming response
+      streamResponse: null, // Clear the raw streaming response
     }),
   },
 }).createMachine({
@@ -102,7 +100,7 @@ const chatMachine = setup({
   states: {
     Idle: {
       on: {
-        userMessage: {
+        "user.message": {
           // Transition to "responding"
           target: "Routing",
           // Update the internal messages state
@@ -119,7 +117,6 @@ const chatMachine = setup({
     },
     Routing: {
       invoke: {
-        // TODO - Look up best practices for naming invoke ids
         id: "routeRequest",
         src: "routeRequest",
         input: ({ context }) => ({
@@ -150,10 +147,8 @@ const chatMachine = setup({
     },
     FollowingUp: {
       invoke: {
-        // TODO - Rename
-        id: "following-up",
-        // TODO - Rename
-        src: "nextQuestion",
+        id: "askNextQuestion",
+        src: "askNextQuestion",
         input: ({ context }) => ({
           apiKey: context.apiKey,
           messages: context.messages,

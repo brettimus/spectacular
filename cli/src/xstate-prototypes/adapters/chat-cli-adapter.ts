@@ -117,7 +117,7 @@ export class ChatCliAdapter {
 
       // Send prompt to state machine
       this.actor.send({
-        type: "userMessage",
+        type: "user.message",
         prompt: userPrompt as string,
       });
 

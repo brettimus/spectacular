@@ -187,7 +187,7 @@ export class SpectacularCliAdapter {
 
       // Send prompt to state machine
       this.actor.send({
-        type: "userMessage",
+        type: "user.message",
         prompt: userPrompt as string,
       });
 

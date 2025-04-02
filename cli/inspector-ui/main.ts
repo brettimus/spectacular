@@ -26,6 +26,6 @@ actor.subscribe((snapshot) => {
 actor.start();
 
 actor.send({
-  type: "userMessage",
+  type: "user.message",
   prompt: "api for geese",
 });

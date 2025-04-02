@@ -30,7 +30,7 @@ export const spectacularMachine = setup({
   types: {
     context: {} as SpectacularMachineContext,
     input: {} as SpectacularMachineInput,
-    events: {} as { type: "userMessage"; prompt: string },
+    events: {} as { type: "user.message"; prompt: string },
     output: {} as SpectacularMachineOutput,
   },
   actors: {
@@ -71,7 +71,7 @@ export const spectacularMachine = setup({
         },
       },
       on: {
-        userMessage: {
+        "user.message": {
           actions: ({ self, event }) => {
             self.getSnapshot().children.ideation?.send(event);
           },
