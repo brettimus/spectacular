@@ -64,7 +64,7 @@ export const schemaCodegenMachine = setup({
 }).createMachine({
   id: "db-schema-codegen",
   description: "generate db/schema.ts file",
-  initial: "idle",
+  initial: "Idle",
   context: ({ input }) => ({
     apiKey: input.apiKey,
     spec: input.spec || "",
@@ -80,17 +80,17 @@ export const schemaCodegenMachine = setup({
     machineError: null,
   }),
   states: {
-    idle: {
+    Idle: {
       on: {
         ANALYZE_TABLES: {
-          target: "analyzingTables",
+          target: "AnalyzingTables",
           actions: assign({
             spec: ({ event }) => event.spec,
           }),
         },
       },
     },
-    analyzingTables: {
+    AnalyzingTables: {
       entry: () =>
         log("info", "Analyzing database tables", { stage: "table-analysis" }),
       invoke: {
@@ -103,14 +103,14 @@ export const schemaCodegenMachine = setup({
           },
         }),
         onDone: {
-          target: "identifyingRules",
+          target: "IdentifyingRules",
           actions: assign({
             schemaSpecification: ({ event }) =>
               event.output?.schemaSpecification || "",
           }),
         },
         onError: {
-          target: "failed",
+          target: "Failed",
           actions: [
             ({ event }) => {
               if (event.error) {
@@ -132,7 +132,7 @@ export const schemaCodegenMachine = setup({
         },
       },
     },
-    identifyingRules: {
+    IdentifyingRules: {
       entry: () =>
         log("info", "Identifying relevant rules", {
           stage: "rule-identification",
@@ -149,13 +149,13 @@ export const schemaCodegenMachine = setup({
           noop: true,
         }),
         onDone: {
-          target: "generatingSchema",
+          target: "GeneratingSchema",
           actions: assign({
             relevantRules: ({ event }) => event.output?.relevantRules || [],
           }),
         },
         onError: {
-          target: "generatingSchema",
+          target: "GeneratingSchema",
           actions: ({ event }) => {
             if (event.error) {
               log(
@@ -168,7 +168,7 @@ export const schemaCodegenMachine = setup({
         },
       },
     },
-    generatingSchema: {
+    GeneratingSchema: {
       entry: () =>
         log("info", "Generating database schema", {
           stage: "schema-generation",
@@ -184,15 +184,15 @@ export const schemaCodegenMachine = setup({
           },
         }),
         onDone: {
-          // target: "verifyingSchema",
+          // target: "VerifyingSchema",
           // TODO - FIX THIS TRANSITION
-          target: "waitingForErrors",
+          target: "WaitingForErrors",
           actions: assign({
             dbSchemaTs: ({ event }) => event.output?.dbSchemaTs || "",
           }),
         },
         onError: {
-          target: "failed",
+          target: "Failed",
           actions: ({ event }) => {
             if (event.error) {
               log("error", "Failed to generate schema", { error: event.error });
@@ -203,7 +203,7 @@ export const schemaCodegenMachine = setup({
     },
     // TODO - Can shell out to an actor that does typescript compilation here
     //        Then allow others to provide alternative implementations on derived machine instances
-    waitingForErrors: {
+    WaitingForErrors: {
       entry: () =>
         log(
           "info",
@@ -212,14 +212,14 @@ export const schemaCodegenMachine = setup({
         ),
       on: {
         ANALYZE_ERRORS: {
-          target: "analyzingErrors",
+          target: "AnalyzingErrors",
           actions: assign({
             errors: ({ event }) => event.errors,
           }),
         },
       },
     },
-    analyzingErrors: {
+    AnalyzingErrors: {
       entry: () =>
         log("info", "Analyzing schema errors", { stage: "error-analysis" }),
       invoke: {
@@ -234,13 +234,13 @@ export const schemaCodegenMachine = setup({
           },
         }),
         onDone: {
-          target: "fixingErrors",
+          target: "FixingErrors",
           actions: assign({
             errorAnalysis: ({ event }) => event.output || null,
           }),
         },
         onError: {
-          target: "failed",
+          target: "Failed",
           actions: ({ event }) => {
             if (event.error) {
               log("error", "Failed to analyze schema errors", {
@@ -251,7 +251,7 @@ export const schemaCodegenMachine = setup({
         },
       },
     },
-    fixingErrors: {
+    FixingErrors: {
       entry: () => log("info", "Fixing schema errors", { stage: "error-fix" }),
       invoke: {
         id: "fix-schema-errors",
@@ -264,15 +264,15 @@ export const schemaCodegenMachine = setup({
           },
         }),
         onDone: {
-          // target: "verifyingFixedSchema",
+          // target: "VerifyingFixedSchema",
           // TODO - FIX THIS TRANSITION
-          target: "success",
+          target: "Success",
           actions: assign({
             fixedSchema: ({ event }) => event.output?.code || null,
           }),
         },
         onError: {
-          target: "failed",
+          target: "Failed",
           actions: ({ event }) => {
             if (event.error) {
               log("error", "Failed to fix schema errors", {
@@ -284,7 +284,7 @@ export const schemaCodegenMachine = setup({
       },
     },
 
-    success: {
+    Success: {
       type: "final",
       entry: () =>
         log("info", "Schema generation successful", { stage: "complete" }),
@@ -295,7 +295,7 @@ export const schemaCodegenMachine = setup({
         suggestions: context.suggestions,
       }),
     },
-    failedToFix: {
+    FailedToFix: {
       type: "final",
       entry: () =>
         log("warn", "Failed to fix all schema errors", { stage: "failed-fix" }),
@@ -306,7 +306,7 @@ export const schemaCodegenMachine = setup({
         suggestions: context.suggestions,
       }),
     },
-    failed: {
+    Failed: {
       type: "final",
       entry: [
         () =>

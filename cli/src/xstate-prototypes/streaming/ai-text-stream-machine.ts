@@ -54,14 +54,14 @@ export const aiTextStreamMachine = setup({
         // FIXME
         //
         // onError: {
-        //   target: "failed",
+        //   target: "Failed",
         //   actions: assign({
         //     error: ({ event }) => event.error,
         //     responseMessages: ({ context }) => context.responseMessages,
         //   }),
         // },
         onDone: {
-          target: "complete",
+          target: "Complete",
           actions: [
             assign({
               // FIXME
@@ -81,10 +81,10 @@ export const aiTextStreamMachine = setup({
           }),
         },
         // STREAM_COMPLETE: {
-        //   target: "complete",
+        //   target: "Complete",
         // },
         STREAM_ERROR: {
-          target: "failed",
+          target: "Failed",
           actions: assign({
             error: ({ event }) => event.error,
             responseMessages: ({ context }) => context.responseMessages,

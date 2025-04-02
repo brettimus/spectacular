@@ -44,11 +44,11 @@ export class SpectacularCliAdapter {
 
       // Handle different states with appropriate UI feedback
       switch (currentState) {
-        case "idle":
+        case "Idle":
           console.log("Idle state stopping spinner");
           this.stopSpinner();
           break;
-        case "ideating": {
+        case "Ideating": {
           // Check if the ideation actor is available
           const ideationActor = snapshot.children.ideation;
           if (ideationActor) {
@@ -59,13 +59,13 @@ export class SpectacularCliAdapter {
             // Check the child actor's state to update UI accordingly
             const childState = ideationSnapshot.value;
             console.log("childState", childState);
-            if (childState === "routing") {
+            if (childState === "Routing") {
               this.startSpinner("Thinking...");
-            } else if (childState === "followingUp") {
+            } else if (childState === "FollowingUp") {
               this.updateSpinner("Preparing follow-up question...");
-            } else if (childState === "generatingPlan") {
+            } else if (childState === "GeneratingPlan") {
               this.updateSpinner("Generating implementation plan...");
-            } else if (childState === "savingPlan") {
+            } else if (childState === "SavingPlan") {
               this.updateSpinner("Saving plan to disk...");
             }
           } else {
@@ -85,13 +85,13 @@ export class SpectacularCliAdapter {
           }
           break;
         }
-        case "generatingSchema":
+        case "GeneratingSchema":
           this.updateSpinner("Generating database schema...");
           break;
-        case "generatingApi":
+        case "GeneratingApi":
           this.updateSpinner("Generating API code...");
           break;
-        case "done":
+        case "Done":
           if (this.loadingSpinner) {
             this.stopSpinner("Complete!");
           }
@@ -116,16 +116,16 @@ export class SpectacularCliAdapter {
 
     // Handle different states with appropriate UI feedback
     switch (currentState) {
-      case "idle":
+      case "Idle":
         this.stopSpinner();
         break;
-      case "routing":
+      case "Routing":
         this.startSpinner("Thinking...");
         break;
-      case "followingUp":
+      case "FollowingUp":
         this.updateSpinner("Preparing follow-up question...");
         break;
-      case "yieldingQuestionStream":
+      case "YieldingQuestionStream":
         if (this.loadingSpinner) {
           this.stopSpinner("Question:");
         }
@@ -133,13 +133,13 @@ export class SpectacularCliAdapter {
           snapshot.context.streamResponse as QuestionTextStreamResult,
         );
         break;
-      case "generatingPlan":
+      case "GeneratingPlan":
         this.updateSpinner("Generating implementation plan...");
         break;
-      case "savingPlan":
+      case "SavingPlan":
         this.updateSpinner("Saving plan to disk...");
         break;
-      case "done":
+      case "Done":
         if (this.loadingSpinner) {
           this.stopSpinner("Complete!");
         }
@@ -187,7 +187,7 @@ export class SpectacularCliAdapter {
 
       // Send prompt to state machine
       this.actor.send({
-        type: "promptReceived",
+        type: "userMessage",
         prompt: userPrompt as string,
       });
 
@@ -203,8 +203,8 @@ export class SpectacularCliAdapter {
       await waitFor(
         ideationActor as ActorRefFrom<typeof chatMachine>,
         (state) => {
-          const isIdle = state.matches("idle");
-          const isDone = state.matches("done");
+          const isIdle = state.matches("Idle");
+          const isDone = state.matches("Done");
           // HACK
           // const isChildDone = state.children?.ideation?.getSnapshot()?.matches("done") ?? false;
 

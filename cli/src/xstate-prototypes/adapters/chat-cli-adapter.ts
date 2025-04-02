@@ -44,16 +44,16 @@ export class ChatCliAdapter {
 
       // Handle different states with appropriate UI feedback
       switch (currentState) {
-        case "idle":
+        case "Idle":
           this.stopSpinner();
           break;
-        case "routing":
+        case "Routing":
           this.startSpinner("Thinking...");
           break;
-        case "followingUp":
+        case "FollowingUp":
           this.updateSpinner("Preparing follow-up question...");
           break;
-        case "yieldingQuestionStream":
+        case "YieldingQuestionStream":
           if (this.loadingSpinner) {
             this.stopSpinner("Question:");
           }
@@ -61,13 +61,13 @@ export class ChatCliAdapter {
             snapshot.context.streamResponse as QuestionTextStreamResult,
           );
           break;
-        case "generatingPlan":
+        case "GeneratingPlan":
           this.updateSpinner("Generating implementation plan...");
           break;
-        case "savingPlan":
+        case "SavingPlan":
           this.updateSpinner("Saving plan to disk...");
           break;
-        case "done":
+        case "Done":
           if (this.loadingSpinner) {
             this.stopSpinner("Complete!");
           }
@@ -117,15 +117,15 @@ export class ChatCliAdapter {
 
       // Send prompt to state machine
       this.actor.send({
-        type: "promptReceived",
+        type: "userMessage",
         prompt: userPrompt as string,
       });
 
       await waitFor(
         this.actor,
         (state) => {
-          const isDone = state.matches("done");
-          const isIdle = state.matches("idle");
+          const isDone = state.matches("Done");
+          const isIdle = state.matches("Idle");
           const shouldContinue = isIdle || isDone;
           return shouldContinue;
         },

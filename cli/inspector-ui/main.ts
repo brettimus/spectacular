@@ -6,7 +6,8 @@ const inspector = createBrowserInspector();
 
 const actor = createActor(chatMachine, {
   input: {
-    cwd: process.cwd(),
+    cwd: "/tmp",
+    apiKey: "123",
   },
   inspect: inspector.inspect,
 });
@@ -25,6 +26,6 @@ actor.subscribe((snapshot) => {
 actor.start();
 
 actor.send({
-  type: "promptReceived",
+  type: "userMessage",
   prompt: "api for geese",
 });

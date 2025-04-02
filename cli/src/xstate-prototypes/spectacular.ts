@@ -30,7 +30,7 @@ export const spectacularMachine = setup({
   types: {
     context: {} as SpectacularMachineContext,
     input: {} as SpectacularMachineInput,
-    events: {} as { type: "promptReceived"; prompt: string },
+    events: {} as { type: "userMessage"; prompt: string },
     output: {} as SpectacularMachineOutput,
   },
   actors: {
@@ -52,7 +52,7 @@ export const spectacularMachine = setup({
     title: "spec.md",
   }),
   states: {
-    ideating: {
+    Ideating: {
       invoke: {
         id: "ideation",
         src: "ideationActor",
@@ -61,7 +61,7 @@ export const spectacularMachine = setup({
           cwd: context.cwd,
         }),
         onDone: {
-          target: "generatingSchema",
+          target: "GeneratingSchema",
           actions: assign({
             spec: ({ event }) => event.output.spec || "",
             projectDir: ({ event }) => event.output.projectDir,
@@ -71,14 +71,14 @@ export const spectacularMachine = setup({
         },
       },
       on: {
-        promptReceived: {
+        userMessage: {
           actions: ({ self, event }) => {
             self.getSnapshot().children.ideation?.send(event);
           },
         },
       },
     },
-    generatingSchema: {
+    GeneratingSchema: {
       invoke: {
         id: "schema-generation",
         src: "schemaGenerationActor",
@@ -87,14 +87,14 @@ export const spectacularMachine = setup({
           spec: context.spec,
         }),
         onDone: {
-          target: "generatingApi",
+          target: "GeneratingApi",
           actions: assign({
             dbSchemaTs: ({ event }) => event.output?.dbSchemaTs || "",
           }),
         },
       },
     },
-    generatingApi: {
+    GeneratingApi: {
       invoke: {
         id: "api-generation",
         src: "apiGenerationActor",
@@ -104,7 +104,7 @@ export const spectacularMachine = setup({
           spec: context.spec,
         }),
         onDone: {
-          target: "done",
+          target: "Done",
           actions: assign({
             apiCode: ({ context }) => {
               // The API codegen machine doesn't directly output apiCode
@@ -125,7 +125,7 @@ export const spectacularMachine = setup({
         });
       },
     },
-    done: {
+    Done: {
       type: "final",
     },
   },

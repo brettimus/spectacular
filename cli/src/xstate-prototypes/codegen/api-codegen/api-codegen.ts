@@ -50,7 +50,7 @@ export const apiCodegenMachine = setup({
   },
 }).createMachine({
   id: "api-codegen",
-  initial: "idle",
+  initial: "Idle",
   context: ({ input }) => ({
     apiKey: input.apiKey,
     schema: input.schema || "",
@@ -66,10 +66,10 @@ export const apiCodegenMachine = setup({
     issues: [],
   }),
   states: {
-    idle: {
+    Idle: {
       on: {
         GENERATE_API: {
-          target: "generatingApi",
+          target: "GeneratingApi",
           actions: assign({
             schema: ({ event }) => event.schema,
             spec: ({ event }) => event.spec,
@@ -77,7 +77,7 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-    generatingApi: {
+    GeneratingApi: {
       entry: () => log("info", "Generating API code", { stage: "generation" }),
       invoke: {
         id: "generate-api",
@@ -90,14 +90,14 @@ export const apiCodegenMachine = setup({
           },
         }),
         onDone: {
-          target: "verifyingApi",
+          target: "VerifyingApi",
           actions: assign({
             apiCode: ({ event }) => event.output?.indexTs || "",
             reasoning: ({ event }) => event.output?.reasoning || "",
           }),
         },
         onError: {
-          target: "failed",
+          target: "Failed",
           actions: ({ event }) => {
             if (event.error) {
               log("error", "Failed to generate API", { error: event.error });
@@ -106,7 +106,7 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-    verifyingApi: {
+    VerifyingApi: {
       entry: () => log("info", "Verifying API code", { stage: "verification" }),
       invoke: {
         id: "verify-api",
@@ -120,7 +120,7 @@ export const apiCodegenMachine = setup({
         }),
         onDone: [
           {
-            target: "success",
+            target: "Success",
             guard: ({ event }) => event.output?.valid === true,
             actions: assign({
               valid: ({ event }) => event.output?.valid || false,
@@ -128,7 +128,7 @@ export const apiCodegenMachine = setup({
             }),
           },
           {
-            target: "waitingForErrors",
+            target: "WaitingForErrors",
             guard: ({ event }) => event.output?.valid !== true,
             actions: assign({
               valid: ({ event }) => event.output?.valid || false,
@@ -137,7 +137,7 @@ export const apiCodegenMachine = setup({
           },
         ],
         onError: {
-          target: "failed",
+          target: "Failed",
           actions: ({ event }) => {
             if (event.error) {
               log("error", "Failed to verify API", { error: event.error });
@@ -146,21 +146,21 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-    waitingForErrors: {
+    WaitingForErrors: {
       entry: () =>
         log("info", "API verification failed. Waiting for errors to analyze", {
           stage: "error-wait",
         }),
       on: {
         ANALYZE_ERRORS: {
-          target: "analyzingErrors",
+          target: "AnalyzingErrors",
           actions: assign({
             errors: ({ event }) => event.errors,
           }),
         },
       },
     },
-    analyzingErrors: {
+    AnalyzingErrors: {
       entry: () =>
         log("info", "Analyzing API errors", { stage: "error-analysis" }),
       invoke: {
@@ -172,13 +172,13 @@ export const apiCodegenMachine = setup({
           errors: context.errors,
         }),
         onDone: {
-          target: "fixingErrors",
+          target: "FixingErrors",
           actions: assign({
             errorAnalysis: ({ event }) => event.output || null,
           }),
         },
         onError: {
-          target: "failed",
+          target: "Failed",
           actions: ({ event }) => {
             if (event.error) {
               log("error", "Failed to analyze API errors", {
@@ -189,7 +189,7 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-    fixingErrors: {
+    FixingErrors: {
       entry: () => log("info", "Fixing API errors", { stage: "error-fix" }),
       invoke: {
         id: "fix-api-errors",
@@ -200,13 +200,13 @@ export const apiCodegenMachine = setup({
           originalApiCode: context.apiCode,
         }),
         onDone: {
-          target: "verifyingFixedApi",
+          target: "VerifyingFixedApi",
           actions: assign({
             fixedApiCode: ({ event }) => event.output?.code || null,
           }),
         },
         onError: {
-          target: "failed",
+          target: "Failed",
           actions: ({ event }) => {
             if (event.error) {
               log("error", "Failed to fix API errors", { error: event.error });
@@ -215,7 +215,7 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-    verifyingFixedApi: {
+    VerifyingFixedApi: {
       entry: () =>
         log("info", "Verifying fixed API code", {
           stage: "verification-fixed",
@@ -232,7 +232,7 @@ export const apiCodegenMachine = setup({
         }),
         onDone: [
           {
-            target: "success",
+            target: "Success",
             guard: ({ event }) => event.output?.valid === true,
             actions: [
               assign({
@@ -248,7 +248,7 @@ export const apiCodegenMachine = setup({
             ],
           },
           {
-            target: "failedToFix",
+            target: "FailedToFix",
             guard: ({ event }) => event.output?.valid !== true,
             actions: assign({
               valid: ({ event }) => event.output?.valid || false,
@@ -257,7 +257,7 @@ export const apiCodegenMachine = setup({
           },
         ],
         onError: {
-          target: "failed",
+          target: "Failed",
           actions: ({ event }) => {
             if (event.error) {
               log("error", "Failed to verify fixed API", {
@@ -268,25 +268,25 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-    failedToFix: {
+    FailedToFix: {
       entry: () =>
         log("warn", "Failed to fix API errors. Manual intervention required.", {
           stage: "failed-fix",
         }),
       on: {
         REGENERATE_API: {
-          target: "generatingApi",
+          target: "GeneratingApi",
         },
       },
     },
-    success: {
+    Success: {
       type: "final",
       entry: () =>
         log("info", "API generation completed successfully", {
           stage: "complete",
         }),
     },
-    failed: {
+    Failed: {
       type: "final",
       entry: () => log("error", "API generation failed", { stage: "failed" }),
     },

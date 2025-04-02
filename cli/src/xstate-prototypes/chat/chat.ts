@@ -43,7 +43,7 @@ const chatMachine = setup({
   types: {
     context: {} as ChatMachineContext,
     input: {} as ChatMachineInput,
-    events: {} as { type: "promptReceived"; prompt: string },
+    events: {} as { type: "userMessage"; prompt: string },
     output: {} as ChatMachineOutput,
   },
   actors: {
@@ -62,6 +62,12 @@ const chatMachine = setup({
     },
   },
   actions: {
+    addUserMessage: assign({
+      messages: ({ context }, params: { prompt: string }) => [
+        ...context.messages,
+        createUserMessage(params.prompt),
+      ],
+    }),
     updateMessagesWithQuestionResponse: assign({
       messages: (
         { context },
@@ -79,7 +85,9 @@ const chatMachine = setup({
   },
 }).createMachine({
   id: "ideation-agent",
-  initial: "idle",
+  description:
+    "A chat agent that ideates on a software project idea to produce a spec",
+  initial: "Idle",
   context: ({ input }) => ({
     apiKey: input.apiKey,
     messages: [],
@@ -92,24 +100,27 @@ const chatMachine = setup({
     projectDir: input.cwd,
   }),
   states: {
-    idle: {
+    Idle: {
       on: {
-        promptReceived: {
+        userMessage: {
           // Transition to "responding"
-          target: "routing",
+          target: "Routing",
           // Update the internal messages state
-          actions: assign({
-            messages: ({ event, context }) => [
-              ...context.messages,
-              createUserMessage(event.prompt),
-            ],
-          }),
+          actions: {
+            type: "addUserMessage",
+            params: ({ event }) => {
+              return {
+                prompt: event.prompt,
+              };
+            },
+          },
         },
       },
     },
-    routing: {
+    Routing: {
       invoke: {
-        id: "routing",
+        // TODO - Look up best practices for naming invoke ids
+        id: "routeRequest",
         src: "routeRequest",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -121,14 +132,14 @@ const chatMachine = setup({
             //
             // NOTE - This does not give a type error even if you remove the corresponding state
             // TODO - Look up if we can cause type errors for targeting undefined states!
-            target: "followingUp",
+            target: "FollowingUp",
             guard: {
               type: "shouldAskFollowUp",
               params: ({ event }) => event.output,
             },
           },
           {
-            target: "generatingPlan",
+            target: "GeneratingPlan",
             guard: {
               type: "shouldGeneratePlan",
               params: ({ event }) => event.output,
@@ -137,16 +148,18 @@ const chatMachine = setup({
         ],
       },
     },
-    followingUp: {
+    FollowingUp: {
       invoke: {
+        // TODO - Rename
         id: "following-up",
+        // TODO - Rename
         src: "nextQuestion",
         input: ({ context }) => ({
           apiKey: context.apiKey,
           messages: context.messages,
         }),
         onDone: {
-          target: "yieldingQuestionStream",
+          target: "YieldingQuestionStream",
           // TODO - Refactor to use dynamic params
           // params: ({ event }) => ({
           //   streamResponse: event.output,
@@ -157,7 +170,7 @@ const chatMachine = setup({
         },
       },
     },
-    yieldingQuestionStream: {
+    YieldingQuestionStream: {
       invoke: {
         id: "process-question-stream",
         src: "processQuestionStream",
@@ -166,7 +179,7 @@ const chatMachine = setup({
           streamResponse: context.streamResponse as QuestionTextStreamResult,
         }),
         onDone: {
-          target: "idle",
+          target: "Idle",
           actions: [
             {
               type: "updateMessagesWithQuestionResponse",
@@ -180,7 +193,7 @@ const chatMachine = setup({
         },
       },
     },
-    generatingPlan: {
+    GeneratingPlan: {
       invoke: {
         id: "generate-plan",
         src: "generatePlan",
@@ -195,11 +208,11 @@ const chatMachine = setup({
               title: ({ event }) => event.output.title,
             }),
           ],
-          target: "savingPlan",
+          target: "SavingPlan",
         },
       },
     },
-    savingPlan: {
+    SavingPlan: {
       invoke: {
         id: "save-plan",
         src: "savePlan",
@@ -213,7 +226,7 @@ const chatMachine = setup({
           };
         },
         onDone: {
-          target: "done",
+          target: "Done",
           actions: assign({
             specLocation: ({ context }) =>
               pathFromInput(context.title, context.cwd),
@@ -221,7 +234,7 @@ const chatMachine = setup({
         },
       },
     },
-    done: {
+    Done: {
       type: "final",
     },
   },
