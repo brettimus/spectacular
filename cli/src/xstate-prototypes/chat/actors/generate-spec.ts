@@ -166,10 +166,7 @@ export const generateSpecActor = fromPromise<
   return generateSpec(input.apiKey, input.messages);
 });
 
-export async function generateSpec(
-  apiKey: string,
-  messages: Message[],
-) {
+export async function generateSpec(apiKey: string, messages: Message[]) {
   const openai = createOpenAI({ apiKey });
 
   const result = await generateObject({

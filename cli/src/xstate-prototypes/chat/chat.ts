@@ -4,8 +4,16 @@ import { pathFromInput } from "@/utils/utils";
 
 import { routeRequestActor } from "./actors/router";
 import type { RouterResponse } from "./actors";
-import { generateSpecActor, askNextQuestionActor, savePlanToDiskActor } from "./actors";
-import { aiTextStreamMachine, type QuestionTextStreamResult, type ResponseMessage } from "../streaming";
+import {
+  generateSpecActor,
+  askNextQuestionActor,
+  savePlanToDiskActor,
+} from "./actors";
+import {
+  aiTextStreamMachine,
+  type AiTextStreamResult,
+  type AiResponseMessage,
+} from "../streaming";
 import { createUserMessage } from "../utils";
 
 interface ChatMachineInput {
@@ -21,7 +29,7 @@ export interface ChatMachineContext {
   projectDir: string | null;
   specLocation: string | null;
   title: string;
-  streamResponse: QuestionTextStreamResult | null;
+  streamResponse: AiTextStreamResult | null;
 }
 
 interface ChatMachineOutput {
@@ -65,7 +73,7 @@ const chatMachine = setup({
     updateMessagesWithQuestionResponse: assign({
       messages: (
         { context },
-        params: { responseMessages: ResponseMessage[] },
+        params: { responseMessages: AiResponseMessage[] },
       ) => {
         return appendResponseMessages({
           messages: context.messages,
@@ -165,7 +173,7 @@ const chatMachine = setup({
         src: "processQuestionStream",
         input: ({ context }) => ({
           // HACK - It's hard to strongly type this stuff without adding a lot of complexity
-          streamResponse: context.streamResponse as QuestionTextStreamResult,
+          streamResponse: context.streamResponse as AiTextStreamResult,
         }),
         onDone: {
           target: "Idle",

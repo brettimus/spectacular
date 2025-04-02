@@ -2,7 +2,7 @@ import { streamText } from "ai";
 import type { Message } from "ai";
 import { fromPromise } from "xstate";
 import { createOpenAI } from "@ai-sdk/openai";
-import type { QuestionTextStreamResult } from "../../streaming/types";
+import type { AiTextStreamResult } from "../../streaming/types";
 
 // https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
 const IDEATING_SYSTEM_PROMPT = `
@@ -43,7 +43,7 @@ This is important to my career.
 `;
 
 export const askNextQuestionActor = fromPromise<
-  QuestionTextStreamResult,
+  AiTextStreamResult,
   { apiKey: string; messages: Message[] }
 >(async ({ input }) => {
   return askNextQuestion(input.apiKey, input.messages);

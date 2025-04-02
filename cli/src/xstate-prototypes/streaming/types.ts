@@ -1,10 +1,10 @@
 import type { streamText, StreamTextResult, ToolSet } from "ai";
 
-export type QuestionTextStreamResult<
+export type AiTextStreamResult<
   TOOLS extends ToolSet = ToolSet,
   PartialOutput = never,
 > = StreamTextResult<TOOLS, PartialOutput>;
 
-export type ResponseMessage = Awaited<
+export type AiResponseMessage = Awaited<
   ReturnType<typeof streamText>["response"]
 >["messages"][number];

@@ -4,7 +4,7 @@ import pico from "picocolors";
 import type { Message } from "ai";
 import { config } from "dotenv";
 import { chatMachine } from "../chat";
-import type { QuestionTextStreamResult } from "../streaming/types";
+import type { AiTextStreamResult } from "../streaming/types";
 
 config();
 
@@ -58,7 +58,7 @@ export class ChatCliAdapter {
             this.stopSpinner("Question:");
           }
           this.streamQuestion(
-            snapshot.context.streamResponse as QuestionTextStreamResult,
+            snapshot.context.streamResponse as AiTextStreamResult,
           );
           break;
         case "GeneratingPlan":
@@ -136,7 +136,7 @@ export class ChatCliAdapter {
     }
   }
 
-  private async streamQuestion(result: QuestionTextStreamResult) {
+  private async streamQuestion(result: AiTextStreamResult) {
     await stream.info(
       (async function* () {
         // let hasStarted = false;

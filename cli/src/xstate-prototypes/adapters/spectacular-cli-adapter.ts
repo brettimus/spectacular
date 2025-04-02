@@ -9,7 +9,7 @@ import pico from "picocolors";
 import type { Message } from "ai";
 // import { chatMachine } from "../chat";
 import { spectacularMachine } from "../spectacular";
-import type { QuestionTextStreamResult } from "../streaming/types";
+import type { AiTextStreamResult } from "../streaming/types";
 import type { chatMachine, ChatMachineContext } from "../chat";
 
 export class SpectacularCliAdapter {
@@ -130,7 +130,7 @@ export class SpectacularCliAdapter {
           this.stopSpinner("Question:");
         }
         this.streamQuestion(
-          snapshot.context.streamResponse as QuestionTextStreamResult,
+          snapshot.context.streamResponse as AiTextStreamResult,
         );
         break;
       case "GeneratingPlan":
@@ -219,7 +219,7 @@ export class SpectacularCliAdapter {
     }
   }
 
-  private async streamQuestion(result: QuestionTextStreamResult) {
+  private async streamQuestion(result: AiTextStreamResult) {
     await stream.info(
       (async function* () {
         // Yield content from the AI SDK stream

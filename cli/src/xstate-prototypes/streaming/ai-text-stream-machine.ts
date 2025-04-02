@@ -1,65 +1,70 @@
 import { setup, assign } from "xstate";
-import type { QuestionTextStreamResult } from "./types";
-import type { ResponseMessage } from "./types";
-import { consumeStreamActor } from "./consume";
+import { consumeStreamActor } from "./consume-stream";
+import { normalizeError } from "../utils";
+import type { AiTextStreamResult, AiResponseMessage } from "./types";
+import type { CancelEvent, ChunkEvent } from "./events";
 
-type QuestionTextStreamOutput = {
-  // ResponseMessage[] is the type of `await (streamText(...).response).messages`
-  // and it contains the final array of messages from the response
-  // for some reason, the Ai SDK does not export this type
-  responseMessages: ResponseMessage[];
+type AiTextStreamOutput = {
+  /**
+   * ResponseMessage[] is the type of `await (streamText(...).response).messages`
+   * and it contains the final array of messages from the response
+   * for some reason, the vercel AI SDK does not export this type
+   */
+  responseMessages: AiResponseMessage[];
 };
 
-// Create a state machine to handle the streaming process
+/**
+ * This state machine can consume a stream of text from the AI SDK.
+ * It emits chunk events for each chunk of text.
+ */
 export const aiTextStreamMachine = setup({
   types: {
     context: {} as {
       chunks: string[];
-      fullContent: string;
       error: Error | null;
-      streamResponse: QuestionTextStreamResult;
-      responseMessages: ResponseMessage[];
+      streamResponse: AiTextStreamResult;
+      responseMessages: AiResponseMessage[];
     },
     input: {} as {
-      streamResponse: QuestionTextStreamResult;
+      streamResponse: AiTextStreamResult;
     },
-    events: {} as
-      | { type: "CHUNK"; content: string }
-      | { type: "STREAM_COMPLETE" }
-      | { type: "STREAM_ERROR"; error: Error },
-    output: {} as QuestionTextStreamOutput,
+    events: {} as ChunkEvent | CancelEvent,
+    output: {} as AiTextStreamOutput,
   },
   actors: {
     consumeStream: consumeStreamActor,
   },
 }).createMachine({
   id: "streamProcessor",
-  initial: "processing",
+  description: "A state machine to consume a stream of text from the AI SDK.",
+  initial: "Processing",
   context: ({ input }) => ({
     chunks: [],
-    fullContent: "",
     error: null,
     streamResponse: input.streamResponse,
     responseMessages: [],
   }),
 
   states: {
-    processing: {
+    Processing: {
       invoke: {
+        id: "consumeStream",
         src: "consumeStream",
         input: ({ context, self }) => ({
           streamResponse: context.streamResponse,
           parent: self,
         }),
-        // FIXME
-        //
-        // onError: {
-        //   target: "Failed",
-        //   actions: assign({
-        //     error: ({ event }) => event.error,
-        //     responseMessages: ({ context }) => context.responseMessages,
-        //   }),
-        // },
+        onError: {
+          target: "Failed",
+          actions: [
+            assign({
+              // NOTE - I couldn't seem to use the `params` field properly in `onError` with typescript,
+              //        so we're using an inlined action to handle the error here
+              error: ({ event }) => normalizeError(event.error),
+              responseMessages: ({ context }) => context.responseMessages,
+            }),
+          ],
+        },
         onDone: {
           target: "Complete",
           actions: [
@@ -73,17 +78,12 @@ export const aiTextStreamMachine = setup({
       },
 
       on: {
-        CHUNK: {
+        "textStream.chunk": {
           actions: assign({
             chunks: ({ context, event }) => [...context.chunks, event.content],
-            fullContent: ({ context, event }) =>
-              context.fullContent + event.content,
           }),
         },
-        // STREAM_COMPLETE: {
-        //   target: "Complete",
-        // },
-        STREAM_ERROR: {
+        "textStream.error": {
           target: "Failed",
           actions: assign({
             error: ({ event }) => event.error,
@@ -93,19 +93,17 @@ export const aiTextStreamMachine = setup({
       },
     },
 
-    complete: {
+    Complete: {
       type: "final",
     },
 
-    failed: {
+    Failed: {
       type: "final",
     },
   },
   output: ({ context }) => ({
-    success: true, // FIXME
-    error: context.error, // FIXME
-    content: context.fullContent,
     chunks: context.chunks,
-    responseMessages: context.responseMessages, // FIXME?
+    responseMessages: context.responseMessages,
+    error: context.error,
   }),
 });
