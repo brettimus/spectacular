@@ -1,8 +1,12 @@
 import { createActor } from "xstate";
+import { config } from "dotenv";
 import { chatMachine } from "./chat";
+
+config();
 
 const actor = createActor(chatMachine, {
   input: {
+    apiKey: process.env.OPENAI_API_KEY ?? "",
     cwd: process.cwd(),
   },
   inspect: (_inspectionEvent) => {

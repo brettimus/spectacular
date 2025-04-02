@@ -1,7 +1,7 @@
 import type { Message } from "ai";
 import { z } from "zod";
 
-const GeneratedPlanSchema = z.object({
+export const GeneratedPlanSchema = z.object({
   title: z.string().describe("A title for the project."),
   plan: z
     .string()

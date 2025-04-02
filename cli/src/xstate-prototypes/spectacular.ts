@@ -57,6 +57,7 @@ export const spectacularMachine = setup({
         id: "ideation",
         src: "ideationActor",
         input: ({ context }) => ({
+          apiKey: context.apiKey,
           cwd: context.cwd,
         }),
         onDone: {

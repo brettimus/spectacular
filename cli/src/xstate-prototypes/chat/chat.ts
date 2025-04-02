@@ -2,13 +2,13 @@ import { appendResponseMessages, type Message } from "ai";
 import { setup, assign } from "xstate";
 import { createUserMessage } from "@/agents/utils";
 
-import { routeRequestActor } from "./router";
+import { routeRequestActor } from "./actors/router";
 import type { RouterResponse } from "./types";
 import { generatePlanActor } from "./actors/generate-plan";
 import { askNextQuestionActor } from "./actors/next-question";
 import { savePlanToDiskActor } from "./actors/save-plan-to-disk";
-import { pathFromInput } from "@/utils/utils";
 import { aiTextStreamMachine } from "../streaming/ai-text-stream-machine";
+import { pathFromInput } from "@/utils/utils";
 import type {
   QuestionTextStreamResult,
   ResponseMessage,
@@ -181,7 +181,10 @@ const chatMachine = setup({
       invoke: {
         id: "generate-plan",
         src: "generatePlan",
-        input: ({ context }) => ({ messages: context.messages }),
+        input: ({ context }) => ({
+          apiKey: context.apiKey,
+          messages: context.messages,
+        }),
         onDone: {
           actions: [
             assign({
