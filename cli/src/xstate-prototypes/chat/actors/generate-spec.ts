@@ -149,14 +149,14 @@ Remember, the specification is for a HONC-stack project:
 This is important to my career.
 `;
 
-export const generatePlanActor = fromPromise<
+export const generateSpecActor = fromPromise<
   GeneratedPlan,
   { apiKey: string; messages: Message[] }
 >(async ({ input }) => {
-  return generateImplementationPlan(input.apiKey, input.messages);
+  return generateSpec(input.apiKey, input.messages);
 });
 
-export async function generateImplementationPlan(
+export async function generateSpec(
   apiKey: string,
   messages: Message[],
 ) {

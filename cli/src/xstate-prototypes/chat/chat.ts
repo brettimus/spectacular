@@ -4,7 +4,7 @@ import { createUserMessage } from "@/agents/utils";
 
 import { routeRequestActor } from "./actors/router";
 import type { RouterResponse } from "./types";
-import { generatePlanActor } from "./actors/generate-plan";
+import { generateSpecActor } from "./actors/generate-spec";
 import { askNextQuestionActor } from "./actors/next-question";
 import { savePlanToDiskActor } from "./actors/save-plan-to-disk";
 import { aiTextStreamMachine } from "../streaming/ai-text-stream-machine";
@@ -49,7 +49,7 @@ const chatMachine = setup({
   actors: {
     routeRequest: routeRequestActor,
     askNextQuestion: askNextQuestionActor,
-    generatePlan: generatePlanActor,
+    generatePlan: generateSpecActor,
     savePlan: savePlanToDiskActor,
     processQuestionStream: aiTextStreamMachine,
   },
