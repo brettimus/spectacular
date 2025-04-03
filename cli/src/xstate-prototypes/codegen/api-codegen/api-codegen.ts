@@ -39,11 +39,11 @@ export const apiCodegenMachine = setup({
     context: {} as ApiCodegenMachineContext,
     input: {} as ApiCodegenMachineInput,
     events: {} as
-      | { type: "GENERATE_API"; schema: string; spec: string }
-      | { type: "VERIFY_API" }
-      | { type: "ANALYZE_ERRORS"; errors: ErrorInfo[] }
-      | { type: "FIX_ERRORS" }
-      | { type: "REGENERATE_API" },
+      | { type: "generate.api"; schema: string; spec: string }
+      | { type: "verify.api" }
+      | { type: "analyze.errors"; errors: ErrorInfo[] }
+      | { type: "fix.errors" }
+      | { type: "regenerate.api" },
   },
   actors: {
     generateApi: generateApiActor,
@@ -71,7 +71,7 @@ export const apiCodegenMachine = setup({
   states: {
     Idle: {
       on: {
-        GENERATE_API: {
+        "generate.api": {
           target: "GeneratingApi",
           actions: assign({
             schema: ({ event }) => event.schema,
@@ -83,7 +83,7 @@ export const apiCodegenMachine = setup({
     GeneratingApi: {
       entry: () => log("info", "Generating API code", { stage: "generation" }),
       invoke: {
-        id: "generate-api",
+        id: "generateApi",
         src: "generateApi",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -112,7 +112,7 @@ export const apiCodegenMachine = setup({
     VerifyingApi: {
       entry: () => log("info", "Verifying API code", { stage: "verification" }),
       invoke: {
-        id: "verify-api",
+        id: "verifyApi",
         src: "verifyApi",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -155,7 +155,7 @@ export const apiCodegenMachine = setup({
           stage: "error-wait",
         }),
       on: {
-        ANALYZE_ERRORS: {
+        "analyze.errors": {
           target: "AnalyzingErrors",
           actions: assign({
             errors: ({ event }) => event.errors,
@@ -167,7 +167,7 @@ export const apiCodegenMachine = setup({
       entry: () =>
         log("info", "Analyzing API errors", { stage: "error-analysis" }),
       invoke: {
-        id: "analyze-api-errors",
+        id: "analyzeApiErrors",
         src: "analyzeApiErrors",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -195,7 +195,7 @@ export const apiCodegenMachine = setup({
     FixingErrors: {
       entry: () => log("info", "Fixing API errors", { stage: "error-fix" }),
       invoke: {
-        id: "fix-api-errors",
+        id: "fixApiErrors",
         src: "fixApiErrors",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -224,7 +224,7 @@ export const apiCodegenMachine = setup({
           stage: "verification-fixed",
         }),
       invoke: {
-        id: "verify-fixed-api",
+        id: "verifyFixedApi",
         src: "verifyApi",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -277,7 +277,7 @@ export const apiCodegenMachine = setup({
           stage: "failed-fix",
         }),
       on: {
-        REGENERATE_API: {
+        "regenerate.api": {
           target: "GeneratingApi",
         },
       },
