@@ -8,21 +8,24 @@ import type { AiTextStreamResult } from "../streaming/types";
 
 config();
 
+const API_KEY = process.env.OPENAI_API_KEY;
+const AI_PROVIDER = "openai";
+
 export class ChatCliAdapter {
   private actor: ActorRefFrom<typeof chatMachine>;
   private loadingSpinner: ReturnType<typeof spinner> | null = null;
 
   constructor() {
-    const apiKey = process.env.OPENAI_API_KEY;
     // TODO - Look up API key from config dir
-    if (!apiKey) {
+    if (!API_KEY) {
       throw new Error("OPENAI_API_KEY is not set");
     }
     // TODO - Try to provide a `processQuestionStream` actor that can
     //        stream the response to the CLI
     this.actor = createActor(chatMachine, {
       input: {
-        apiKey,
+        apiKey: API_KEY,
+        aiProvider: AI_PROVIDER,
         cwd: process.cwd(),
       },
       // Add inspection to debug actor lifecycle
@@ -40,7 +43,7 @@ export class ChatCliAdapter {
           ? snapshot.value
           : Object.keys(snapshot.value)[0];
 
-      // console.log(`State transition to -> ${currentState}`);
+      console.log(`State transition to -> ${currentState}`);
 
       // Handle different states with appropriate UI feedback
       switch (currentState) {
@@ -53,7 +56,7 @@ export class ChatCliAdapter {
         case "FollowingUp":
           this.updateSpinner("Preparing follow-up question...");
           break;
-        case "YieldingQuestionStream":
+        case "ProcessingAiResponse":
           if (this.loadingSpinner) {
             this.stopSpinner("Question:");
           }

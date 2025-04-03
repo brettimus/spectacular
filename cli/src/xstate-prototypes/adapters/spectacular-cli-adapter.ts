@@ -125,7 +125,7 @@ export class SpectacularCliAdapter {
       case "FollowingUp":
         this.updateSpinner("Preparing follow-up question...");
         break;
-      case "YieldingQuestionStream":
+      case "ProcessingAiResponse":
         if (this.loadingSpinner) {
           this.stopSpinner("Question:");
         }
