@@ -50,12 +50,12 @@ export const schemaCodegenMachine = setup({
     context: {} as SchemaCodegenMachineContext,
     input: {} as SchemaCodegenMachineInput,
     events: {} as
-      | { type: "ANALYZE_TABLES"; spec: string }
-      | { type: "GENERATE_SCHEMA" }
-      | { type: "VERIFY_SCHEMA" }
-      | { type: "ANALYZE_ERRORS"; errors: ErrorInfo[] }
-      | { type: "FIX_ERRORS" }
-      | { type: "REGENERATE_SCHEMA" },
+      | { type: "analyze.tables"; spec: string }
+      | { type: "generate.schema" }
+      | { type: "verify.schema" }
+      | { type: "analyze.errors"; errors: ErrorInfo[] }
+      | { type: "fix.errors" }
+      | { type: "regenerate.schema" },
     output: {} as SchemaCodegenMachineOutput,
   },
   actors: {
@@ -89,7 +89,7 @@ export const schemaCodegenMachine = setup({
   states: {
     Idle: {
       on: {
-        ANALYZE_TABLES: {
+        "analyze.tables": {
           target: "AnalyzingTables",
           actions: assign({
             spec: ({ event }) => event.spec,
@@ -101,7 +101,7 @@ export const schemaCodegenMachine = setup({
       entry: () =>
         log("info", "Analyzing database tables", { stage: "table-analysis" }),
       invoke: {
-        id: "analyze-tables",
+        id: "analyzeTables",
         src: "analyzeTables",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -145,7 +145,7 @@ export const schemaCodegenMachine = setup({
           stage: "rule-identification",
         }),
       invoke: {
-        id: "identify-rules",
+        id: "identifyRules",
         src: "identifyRules",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -181,7 +181,7 @@ export const schemaCodegenMachine = setup({
           stage: "schema-generation",
         }),
       invoke: {
-        id: "generate-schema",
+        id: "generateSchema",
         src: "generateSchema",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -220,7 +220,7 @@ export const schemaCodegenMachine = setup({
           { stage: "error-wait" },
         ),
       on: {
-        ANALYZE_ERRORS: {
+        "analyze.errors": {
           target: "AnalyzingErrors",
           actions: assign({
             errors: ({ event }) => event.errors,
@@ -232,7 +232,7 @@ export const schemaCodegenMachine = setup({
       entry: () =>
         log("info", "Analyzing schema errors", { stage: "error-analysis" }),
       invoke: {
-        id: "analyze-schema-errors",
+        id: "analyzeSchemaErrors",
         src: "analyzeErrors",
         input: ({ context }) => ({
           apiKey: context.apiKey,
@@ -263,7 +263,7 @@ export const schemaCodegenMachine = setup({
     FixingErrors: {
       entry: () => log("info", "Fixing schema errors", { stage: "error-fix" }),
       invoke: {
-        id: "fix-schema-errors",
+        id: "fixSchemaErrors",
         src: "fixSchema",
         input: ({ context }) => ({
           apiKey: context.apiKey,
