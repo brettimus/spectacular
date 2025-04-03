@@ -51,7 +51,12 @@ Ask the user one question at a time so we can develop a thorough, step-by-step s
 This is important to my career.
 `;
 
-export async function askNextQuestion(apiKey: string, messages: Message[], aiProvider: FpModelProvider = "openai", aiGatewayUrl?: string) {
+export async function askNextQuestion(
+  apiKey: string,
+  messages: Message[],
+  aiProvider: FpModelProvider = "openai",
+  aiGatewayUrl?: string,
+) {
   const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
 
   return streamText({
@@ -61,12 +66,24 @@ export async function askNextQuestion(apiKey: string, messages: Message[], aiPro
   });
 }
 
-function fromModelProvider(aiProvider: FpModelProvider, apiKey: string, aiGatewayUrl?: string) {
+function fromModelProvider(
+  aiProvider: FpModelProvider,
+  apiKey: string,
+  aiGatewayUrl?: string,
+) {
   switch (aiProvider) {
     case "openai":
-      return aiModelFactory({ apiKey, modelDetails: OPENAI_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: OPENAI_STRATEGY,
+        aiGatewayUrl,
+      });
     case "anthropic":
-      return aiModelFactory({ apiKey, modelDetails: ANTHROPIC_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: ANTHROPIC_STRATEGY,
+        aiGatewayUrl,
+      });
     case "ollama":
       return ollama("gemma3:4b");
     default:

@@ -4,7 +4,10 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { ollama } from "ollama-ai-provider";
 
 type OpenAiModelName = "gpt-4o" | "gpt-4o-mini" | "o3-mini";
-type AnthropicModelName = "claude-3-7-sonnet-20250219" | "claude-3-5-sonnet-20241022" | "claude-3-5-haiku-20241022";
+type AnthropicModelName =
+  | "claude-3-7-sonnet-20250219"
+  | "claude-3-5-sonnet-20241022"
+  | "claude-3-5-haiku-20241022";
 type OllamaModelName = "gemma3:4b" | "qwq:32b";
 
 export type FpModelDetails =

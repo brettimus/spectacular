@@ -7,7 +7,6 @@ const OPENAI_STRATEGY = {
   modelProvider: "openai",
 } as const;
 
-
 const ANTHROPIC_STRATEGY = {
   modelName: "claude-3-5-haiku-20241022",
   modelProvider: "anthropic",
@@ -37,13 +36,8 @@ Consider the user's intent, as well as the following:
 const RouterSchema = z.object({
   reasoning: z
     .string()
-    .describe(
-      "A brief explanation of your reasoning for the classification.",
-    ),
-  nextStep: z.enum([
-    "ask_follow_up_question",
-    "generate_implementation_plan",
-  ]),
+    .describe("A brief explanation of your reasoning for the classification."),
+  nextStep: z.enum(["ask_follow_up_question", "generate_implementation_plan"]),
 });
 
 export async function routeRequest(

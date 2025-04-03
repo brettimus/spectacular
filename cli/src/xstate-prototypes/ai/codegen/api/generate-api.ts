@@ -20,9 +20,7 @@ const ApiGenerationSchema = z.object({
   reasoning: z
     .string()
     .describe("Your step by step thought process for designing the api"),
-  indexTs: z
-    .string()
-    .describe("The generated api routes file, in typescript"),
+  indexTs: z.string().describe("The generated api routes file, in typescript"),
 });
 
 // Keep prompts and examples within this module
@@ -261,14 +259,26 @@ Things you usually screw up (things to avoid):
     );
     throw error;
   }
-} 
+}
 
-function fromModelProvider(aiProvider: FpModelProvider, apiKey: string, aiGatewayUrl?: string) {
+function fromModelProvider(
+  aiProvider: FpModelProvider,
+  apiKey: string,
+  aiGatewayUrl?: string,
+) {
   switch (aiProvider) {
     case "openai":
-      return aiModelFactory({ apiKey, modelDetails: OPENAI_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: OPENAI_STRATEGY,
+        aiGatewayUrl,
+      });
     case "anthropic":
-      return aiModelFactory({ apiKey, modelDetails: ANTHROPIC_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: ANTHROPIC_STRATEGY,
+        aiGatewayUrl,
+      });
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }

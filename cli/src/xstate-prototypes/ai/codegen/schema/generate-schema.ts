@@ -110,7 +110,6 @@ This is important to my career.`,
   }
 }
 
-
 // Helper functions for providing examples
 export function getD1SchemaExample() {
   return `
@@ -369,12 +368,24 @@ export type EventSelect = typeof events.$inferSelect;
 `;
 }
 
-function fromModelProvider(aiProvider: FpModelProvider, apiKey: string, aiGatewayUrl?: string) {
+function fromModelProvider(
+  aiProvider: FpModelProvider,
+  apiKey: string,
+  aiGatewayUrl?: string,
+) {
   switch (aiProvider) {
     case "openai":
-      return aiModelFactory({ apiKey, modelDetails: OPENAI_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: OPENAI_STRATEGY,
+        aiGatewayUrl,
+      });
     case "anthropic":
-      return aiModelFactory({ apiKey, modelDetails: ANTHROPIC_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: ANTHROPIC_STRATEGY,
+        aiGatewayUrl,
+      });
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }

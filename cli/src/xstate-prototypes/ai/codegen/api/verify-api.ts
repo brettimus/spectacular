@@ -113,14 +113,26 @@ Rate the overall quality of the generated API on a scale of 1-5 and explain your
     );
     throw error;
   }
-} 
+}
 
-function fromModelProvider(aiProvider: FpModelProvider, apiKey: string, aiGatewayUrl?: string) {
+function fromModelProvider(
+  aiProvider: FpModelProvider,
+  apiKey: string,
+  aiGatewayUrl?: string,
+) {
   switch (aiProvider) {
     case "openai":
-      return aiModelFactory({ apiKey, modelDetails: OPENAI_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: OPENAI_STRATEGY,
+        aiGatewayUrl,
+      });
     case "anthropic":
-      return aiModelFactory({ apiKey, modelDetails: ANTHROPIC_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: ANTHROPIC_STRATEGY,
+        aiGatewayUrl,
+      });
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }

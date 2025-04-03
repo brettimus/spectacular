@@ -8,7 +8,7 @@ import type { ErrorInfo } from "@/utils/typechecking/types";
 
 // Infer the sources type from the generateText return type
 type GenerateTextReturnType = Awaited<ReturnType<typeof generateText>>;
-type SourcesType = GenerateTextReturnType['sources'];
+type SourcesType = GenerateTextReturnType["sources"];
 
 // Result type remains the same, using any for sources type for now
 export type ApiErrorAnalysisResult = {
@@ -20,7 +20,7 @@ const OPENAI_STRATEGY = {
   modelName: "gpt-4o",
   modelProvider: "openai",
   responsesApi: true,
-} as const; 
+} as const;
 
 const ANTHROPIC_STRATEGY = {
   modelName: "claude-3-7-sonnet-20250219",
@@ -55,7 +55,10 @@ export async function analyzeApiErrors(
       // Assuming tools might vary based on provider/model
       tools: {
         // TODO - Need to configure this based on the model provider!!!
-        web_search_preview: createOpenAI({ apiKey, baseURL: aiGatewayUrl }).tools.webSearchPreview(),
+        web_search_preview: createOpenAI({
+          apiKey,
+          baseURL: aiGatewayUrl,
+        }).tools.webSearchPreview(),
       },
       abortSignal: signal,
     });
@@ -104,14 +107,26 @@ Focus specifically on:
 - Correct usage of Drizzle ORM with D1 database
 - Any type issues with request/response handling
 `;
-} 
+}
 
-function fromModelProvider(aiProvider: FpModelProvider, apiKey: string, aiGatewayUrl?: string) {
+function fromModelProvider(
+  aiProvider: FpModelProvider,
+  apiKey: string,
+  aiGatewayUrl?: string,
+) {
   switch (aiProvider) {
     case "openai":
-      return aiModelFactory({ apiKey, modelDetails: OPENAI_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: OPENAI_STRATEGY,
+        aiGatewayUrl,
+      });
     case "anthropic":
-      return aiModelFactory({ apiKey, modelDetails: ANTHROPIC_STRATEGY, aiGatewayUrl });
+      return aiModelFactory({
+        apiKey,
+        modelDetails: ANTHROPIC_STRATEGY,
+        aiGatewayUrl,
+      });
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
