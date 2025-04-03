@@ -14,10 +14,14 @@ import type { SchemaErrorAnalysisResult } from "@/xstate-prototypes/ai/codegen/s
 import type { FpModelProvider } from "@/xstate-prototypes/ai";
 
 interface SchemaCodegenMachineInput {
+  /** The API key to use for AI calls */
   apiKey: string;
+  /** The AI provider to use for AI calls */
   aiProvider?: FpModelProvider;
+  /** The AI gateway URL to use for AI calls */
   aiGatewayUrl?: string;
-  spec?: string;
+  /** The spec to use for schema generation */
+  spec: string;
 }
 
 interface SchemaCodegenMachineContext {
@@ -74,7 +78,7 @@ export const schemaCodegenMachine = setup({
     apiKey: input.apiKey,
     aiProvider: input.aiProvider || "openai",
     aiGatewayUrl: input.aiGatewayUrl,
-    spec: input.spec || "",
+    spec: input.spec,
     schemaSpecification: "",
     relevantRules: [],
     dbSchemaTs: "",

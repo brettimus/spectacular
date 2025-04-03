@@ -2,12 +2,15 @@ import type { LanguageModelV1 } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { ollama } from "ollama-ai-provider";
+import { traceAISDKModel } from "evalite/ai-sdk";
 
 type OpenAiModelName = "gpt-4o" | "gpt-4o-mini" | "o3-mini";
+
 type AnthropicModelName =
   | "claude-3-7-sonnet-20250219"
   | "claude-3-5-sonnet-20241022"
   | "claude-3-5-haiku-20241022";
+
 type OllamaModelName = "gemma3:4b" | "qwq:32b";
 
 export type FpModelDetails =
@@ -33,11 +36,20 @@ export type FpAiModelFactoryOptions = {
   aiGatewayUrl?: string;
 };
 
+/**
+ * Create an ai-sdk {@link LanguageModelV1} from a model details object
+ *
+ * This function will also wrap the model in an evalite {@link traceAISDKModel}
+ * to enable tracing of the model calls during evals.
+ *
+ * Tracing is a noop in production.
+ */
 export function aiModelFactory(
   options: FpAiModelFactoryOptions,
 ): LanguageModelV1 {
   const { apiKey, modelDetails, aiGatewayUrl } = options;
-  return fromModelDetails(apiKey, modelDetails, aiGatewayUrl);
+  const model = fromModelDetails(apiKey, modelDetails, aiGatewayUrl);
+  return traceAISDKModel(model);
 }
 
 function fromModelDetails(
