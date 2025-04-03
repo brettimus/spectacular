@@ -11,9 +11,12 @@ import {
   type ApiErrorAnalysisResult,
   // type ApiFixResult
 } from "./actors";
+import type { FpModelProvider } from "@/xstate-prototypes/ai";
 
 interface ApiCodegenMachineInput {
   apiKey: string;
+  aiProvider?: FpModelProvider;
+  aiGatewayUrl?: string;
   schema?: string;
   spec?: string;
 }

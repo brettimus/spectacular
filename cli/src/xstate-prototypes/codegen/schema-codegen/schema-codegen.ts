@@ -9,16 +9,21 @@ import {
   verifySchemaActor,
   analyzeErrorsActor,
   fixSchemaActor,
-  type SchemaErrorAnalysisResult,
 } from "./actors";
+import type { SchemaErrorAnalysisResult } from "@/xstate-prototypes/ai/codegen/schema/types";
+import type { FpModelProvider } from "@/xstate-prototypes/ai";
 
 interface SchemaCodegenMachineInput {
   apiKey: string;
+  aiProvider?: FpModelProvider;
+  aiGatewayUrl?: string;
   spec?: string;
 }
 
 interface SchemaCodegenMachineContext {
   apiKey: string;
+  aiProvider: FpModelProvider;
+  aiGatewayUrl?: string;
   spec: string;
   schemaSpecification: string;
   relevantRules: SelectedRule[];
@@ -67,6 +72,8 @@ export const schemaCodegenMachine = setup({
   initial: "Idle",
   context: ({ input }) => ({
     apiKey: input.apiKey,
+    aiProvider: input.aiProvider || "openai",
+    aiGatewayUrl: input.aiGatewayUrl,
     spec: input.spec || "",
     schemaSpecification: "",
     relevantRules: [],
@@ -182,6 +189,8 @@ export const schemaCodegenMachine = setup({
             schemaSpecification: context.schemaSpecification,
             relevantRules: context.relevantRules,
           },
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           // target: "VerifyingSchema",

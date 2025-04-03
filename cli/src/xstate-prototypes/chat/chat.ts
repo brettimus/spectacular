@@ -15,14 +15,19 @@ import {
   type AiResponseMessage,
 } from "../streaming";
 import { createUserMessage } from "../utils";
+import type { FpModelProvider } from "../ai";
 
 interface ChatMachineInput {
   apiKey: string;
+  aiProvider?: FpModelProvider;
+  aiGatewayUrl?: string;
   cwd: string;
 }
 
 export interface ChatMachineContext {
   apiKey: string;
+  aiProvider: FpModelProvider;
+  aiGatewayUrl?: string;
   messages: Message[];
   cwd: string;
   spec: string | null;
@@ -90,6 +95,8 @@ const chatMachine = setup({
   initial: "AwaitingUserInput",
   context: ({ input }) => ({
     apiKey: input.apiKey,
+    aiProvider: input.aiProvider ?? "openai",
+    aiGatewayUrl: input.aiGatewayUrl,
     messages: [],
     cwd: input.cwd,
     spec: null,

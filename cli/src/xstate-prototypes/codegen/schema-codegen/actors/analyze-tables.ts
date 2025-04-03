@@ -4,7 +4,7 @@ import { traceAISDKModel } from "evalite/ai-sdk";
 import { z } from "zod";
 import { fromPromise } from "xstate";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { SchemaAnalysisOptions, SchemaAnalysisResult } from "./types";
+import type { SchemaAnalysisOptions, SchemaAnalysisResult } from "@/xstate-prototypes/ai/codegen/schema/types";
 
 // The system prompt used for analyzing database tables
 const SCHEMA_SYSTEM_PROMPT = `

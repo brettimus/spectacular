@@ -33,7 +33,12 @@
     "test:typechecking:manual": "tsx src/utils/typechecking/manual-test.ts"
   },
   "exports": "./dist/index.js",
-  "files": ["dist", "README.md", "LICENSE", ".gitignore"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    ".gitignore"
+  ],
   "bin": {
     "spectacular": "dist/index.js",
     "spectacular-machine": "dist/machines/commands/cli-entry.js"
@@ -45,6 +50,7 @@
     "type": "git"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^1.2.5",
     "@ai-sdk/openai": "^1.3.3",
     "@clack/core": "^0.3.4",
     "@clack/prompts": "^0.10.0",

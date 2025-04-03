@@ -3,7 +3,7 @@ import { generateText } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
 import { fromPromise } from "xstate";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { SchemaFixOptions, SchemaFixResult } from "./types";
+import type { SchemaFixOptions, SchemaFixResult } from "@/xstate-prototypes/ai/codegen/schema/types";
 
 /**
  * Fix schema errors using AI

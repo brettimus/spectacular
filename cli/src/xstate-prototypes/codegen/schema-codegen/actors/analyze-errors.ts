@@ -6,7 +6,7 @@ import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type {
   TypescriptErrorAnalysisOptions,
   SchemaErrorAnalysisResult,
-} from "./types";
+} from "@/xstate-prototypes/ai/codegen/schema/types";
 import type { ErrorInfo } from "@/utils/typechecking/types";
 
 /**

@@ -7,12 +7,12 @@ import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type {
   SchemaVerificationOptions,
   SchemaVerificationResult,
-} from "../types";
+} from "../../../../ai/codegen/schema/types";
 import {
   getD1AdditionalTips,
   getD1SchemaExample,
   getDrizzleSchemaExamples,
-} from "../generate-schema";
+} from "../../../../ai/codegen/schema/generate-schema";
 
 // System prompt for schema verification
 const SCHEMA_VERIFICATION_SYSTEM_PROMPT = `
