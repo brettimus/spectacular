@@ -22,6 +22,8 @@ interface SchemaCodegenMachineInput {
   aiGatewayUrl?: string;
   /** The spec to use for schema generation */
   spec: string;
+  /** Project root directory - Only relevant if we are writing to a file */
+  projectRoot?: string;
 }
 
 interface SchemaCodegenMachineContext {
@@ -29,6 +31,7 @@ interface SchemaCodegenMachineContext {
   aiProvider: FpModelProvider;
   aiGatewayUrl?: string;
   spec: string;
+
   schemaSpecification: string;
   relevantRules: SelectedRule[];
   dbSchemaTs: string;
