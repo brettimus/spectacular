@@ -1,1 +1,1 @@
-export * from "./schema-codegen";
+export { schemaCodegenMachine } from "./schema-codegen";
