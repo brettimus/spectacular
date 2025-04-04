@@ -1,20 +1,30 @@
 import { generateObject } from "ai";
 import { z } from "zod";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { SchemaGenerationOptions, SchemaGenerationResult } from "../types";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
+import type { SelectedRule } from "../../types";
+
+export type GenerateSchemaOptions = {
+  schemaSpecification: string;
+  relevantRules: SelectedRule[];
+};
+
+export type GenerateSchemaResult = {
+  explanation: string;
+  dbSchemaTs: string;
+};
 
 /**
  * Generate Drizzle ORM schema using AI
  */
 export async function generateSchema(
   aiConfig: FpAiConfig,
-  options: SchemaGenerationOptions,
+  options: GenerateSchemaOptions,
   signal?: AbortSignal,
-): Promise<SchemaGenerationResult> {
+): Promise<GenerateSchemaResult> {
   try {
     const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);

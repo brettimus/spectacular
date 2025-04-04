@@ -1,4 +1,8 @@
-export { generateSchema } from "./generate-schema";
+export {
+  generateSchema,
+  type GenerateSchemaOptions,
+  type GenerateSchemaResult,
+} from "./generate-schema";
 export {
   analyzeErrors,
   type AnalyzeSchemaErrorsResult,
@@ -12,7 +16,6 @@ export {
 // HACK - My typescript language server needed this import to use ./index for some reason?
 export { identifyRules } from "./identify-rules/index";
 export { analyzeTables } from "./analyze-tables";
-export type { SchemaGenerationOptions, SchemaGenerationResult } from "./types";
 export type {
   AnalyzeTablesResult,
   AnalyzeTablesOptions,

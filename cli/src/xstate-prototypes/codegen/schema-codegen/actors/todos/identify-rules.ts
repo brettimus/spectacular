@@ -1,6 +1,6 @@
 import { fromPromise } from "xstate";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { SelectedRule } from "@/xstate-prototypes/ai/codegen/schema/types";
+import type { SelectedRule } from "@/xstate-prototypes/ai";
 import { identifyRules as identifyRulesAi } from "@/xstate-prototypes/ai";
 import type { FpAiConfig } from "@/xstate-prototypes/ai";
 

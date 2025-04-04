@@ -1,6 +1,6 @@
 import { setup, assign } from "xstate";
-import type { SelectedRule } from "@/xstate-prototypes/ai/codegen/schema/types";
-import { log } from "@/xstate-prototypes/utils/logging/logger";
+import type { SelectedRule } from "@/xstate-prototypes/ai";
+import { log } from "@/xstate-prototypes/utils/logging";
 import {
   analyzeTablesActor,
   identifyRulesActor,

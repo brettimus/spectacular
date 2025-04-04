@@ -21,6 +21,9 @@ export {
   fixSchema,
   type FixSchemaOptions,
   type FixSchemaResult,
+  generateSchema,
+  type GenerateSchemaOptions,
+  type GenerateSchemaResult,
 } from "./codegen/schema";
 
 export {
@@ -35,4 +38,5 @@ export {
 
 // TODO - Implement rule identification
 //
-export { identifyRules } from "./codegen/schema/identify-rules/identify-rules";
+export type { SelectedRule } from "./codegen/types";
+export { identifyRules } from "./codegen/schema";
