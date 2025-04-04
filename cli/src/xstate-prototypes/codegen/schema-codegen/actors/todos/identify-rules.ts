@@ -12,12 +12,7 @@ export const identifyRulesActor = fromPromise<
     noop: boolean;
   }
 >(async ({ input, signal }) => {
-  const {
-    aiConfig,
-    schemaSpecification,
-    noop: isNoop,
-  } = input;
-
+  const { aiConfig, schemaSpecification, noop: isNoop } = input;
 
   try {
     log("debug", "Identifying rules for schema", {

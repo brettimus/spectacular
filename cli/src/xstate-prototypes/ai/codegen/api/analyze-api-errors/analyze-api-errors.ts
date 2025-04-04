@@ -18,7 +18,7 @@ export type ApiErrorAnalysisResult = {
 export type AnalyzeApiErrorsOptions = {
   apiCode: string;
   errors: ErrorInfo[];
-}
+};
 
 /**
  * Analyze API errors using AI

@@ -1,19 +1,14 @@
 import { generateObject } from "ai";
 import { z } from "zod";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type {
-  SchemaAnalysisOptions,
-  SchemaAnalysisResult,
-} from "@/xstate-prototypes/ai/codegen/schema/types";
-import {
-  aiModelFactory,
-} from "../../../ai-model-factory";
+
+import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 // Schema definition for the output object
-const SchemaAnalysisOutputSchema = z.object({
+const AnalyzeTablesOutputSchema = z.object({
   reasoning: z
     .string()
     .describe(
@@ -26,14 +21,20 @@ const SchemaAnalysisOutputSchema = z.object({
     ),
 });
 
+export type AnalyzeTablesResult = z.infer<typeof AnalyzeTablesOutputSchema>;
+
+export type AnalyzeTablesOptions = {
+  specContent: string;
+};
+
 /**
  * Analyze tables from specification using AI
  */
 export async function analyzeTables(
   aiConfig: FpAiConfig,
-  options: SchemaAnalysisOptions,
+  options: AnalyzeTablesOptions,
   signal?: AbortSignal,
-): Promise<SchemaAnalysisResult> {
+): Promise<AnalyzeTablesResult> {
   try {
     const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
@@ -50,7 +51,7 @@ export async function analyzeTables(
 
     const result = await generateObject({
       model,
-      schema: SchemaAnalysisOutputSchema,
+      schema: AnalyzeTablesOutputSchema,
       messages: [
         {
           role: "user",

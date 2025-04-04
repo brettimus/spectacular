@@ -1,5 +1,3 @@
-
-
 export type OpenAiModelName = "gpt-4o" | "gpt-4o-mini" | "o3-mini";
 
 export type AnthropicModelName =
@@ -11,18 +9,18 @@ export type OllamaModelName = "gemma3:4b" | "qwq:32b";
 
 export type FpModelDetails =
   | {
-    modelProvider: "openai";
-    modelName: OpenAiModelName;
-    responsesApi?: boolean;
-  }
+      modelProvider: "openai";
+      modelName: OpenAiModelName;
+      responsesApi?: boolean;
+    }
   | {
-    modelProvider: "anthropic";
-    modelName: AnthropicModelName;
-  }
+      modelProvider: "anthropic";
+      modelName: AnthropicModelName;
+    }
   | {
-    modelProvider: "ollama";
-    modelName: OllamaModelName;
-  };
+      modelProvider: "ollama";
+      modelName: OllamaModelName;
+    };
 
 export type FpModelProvider = FpModelDetails["modelProvider"];
 
@@ -39,4 +37,4 @@ export type FpAiConfig = {
   apiKey: string;
   aiProvider: FpModelProvider;
   aiGatewayUrl?: string;
-}
+};

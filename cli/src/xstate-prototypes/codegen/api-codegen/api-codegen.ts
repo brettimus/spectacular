@@ -7,7 +7,11 @@ import {
   fixApiErrorsActor,
   type ApiErrorAnalysisResult,
 } from "./actors";
-import { DEFAULT_AI_PROVIDER, type FpAiConfig, type FpModelProvider } from "@/xstate-prototypes/ai";
+import {
+  DEFAULT_AI_PROVIDER,
+  type FpAiConfig,
+  type FpModelProvider,
+} from "@/xstate-prototypes/ai";
 import { saveApiIndexToDiskActor } from "./actors/save-api-index-to-disk";
 import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typecheck";
 

@@ -1,8 +1,6 @@
 import { generateObject } from "ai";
 import { z } from "zod";
-import {
-  aiModelFactory,
-} from "../../../ai-model-factory";
+import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import type { SelectedRule } from "../types";
 import { OPENAI_STRATEGY } from "./openai";
@@ -10,7 +8,7 @@ import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 export type IdentifyRulesOptions = {
   schemaSpecification: string;
-}
+};
 
 /**
  * Identify relevant rules from schema specification using AI

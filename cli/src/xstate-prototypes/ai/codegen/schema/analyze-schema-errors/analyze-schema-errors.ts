@@ -5,9 +5,7 @@ import type {
   SchemaErrorAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
 import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
-import {
-  aiModelFactory,
-} from "../../../ai-model-factory";
+import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 
 import { OPENAI_STRATEGY } from "./openai";

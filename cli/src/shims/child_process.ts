@@ -28,23 +28,23 @@ export interface SpawnOptionsShim {
 export function spawn(
   command: string,
   args?: string[],
-  options?: SpawnOptionsShim
+  options?: SpawnOptionsShim,
 ): ChildProcessShim {
   console.warn(
     `[Browser child_process shim] Attempted to spawn command: ${command} with args:`,
     args,
-    options ? `with options: ${JSON.stringify(options)}` : "without options"
+    options ? `with options: ${JSON.stringify(options)}` : "without options",
   );
 
   const childProcess = new EventEmitter() as ChildProcessShim;
-  
+
   // Simulate a fake process ID
   childProcess.pid = Math.floor(Math.random() * 10000);
   childProcess.killed = false;
   childProcess.stdin = null;
   childProcess.stdout = null;
   childProcess.stderr = null;
-  
+
   // Mock the kill method
   childProcess.kill = (signal?: string) => {
     if (!childProcess.killed) {
@@ -66,12 +66,17 @@ export function spawn(
 }
 
 // Also export a mock for other common child_process methods if needed
-export const exec = (command: string, callback: (error: Error | null, stdout: string, stderr: string) => void) => {
+export const exec = (
+  command: string,
+  callback: (error: Error | null, stdout: string, stderr: string) => void,
+) => {
   console.warn(`[Browser child_process shim] Attempted to exec: ${command}`);
   callback(null, "", "");
 };
 
 export const execSync = (command: string): Buffer => {
-  console.warn(`[Browser child_process shim] Attempted to execSync: ${command}`);
+  console.warn(
+    `[Browser child_process shim] Attempted to execSync: ${command}`,
+  );
   return Buffer.from("");
 };

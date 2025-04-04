@@ -5,3 +5,7 @@ export { fixSchema } from "./fix-schema";
 export { identifyRules } from "./identify-rules/index";
 export { analyzeTables } from "./analyze-tables";
 export type { SchemaGenerationOptions, SchemaGenerationResult } from "./types";
+export type {
+  AnalyzeTablesResult,
+  AnalyzeTablesOptions,
+} from "./analyze-tables";

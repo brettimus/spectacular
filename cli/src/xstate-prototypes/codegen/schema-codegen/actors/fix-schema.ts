@@ -15,10 +15,4 @@ export const fixSchemaActor = fromPromise<
     aiConfig: FpAiConfig;
     options: SchemaFixOptions;
   }
->(({ input, signal }) =>
-  fixSchemaAi(
-    input.aiConfig,
-    input.options,
-    signal,
-  ),
-);
+>(({ input, signal }) => fixSchemaAi(input.aiConfig, input.options, signal));

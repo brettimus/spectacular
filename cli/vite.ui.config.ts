@@ -10,7 +10,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { resolve } from "node:path";
 import { evaliteTracerPlugin } from "./src/shims/evalite-tracer-plugin";
 
-export default defineConfig(() => {  
+export default defineConfig(() => {
   return {
     root: "./inspector-ui",
     plugins: [
@@ -39,7 +39,9 @@ export default defineConfig(() => {
     },
     // Make environment variables available to client code
     define: {
-      'process.env.SKIP_TRACING': JSON.stringify(process.env.SKIP_TRACING || 'false'),
+      "process.env.SKIP_TRACING": JSON.stringify(
+        process.env.SKIP_TRACING || "false",
+      ),
     },
   };
 });

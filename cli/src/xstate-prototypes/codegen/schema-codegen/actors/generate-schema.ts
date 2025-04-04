@@ -12,10 +12,4 @@ export const generateSchemaActor = fromPromise<
     aiConfig: FpAiConfig;
     options: SchemaGenerationOptions;
   }
->(({ input, signal }) =>
-  generateSchema(
-    input.aiConfig,
-    input.options,
-    signal,
-  ),
-);
+>(({ input, signal }) => generateSchema(input.aiConfig, input.options, signal));

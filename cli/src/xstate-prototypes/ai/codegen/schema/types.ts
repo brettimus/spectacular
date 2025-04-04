@@ -5,10 +5,6 @@ export interface SelectedRule {
   reason: string;
 }
 
-export interface SchemaAnalysisOptions {
-  specContent: string;
-}
-
 export interface SchemaGenerationOptions {
   schemaSpecification: string;
   relevantRules: SelectedRule[];
@@ -27,11 +23,6 @@ export interface TypescriptErrorAnalysisOptions {
   schema: string;
   schemaSpecification: string;
   errors: ErrorInfo[];
-}
-
-export interface SchemaAnalysisResult {
-  reasoning: string;
-  schemaSpecification: string;
 }
 
 export interface SchemaGenerationResult {

@@ -12,7 +12,7 @@ export type ApiFixResult = {
 export type FixApiErrorsOptions = {
   fixContent: string;
   originalApiCode: string;
-}
+};
 
 /**
  * Generate a fixed API code based on the analysis results
@@ -70,8 +70,8 @@ Return only the fixed code. It should be valid TypeScript code. DO NOT INCLUDE A
           prediction: {
             type: "content",
             content: originalApiCode,
-          }
-        }
+          },
+        },
       },
       abortSignal: signal,
     });

@@ -3,7 +3,13 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { ollama } from "ollama-ai-provider";
 import { traceAISDKModel } from "evalite/ai-sdk";
-import type { AnthropicModelName, FpAiModelFactoryOptions, FpModelDetails, OllamaModelName, OpenAiModelName } from "./types";
+import type {
+  AnthropicModelName,
+  FpAiModelFactoryOptions,
+  FpModelDetails,
+  OllamaModelName,
+  OpenAiModelName,
+} from "./types";
 
 /**
  * Create an ai-sdk {@link LanguageModelV1} from a model details object
@@ -18,7 +24,7 @@ export function aiModelFactory(
 ): LanguageModelV1 {
   const { apiKey, modelDetails, aiGatewayUrl } = options;
   const model = fromModelDetails(apiKey, modelDetails, aiGatewayUrl);
-  
+
   return traceAISDKModel(model);
 }
 

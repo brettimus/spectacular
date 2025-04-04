@@ -12,10 +12,4 @@ export const analyzeErrorsActor = fromPromise<
     aiConfig: FpAiConfig;
     options: TypescriptErrorAnalysisOptions;
   }
->(({ input, signal }) =>
-  analyzeErrors(
-    input.aiConfig,
-    input.options,
-    signal,
-  ),
-);
+>(({ input, signal }) => analyzeErrors(input.aiConfig, input.options, signal));

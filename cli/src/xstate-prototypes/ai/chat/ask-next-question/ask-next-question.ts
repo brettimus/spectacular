@@ -8,7 +8,7 @@ import { ollama } from "ollama-ai-provider";
 
 export type AskNextQuestionOptions = {
   messages: Message[];
-}
+};
 
 export async function askNextQuestion(
   aiConfig: FpAiConfig,

@@ -1,9 +1,7 @@
 import { generateObject } from "ai";
 import { z } from "zod";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import {
-  aiModelFactory,
-} from "../../../ai-model-factory";
+import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
@@ -97,7 +95,7 @@ const getCommonHonoMistakes = () => {
 export type GenerateApiOptions = {
   spec: string;
   schema: string;
-}
+};
 
 /**
  * Generate API code using AI

@@ -20,7 +20,7 @@ const RouterSchema = z.object({
 
 export type RouteRequestOptions = {
   messages: Message[];
-}
+};
 
 export async function routeRequest(
   aiConfig: FpAiConfig,

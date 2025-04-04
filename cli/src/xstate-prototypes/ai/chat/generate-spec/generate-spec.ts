@@ -20,7 +20,7 @@ export type GeneratedPlan = z.infer<typeof GeneratedPlanSchema>;
 
 export type GenerateSpecOptions = {
   messages: Message[];
-}
+};
 
 export async function generateSpec(
   aiConfig: FpAiConfig,

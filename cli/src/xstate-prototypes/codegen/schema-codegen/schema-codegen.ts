@@ -10,7 +10,11 @@ import {
   fixSchemaActor,
 } from "./actors";
 import type { SchemaErrorAnalysisResult } from "@/xstate-prototypes/ai/codegen/schema/types";
-import { DEFAULT_AI_PROVIDER, type FpAiConfig, type FpModelProvider } from "@/xstate-prototypes/ai";
+import {
+  DEFAULT_AI_PROVIDER,
+  type FpAiConfig,
+  type FpModelProvider,
+} from "@/xstate-prototypes/ai";
 import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typecheck";
 import { downloadTemplateActor } from "@/xstate-prototypes/download-template/download-template";
 import { installDependenciesActor } from "@/xstate-prototypes/download-template/install-dependencies";
