@@ -11,7 +11,7 @@ export {
   analyzeApiErrors,
   type AnalyzeApiErrorsResult,
   fixApiErrors,
-  type ApiFixResult,
+  type FixApiErrorsResult,
 } from "./codegen/api";
 // TODO - Finish exports
 //

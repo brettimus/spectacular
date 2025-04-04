@@ -5,7 +5,7 @@ import { aiModelFactory } from "../../../ai-model-factory";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
-export type ApiFixResult = {
+export type FixApiErrorsResult = {
   code: string;
 };
 
@@ -24,7 +24,7 @@ export async function fixApiErrors(
   aiConfig: FpAiConfig,
   options: FixApiErrorsOptions,
   signal?: AbortSignal,
-): Promise<ApiFixResult | null> {
+): Promise<FixApiErrorsResult | null> {
   try {
     const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);

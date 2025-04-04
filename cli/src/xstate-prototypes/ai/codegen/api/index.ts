@@ -3,4 +3,4 @@ export {
   analyzeApiErrors,
   type AnalyzeApiErrorsResult,
 } from "./analyze-api-errors";
-export { fixApiErrors, type ApiFixResult } from "./fix-api";
+export { fixApiErrors, type FixApiErrorsResult } from "./fix-api";

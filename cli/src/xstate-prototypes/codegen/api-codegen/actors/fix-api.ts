@@ -1,12 +1,12 @@
 import { fromPromise } from "xstate";
 import {
   fixApiErrors,
-  type ApiFixResult,
-} from "@/xstate-prototypes/ai/codegen/api/fix-api";
-import type { FpAiConfig } from "@/xstate-prototypes/ai";
+  type FixApiErrorsResult,
+  type FpAiConfig,
+} from "@/xstate-prototypes/ai";
 
 export const fixApiErrorsActor = fromPromise<
-  ApiFixResult | null,
+  FixApiErrorsResult | null,
   {
     aiConfig: FpAiConfig;
     fixContent: string;

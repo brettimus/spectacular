@@ -1,1 +1,1 @@
-export { fixApiErrors, type ApiFixResult } from "./fix-api";
+export { fixApiErrors, type FixApiErrorsResult } from "./fix-api";
