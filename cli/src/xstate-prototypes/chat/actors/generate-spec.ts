@@ -1,14 +1,11 @@
 import type { Message } from "ai";
 import { fromPromise } from "xstate";
-import {
-  generateSpec,
-  type GeneratedPlan,
-  GeneratedPlanSchema,
-} from "@/xstate-prototypes/ai/chat/generate-spec";
+import { generateSpec, type GeneratedPlan } from "@/xstate-prototypes/ai";
 import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
-// Re-exporting schema for backwards compatibility within this module
-export { GeneratedPlanSchema, type GeneratedPlan };
+// Re-exporting this return type because it is used by the main machine
+// and it makes sense to have it in the same file as the actor
+export type { GeneratedPlan };
 
 export const generateSpecActor = fromPromise<
   GeneratedPlan,

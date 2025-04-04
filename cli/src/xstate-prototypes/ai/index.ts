@@ -5,9 +5,16 @@ export type {
   AnalyzeTablesResult,
   AnalyzeTablesOptions,
 } from "./codegen/schema";
+
 // TODO - Finish exports
 //
-export { askNextQuestion } from "./chat";
+export {
+  askNextQuestion,
+  generateSpec,
+  GeneratedPlanSchema,
+  type GeneratedPlan,
+} from "./chat";
+
 // TODO - Implement rule identification
 //
 export { identifyRules } from "./codegen/schema/identify-rules/identify-rules";
