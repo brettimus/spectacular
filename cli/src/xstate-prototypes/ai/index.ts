@@ -11,11 +11,16 @@ export {
   type RouterResponse,
 } from "./chat";
 
-export type {
-  AnalyzeTablesResult,
-  AnalyzeTablesOptions,
-  AnalyzeSchemaErrorsOptions,
-  AnalyzeSchemaErrorsResult,
+export {
+  analyzeTables,
+  type AnalyzeTablesResult,
+  type AnalyzeTablesOptions,
+  analyzeErrors,
+  type AnalyzeSchemaErrorsOptions,
+  type AnalyzeSchemaErrorsResult,
+  fixSchema,
+  type FixSchemaOptions,
+  type FixSchemaResult,
 } from "./codegen/schema";
 
 export {

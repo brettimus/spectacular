@@ -1,10 +1,10 @@
 import { fromPromise } from "xstate";
-import type {
-  AnalyzeTablesOptions,
-  AnalyzeTablesResult,
+import {
+  analyzeTables,
+  type AnalyzeTablesOptions,
+  type AnalyzeTablesResult,
+  type FpAiConfig,
 } from "@/xstate-prototypes/ai";
-import { analyzeTables } from "@/xstate-prototypes/ai/codegen/schema/analyze-tables";
-import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 /**
  * Analyze tables from specification using AI

@@ -1,18 +1,18 @@
 import { fromPromise } from "xstate";
-import type {
-  SchemaFixOptions,
-  SchemaFixResult,
-} from "@/xstate-prototypes/ai/codegen/schema/types";
-import { fixSchema as fixSchemaAi } from "@/xstate-prototypes/ai/codegen/schema/fix-schema";
-import type { FpAiConfig } from "@/xstate-prototypes/ai";
+import {
+  fixSchema,
+  type FixSchemaOptions,
+  type FixSchemaResult,
+  type FpAiConfig,
+} from "@/xstate-prototypes/ai";
 
 /**
  * Fix schema errors using AI
  */
 export const fixSchemaActor = fromPromise<
-  SchemaFixResult | null,
+  FixSchemaResult | null,
   {
     aiConfig: FpAiConfig;
-    options: SchemaFixOptions;
+    options: FixSchemaOptions;
   }
->(({ input, signal }) => fixSchemaAi(input.aiConfig, input.options, signal));
+>(({ input, signal }) => fixSchema(input.aiConfig, input.options, signal));
