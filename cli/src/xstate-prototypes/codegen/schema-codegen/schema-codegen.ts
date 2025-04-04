@@ -1,5 +1,4 @@
 import { setup, assign } from "xstate";
-import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
 import type { SelectedRule } from "@/xstate-prototypes/ai/codegen/schema/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
@@ -15,7 +14,10 @@ import {
   type FpAiConfig,
   type FpModelProvider,
 } from "@/xstate-prototypes/ai";
-import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking";
+import {
+  validateTypeScriptActor,
+  type ErrorInfo,
+} from "@/xstate-prototypes/typechecking";
 import {
   downloadTemplateActor,
   installDependenciesActor,
