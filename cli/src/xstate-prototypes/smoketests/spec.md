@@ -1,80 +1,193 @@
-# Document Word Frequency API Implementation Plan
+# Plant Analytics API Specification
 
-This document outlines the design and step-by-step implementation plan for an API that takes in a plain text document and returns the list of the top 10 most frequent words along with the total word count. The API is built using Cloudflare Workers with Hono.js.
+This document outlines the design and implementation plan for an API that accepts analytics events from monitored plants. The API is intended to record a variety of events including environmental conditions (temperature, humidity, light intensity, soil moisture, CO2 levels) and plant growth metrics (plant height, leaf count, flower count, fruit count, stem diameter) associated with multiple plants and locations. Additionally, the API will include endpoints to manage metadata for plants and locations. The system will be built on Cloudflare Workers using Hono.js as the API framework, with Cloudflare D1 (using Drizzle ORM) for data persistence. UUIDs will be used for unique identifiers across entities.
 
-## 1. Project Description
+---
 
-The Document Word Frequency API is designed to process plain text provided via a JSON request body, perform text analysis to count the frequency of each word, and return the results in a JSON response. The response includes the total word count as well as the top 10 most numerous words with their counts.
-
-## 2. Technology Stack
+## 1. Technology Stack
 
 - **Edge Runtime:** Cloudflare Workers
-- **API Framework:** Hono.js
-- **Language:** TypeScript (leveraging type safety)
+- **API Framework:** Hono.js (TypeScript-based API framework)
+- **Database:** Cloudflare D1 (SQLite-based) with Drizzle ORM for type-safe queries
+- **Authentication:** Clerk (to secure metadata management endpoints, if required)
 
-There is no need for a database, authentication, or additional integrations since the API is stateless and solely performs text analysis.
+---
 
-## 3. API Endpoint
+## 2. Database Schema Design
 
-### 3.1. POST /analyze
+We will design three primary tables: Plants, Locations, and Events. Each will use a UUID as a primary key (or unique identifier).
 
-- **Description:** This endpoint accepts a JSON request body with a property `text` containing the plain text document, processes the text to compute word counts, and delivers a JSON response with:
-  - `totalWords`: An integer representing the total number of words in the document.
-  - `topWords`: An array of objects, each representing a word and its count, sorted by frequency in descending order. Only the top 10 are included.
+### 2.1. Plants Table
 
-- **Request Body Example:**
+- id (UUID, Primary Key)
+- name (TEXT, required)
+- description (TEXT, optional)
+- created_at (DATETIME, automatically set at insertion)
 
-```json
-{
-  "text": "Your text content here..."
-}
-```
+### 2.2. Locations Table
 
-- **Response Example:**
+- id (UUID, Primary Key)
+- name (TEXT, required)
+- description (TEXT, optional)
+- latitude (REAL, optional)
+- longitude (REAL, optional)
+- created_at (DATETIME, automatically set at insertion)
 
-```json
-{
-  "totalWords": 123,
-  "topWords": [
-    { "word": "example", "count": 10 },
-    { "word": "test", "count": 8 },
-    ...
-  ]
-}
-```
+### 2.3. Events Table
 
-- **Flow/Logic:**
-  1. Validate the request body to ensure a `text` property is provided and is a non-empty string.
-  2. Normalize the text (e.g., convert to lower case, remove punctuation if necessary) to standardize word counting.
-  3. Tokenize the text into words. Consider splitting on whitespace and handling punctuation boundaries.
-  4. Iterate over the tokens to build a frequency map (using a dictionary / hash map).
-  5. Calculate the total word count from the frequency map.
-  6. Sort the frequency map entries in descending order of frequency.
-  7. Return the top 10 words (or fewer if there aren’t enough unique words) along with their counts.
+This table records the analytics events from the monitored plants. It includes a type discriminator field (either 'environmental' or 'growth') and nullable columns for metrics that don’t apply to certain event types.
 
-## 4. Additional Considerations
+- id (INTEGER, Primary Key, Auto Increment or UUID if preferred)
+- timestamp (DATETIME, provided or default to event receipt time)
+- plant_id (UUID, Foreign Key referencing Plants.id)
+- location_id (UUID, Foreign Key referencing Locations.id)
+- event_type (TEXT, ENUM-like value; e.g., 'environmental', 'growth')
 
-- **Input Validation:** Handle cases where the request JSON is malformed or the `text` field is missing or empty. Respond with appropriate error status codes (e.g., 400 Bad Request).
-- **Normalization:** Decide on text normalization steps (e.g., treating 'Word' and 'word' as the same, removing punctuation, etc.)
-- **Performance:** The text analysis is done in-memory. For extremely large texts, consider whether additional optimizations or stream processing may be required.
-- **Error Handling:** Use appropriate error handling to catch any unexpected exceptions during text processing and return a 500 Internal Server Error if needed.
+-- Metrics for Environmental Conditions (nullable for non-environmental events):
+   - temperature (REAL, nullable)
+   - humidity (REAL, nullable)
+   - light_intensity (REAL, nullable)
+   - soil_moisture (REAL, nullable)
+   - co2 (REAL, nullable)
 
-## 5. Future Considerations
+-- Metrics for Plant Growth (nullable for non-growth events):
+   - plant_height (REAL, nullable)
+   - leaf_count (INTEGER, nullable)
+   - flower_count (INTEGER, nullable)
+   - fruit_count (INTEGER, nullable)
+   - stem_diameter (REAL, nullable)
 
-- **Extended Text Analysis:** In the future, consider expanding the API to return additional text statistics such as sentence count, average word length, etc.
-- **Caching:** For repeated requests with the same input (if applicable), implement a caching layer at the edge to improve performance.
-- **Analytics:** Introduce logging and monitoring to capture the usage patterns of the API.
-- **Scaling:** Although not required for this basic API, if the traffic increases, consider performing performance tests and optimizations at the Cloudflare Workers edge.
+- created_at (DATETIME, automatically set at insertion)
 
-## 6. Deployment Configuration
+---
 
-- Create a Cloudflare Workers project using Wrangler.
-- Configure the wrangler.toml to deploy to the appropriate Cloudflare Workers environment.
-- Use TypeScript with Hono.js for developing the API.
+## 3. API Endpoints
+
+The API endpoints can be grouped into two main categories: metadata management (for plants and locations) and event ingestion.
+
+### 3.1. Plant Metadata Endpoints
+
+- **POST /plants**
+  - Description: Create a new plant record.
+  - Expected Payload:
+    {
+      "id": "[UUID]",  // or auto-generated
+      "name": "Plant A",
+      "description": "Description about Plant A"
+    }
+
+- **GET /plants**
+  - Description: Retrieve a list of all plant records. Supports filtering if needed.
+  - Query Params: Optional filters (e.g., name)
+
+- **GET /plants/:id**
+  - Description: Retrieve detailed information about a single plant.
+
+- **PUT /plants/:id**
+  - Description: Update metadata for a given plant.
+  - Expected Payload: Fields to update (e.g., name, description).
+
+- **DELETE /plants/:id**
+  - Description: Remove a plant record if necessary.
+
+### 3.2. Location Metadata Endpoints
+
+- **POST /locations**
+  - Description: Create a new location record.
+  - Expected Payload:
+    {
+      "id": "[UUID]",
+      "name": "Greenhouse 1",
+      "description": "Main greenhouse location",
+      "latitude": 40.7128,
+      "longitude": -74.0060
+    }
+
+- **GET /locations**
+  - Description: Retrieve a list of location records.
+  - Query Params: Optional filtering (e.g., name)
+
+- **GET /locations/:id**
+  - Description: Retrieve detailed information about a single location.
+
+- **PUT /locations/:id**
+  - Description: Update the metadata for a given location.
+
+- **DELETE /locations/:id**
+  - Description: Delete a location record if necessary.
+
+### 3.3. Analytics Events Endpoints
+
+- **POST /events**
+  - Description: Accept an analytics event from a plant. The endpoint expects a payload including plant_id and location_id as UUIDs, an event_type ("environmental" or "growth"), and the respective metrics.
+  - Expected Payload Examples:
+
+    **Environmental Event:**
+    {
+      "timestamp": "2023-10-10T12:00:00Z",
+      "plant_id": "[UUID]",
+      "location_id": "[UUID]",
+      "event_type": "environmental",
+      "temperature": 22.5,
+      "humidity": 60,
+      "light_intensity": 350,
+      "soil_moisture": 45,
+      "co2": 400
+    }
+
+    **Plant Growth Event:**
+    {
+      "timestamp": "2023-10-10T12:05:00Z",
+      "plant_id": "[UUID]",
+      "location_id": "[UUID]",
+      "event_type": "growth",
+      "plant_height": 15.0,
+      "leaf_count": 8,
+      "flower_count": 2,
+      "fruit_count": 1,
+      "stem_diameter": 3.5
+    }
+
+- **GET /events**
+  - Description: Retrieve a list of events. Supports query parameters for filtering by plant_id, location_id, event_type, and date ranges.
+  - Query Params: plant_id, location_id, event_type, start_date, end_date
+
+---
+
+## 4. Integrations
+
+- **Clerk (Authentication):** Secure endpoints for metadata management (create/update/delete for plants and locations) ensuring that only authorized users can modify metadata.
+
+- **Analytics Clients:** External devices or systems will push analytics data (both environmental and growth events) using the event ingestion endpoint.
+
+*(No email, blob storage, or realtime updates integrations are required at this stage.)*
+
+---
+
+## 5. Additional Notes
+
+- The API should perform validation for all incoming data. For example, ensure that numerical fields are within expected ranges and that UUIDs are properly formatted.
+- Consider adding middleware in Hono.js for error handling and logging.
+- The API might also include pagination for GET endpoints if the volume of data grows large.
+- Implement rate limiting to prevent abuse of the event ingestion endpoint.
+
+---
+
+## 6. Future Considerations
+
+- Add more granular permissions based on user roles when using Clerk for metadata changes.
+- Implement realtime updates or notifications for particular events using Cloudflare Durable Objects.
+- Explore analytics or dashboards to visualize trends in plant health based on the analytics events.
+- Consider separating event types into different tables to optimize query performance if data volume becomes very large.
+- Future enhancements might include an aggregation layer or scheduled jobs for data summarization.
+
+---
 
 ## 7. Further Reading
 
-- Hono.js documentation for additional API handling details.
-- Cloudflare Workers documentation for deployment and edge runtime guidelines.
+- Cloudflare Workers Documentation
+- Hono.js API Framework Documentation
+- Cloudflare D1 & Drizzle ORM Integration Guides
+- Clerk Integration for Serverless Environments
 
-This plan should provide a clear roadmap to implement the Document Word Frequency API using the HONC stack: Hono.js, Cloudflare Workers, with TypeScript.
+This implementation plan provides the necessary high-level guidance to build and deploy the Plant Analytics API. The details provided herein should be sufficient for an experienced developer to get started on the project.

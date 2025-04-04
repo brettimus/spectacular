@@ -34,6 +34,9 @@ export async function validateTypeScript(
     throw new Error("Directory to project does not exist");
   }
 
+  console.log("[validateTypeScript] projectDir", projectDir);
+  console.log("[validateTypeScript] packageManager", packageManager);
+
   try {
     let output = "";
     let result: Awaited<ReturnType<typeof execPromise>>;
@@ -47,12 +50,16 @@ export async function validateTypeScript(
       // Capture both stdout and stderr
       output =
         (result.stdout?.toString() || "") + (result.stderr?.toString() || "");
+
+      console.log("[validateTypeScript] output", output);
     } catch (execError) {
+      console.log("[validateTypeScript] execError", execError);
       // When tsc finds type errors, it exits with non-zero code, which causes exec to throw
       if (isExecError(execError)) {
         const stdout = execError.stdout?.toString() || "";
         const stderr = execError.stderr?.toString() || "";
         output = stdout + stderr;
+        console.log("[validateTypeScript] output", output);
       } else {
         console.error(
           "[validateTypeScript] Not a recognized exec error:",

@@ -12,7 +12,10 @@ import {
 } from "./actors";
 import type { SchemaErrorAnalysisResult } from "@/xstate-prototypes/ai/codegen/schema/types";
 import type { FpModelProvider } from "@/xstate-prototypes/ai";
-
+import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typecheck";
+import { downloadTemplateActor } from "@/xstate-prototypes/download-template/download-template";
+import { installDependenciesActor } from "@/xstate-prototypes/download-template/install-dependencies";
+import { saveSchemaToDiskActor } from "./actors/save-schema-to-disk";
 interface SchemaCodegenMachineInput {
   /** The API key to use for AI calls */
   apiKey: string;
@@ -23,7 +26,7 @@ interface SchemaCodegenMachineInput {
   /** The spec to use for schema generation */
   spec: string;
   /** Project root directory - Only relevant if we are writing to a file */
-  projectRoot?: string;
+  projectDir?: string;
 }
 
 interface SchemaCodegenMachineContext {
@@ -31,6 +34,9 @@ interface SchemaCodegenMachineContext {
   aiProvider: FpModelProvider;
   aiGatewayUrl?: string;
   spec: string;
+  projectDir: string;
+
+  fixAttempts: number;
 
   schemaSpecification: string;
   relevantRules: SelectedRule[];
@@ -57,21 +63,35 @@ export const schemaCodegenMachine = setup({
     context: {} as SchemaCodegenMachineContext,
     input: {} as SchemaCodegenMachineInput,
     events: {} as
+      | { type: "download.template" }
       | { type: "analyze.tables"; spec: string }
       | { type: "generate.schema" }
       | { type: "verify.schema" }
-      | { type: "analyze.errors"; errors: ErrorInfo[] }
       | { type: "fix.errors" }
       | { type: "regenerate.schema" },
     output: {} as SchemaCodegenMachineOutput,
   },
   actors: {
+    downloadTemplate: downloadTemplateActor,
+    installDependencies: installDependenciesActor,
     analyzeTables: analyzeTablesActor,
     identifyRules: identifyRulesActor,
     generateSchema: generateSchemaActor,
+    saveSchema: saveSchemaToDiskActor,
     verifySchema: verifySchemaActor,
     analyzeErrors: analyzeErrorsActor,
     fixSchema: fixSchemaActor,
+    validateTypeScript: validateTypeScriptActor,
+  },
+  guards: {
+    hasErrors: ({ context }) => context.errors.length > 0,
+    // HACK
+    eventHasErrors: ({ event }) => {
+      if ("output" in event && Array.isArray(event.output)) {
+        return event.output.length > 0;
+      }
+      return false;
+    },
   },
 }).createMachine({
   id: "db-schema-codegen",
@@ -82,6 +102,10 @@ export const schemaCodegenMachine = setup({
     aiProvider: input.aiProvider || "openai",
     aiGatewayUrl: input.aiGatewayUrl,
     spec: input.spec,
+    projectDir: input.projectDir || process.cwd(),
+
+    fixAttempts: 0,
+
     schemaSpecification: "",
     relevantRules: [],
     dbSchemaTs: "",
@@ -102,6 +126,55 @@ export const schemaCodegenMachine = setup({
             spec: ({ event }) => event.spec,
           }),
         },
+        "download.template": {
+          target: "DownloadingTemplate",
+        },
+      },
+    },
+    DownloadingTemplate: {
+      entry: () =>
+        log("info", "Downloading template", { stage: "download-template" }),
+      invoke: {
+        id: "downloadTemplate",
+        src: "downloadTemplate",
+        input: ({ context }) => ({
+          projectDir: context.projectDir,
+        }),
+        onDone: {
+          target: "InstallingDependencies",
+        },
+        onError: {
+          target: "Failed",
+          actions: ({ event }) => {
+            log("error", "Failed to download template", { error: event.error });
+          },
+        },
+      },
+    },
+    InstallingDependencies: {
+      entry: () =>
+        log("info", "Installing dependencies", {
+          stage: "install-dependencies",
+        }),
+      invoke: {
+        id: "installDependencies",
+        src: "installDependencies",
+        input: ({ context }) => ({
+          projectDir: context.projectDir,
+          // TODO - Make this dynamic
+          packageManager: "npm",
+        }),
+        onDone: {
+          target: "AnalyzingTables",
+        },
+        onError: {
+          target: "Failed",
+          actions: ({ event }) => {
+            log("error", "Failed to install dependencies", {
+              error: event.error,
+            });
+          },
+        },
       },
     },
     AnalyzingTables: {
@@ -115,6 +188,8 @@ export const schemaCodegenMachine = setup({
           options: {
             specContent: context.spec,
           },
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "IdentifyingRules",
@@ -161,6 +236,8 @@ export const schemaCodegenMachine = setup({
            * NOTE - This `noop` flag skips rule selection from a knowledge base, since we don't have a knowledge base yet
            */
           noop: true,
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "GeneratingSchema",
@@ -202,7 +279,7 @@ export const schemaCodegenMachine = setup({
         onDone: {
           // target: "VerifyingSchema",
           // TODO - FIX THIS TRANSITION
-          target: "WaitingForErrors",
+          target: "SavingSchema",
           actions: assign({
             dbSchemaTs: ({ event }) => event.output?.dbSchemaTs || "",
           }),
@@ -217,27 +294,60 @@ export const schemaCodegenMachine = setup({
         },
       },
     },
+    SavingSchema: {
+      entry: () => log("info", "Saving schema", { stage: "save-schema" }),
+      invoke: {
+        id: "saveSchema",
+        src: "saveSchema",
+        input: ({ context }) => ({
+          projectDir: context.projectDir,
+          schema: context.dbSchemaTs,
+        }),
+        onDone: {
+          target: "CheckingTypescript",
+        },
+        onError: {
+          target: "Failed",
+        },
+      },
+    },
     // TODO - Can shell out to an actor that does typescript compilation here
     //        Then allow others to provide alternative implementations on derived machine instances
-    WaitingForErrors: {
+    CheckingTypescript: {
       entry: () =>
         log(
           "info",
           "Schema verification failed. Waiting for errors to analyze",
           { stage: "error-wait" },
         ),
-      on: {
-        "analyze.errors": {
-          target: "AnalyzingErrors",
-          actions: assign({
-            errors: ({ event }) => event.errors,
-          }),
-        },
+      invoke: {
+        id: "validateTypeScript",
+        src: "validateTypeScript",
+        input: ({ context }) => ({
+          projectDir: context.projectDir,
+        }),
+        onDone: [
+          {
+            target: "AnalyzingErrors",
+            guard: ({ event }) => event.output.length > 0,
+            actions: [
+              assign({
+                errors: ({ event }) => {
+                  return event.output;
+                },
+              }),
+            ],
+          },
+          {
+            target: "Success",
+          },
+        ],
       },
     },
     AnalyzingErrors: {
       entry: () =>
         log("info", "Analyzing schema errors", { stage: "error-analysis" }),
+
       invoke: {
         id: "analyzeSchemaErrors",
         src: "analyzeErrors",
@@ -268,7 +378,12 @@ export const schemaCodegenMachine = setup({
       },
     },
     FixingErrors: {
-      entry: () => log("info", "Fixing schema errors", { stage: "error-fix" }),
+      entry: [
+        () => log("info", "Fixing schema errors", { stage: "error-fix" }),
+        assign({
+          fixAttempts: ({ context }) => context.fixAttempts + 1,
+        }),
+      ],
       invoke: {
         id: "fixSchemaErrors",
         src: "fixSchema",
@@ -282,7 +397,7 @@ export const schemaCodegenMachine = setup({
         onDone: {
           // target: "VerifyingFixedSchema",
           // TODO - FIX THIS TRANSITION
-          target: "Success",
+          target: "SavingFixedSchema",
           actions: assign({
             fixedSchema: ({ event }) => event.output?.code || null,
           }),
@@ -299,7 +414,24 @@ export const schemaCodegenMachine = setup({
         },
       },
     },
-
+    SavingFixedSchema: {
+      entry: () =>
+        log("info", "Saving fixed schema", { stage: "save-fixed-schema" }),
+      invoke: {
+        id: "saveFixedSchema",
+        src: "saveSchema",
+        input: ({ context }) => ({
+          projectDir: context.projectDir,
+          schema: context.fixedSchema || context.dbSchemaTs,
+        }),
+        onDone: {
+          target: "Success",
+        },
+        onError: {
+          target: "Failed",
+        },
+      },
+    },
     Success: {
       type: "final",
       entry: () =>
