@@ -40,5 +40,5 @@ export const createLogger = (logsDir: string, machineName: string) => {
 
       previousState = snapshot.value;
     }
-  }
-}
+  };
+};

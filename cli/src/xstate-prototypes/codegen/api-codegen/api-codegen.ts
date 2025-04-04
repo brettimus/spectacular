@@ -29,7 +29,6 @@ interface ApiCodegenMachineContext {
   apiCode: string;
   projectDir: string;
 
-
   reasoning: string;
   errors: ErrorInfo[];
   errorAnalysis: ApiErrorAnalysisResult | null;
@@ -156,7 +155,9 @@ export const apiCodegenMachine = setup({
           {
             target: "FixingErrors",
             guard: ({ event }) => {
-              const apiErrors = event.output.filter((e: ErrorInfo) => e?.location?.includes("index.ts"));
+              const apiErrors = event.output.filter((e: ErrorInfo) =>
+                e?.location?.includes("index.ts"),
+              );
               return apiErrors.length > 0;
             },
             actions: [
@@ -165,7 +166,7 @@ export const apiCodegenMachine = setup({
                   return event.output;
                 },
               }),
-            ],           
+            ],
           },
           {
             target: "Success",
@@ -181,7 +182,9 @@ export const apiCodegenMachine = setup({
         onError: {
           target: "Failed",
           actions: ({ event }) => {
-            log("error", "Failed to validate TypeScript", { error: event.error });
+            log("error", "Failed to validate TypeScript", {
+              error: event.error,
+            });
           },
         },
       },
@@ -242,8 +245,7 @@ export const apiCodegenMachine = setup({
       },
     },
     SavingFixedApiIndex: {
-      entry: () =>
-        log("info", "Saving fixed API", { stage: "save-fixed-api" }),
+      entry: () => log("info", "Saving fixed API", { stage: "save-fixed-api" }),
       invoke: {
         id: "saveFixedApi",
         src: "saveApiIndex",

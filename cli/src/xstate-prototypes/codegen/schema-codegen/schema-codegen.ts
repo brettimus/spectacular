@@ -16,6 +16,8 @@ import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typech
 import { downloadTemplateActor } from "@/xstate-prototypes/download-template/download-template";
 import { installDependenciesActor } from "@/xstate-prototypes/download-template/install-dependencies";
 import { saveSchemaToDiskActor } from "./actors/save-schema-to-disk";
+import { getPackageManager } from "@/utils/package-manager";
+
 interface SchemaCodegenMachineInput {
   /** The API key to use for AI calls */
   apiKey: string;
@@ -82,7 +84,7 @@ export const schemaCodegenMachine = setup({
     analyzeErrors: analyzeErrorsActor,
     fixSchema: fixSchemaActor,
     validateTypeScript: validateTypeScriptActor,
-  }
+  },
 }).createMachine({
   id: "db-schema-codegen",
   description: "generate db/schema.ts file",
@@ -152,7 +154,7 @@ export const schemaCodegenMachine = setup({
         input: ({ context }) => ({
           projectDir: context.projectDir,
           // TODO - Make this dynamic
-          packageManager: "npm",
+          packageManager: getPackageManager() as "npm" | "yarn" | "pnpm",
         }),
         onDone: {
           target: "AnalyzingTables",
@@ -316,7 +318,9 @@ export const schemaCodegenMachine = setup({
           {
             target: "AnalyzingErrors",
             guard: ({ event }) => {
-              const schemaErrors = event.output.filter((e: ErrorInfo) => e?.location?.includes("schema.ts"));
+              const schemaErrors = event.output.filter((e: ErrorInfo) =>
+                e?.location?.includes("schema.ts"),
+              );
               return schemaErrors.length > 0;
             },
             actions: [

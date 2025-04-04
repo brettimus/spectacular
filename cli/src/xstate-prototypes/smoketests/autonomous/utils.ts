@@ -47,16 +47,19 @@ export function setUpLogsDir({
   if (!existsSync(logsDir)) {
     mkdirSync(logsDir, { recursive: true });
     console.log(`Created logs directory: ${logsDir}`);
-  } 
+  }
   return logsDir;
 }
 
 export function addTimestampToProjectDirName(projectDirName: string) {
   const timestamp = new Date().toISOString().replace(/[-:Z]/g, "");
-  const lastDotIndex = projectDirName.lastIndexOf('.');
-  
+  const lastDotIndex = projectDirName.lastIndexOf(".");
+
   // Always strip extension if present
-  const name = lastDotIndex === -1 ? projectDirName : projectDirName.substring(0, lastDotIndex);
+  const name =
+    lastDotIndex === -1
+      ? projectDirName
+      : projectDirName.substring(0, lastDotIndex);
   return `${timestamp}-${name}`;
 }
 

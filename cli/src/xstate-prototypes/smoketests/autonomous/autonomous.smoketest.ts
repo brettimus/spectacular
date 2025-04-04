@@ -1,7 +1,13 @@
 import { config } from "dotenv";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { addTimestampToProjectDirName, setUpLogsDir, setUpProjectDir, verifyCurrentDir, writeSpecToFile } from "./utils";
+import {
+  addTimestampToProjectDirName,
+  setUpLogsDir,
+  setUpProjectDir,
+  verifyCurrentDir,
+  writeSpecToFile,
+} from "./utils";
 import { createSpec } from "./create-spec";
 import { autoSpectacular } from "./auto-spectacular";
 

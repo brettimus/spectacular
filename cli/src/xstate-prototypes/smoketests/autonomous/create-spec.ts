@@ -33,7 +33,9 @@ type CreateSpecOptions = {
 
 // Schema remains the same
 const GeneratedSpecSchema = z.object({
-  projectDirName: z.string().describe("A valid unix style directory name for the project"),
+  projectDirName: z
+    .string()
+    .describe("A valid unix style directory name for the project"),
   spec: z
     .string()
     .describe(

@@ -28,9 +28,7 @@ export async function autoSpectacular({
     },
   });
 
-  schemaGeneratorActor.subscribe(
-    createLogger(logsDir, "schemaCodegenMachine"),
-  );
+  schemaGeneratorActor.subscribe(createLogger(logsDir, "schemaCodegenMachine"));
 
   schemaGeneratorActor.start();
 
@@ -45,12 +43,18 @@ export async function autoSpectacular({
   const finalState = schemaGeneratorActor.getSnapshot();
 
   if (!finalState.matches("Success")) {
-    console.error("Schema generation failed", JSON.stringify(finalState.toJSON(), null, 2));
+    console.error(
+      "Schema generation failed",
+      JSON.stringify(finalState.toJSON(), null, 2),
+    );
     throw new Error("Schema generation failed");
   }
 
   if (!finalState.output) {
-    console.error("Schema generation has no output", JSON.stringify(finalState.toJSON(), null, 2));
+    console.error(
+      "Schema generation has no output",
+      JSON.stringify(finalState.toJSON(), null, 2),
+    );
     throw new Error("Schema generation has no output");
   }
 
@@ -66,11 +70,13 @@ export async function autoSpectacular({
     },
   });
 
-  apiGeneratorActor.subscribe(
-    createLogger(logsDir, "apiCodegenMachine"),
-  );
+  apiGeneratorActor.subscribe(createLogger(logsDir, "apiCodegenMachine"));
 
   apiGeneratorActor.start();
 
-  apiGeneratorActor.send({ type: "generate.api", schema: schemaGenOutput.dbSchemaTs, spec });
+  apiGeneratorActor.send({
+    type: "generate.api",
+    schema: schemaGenOutput.dbSchemaTs,
+    spec,
+  });
 }
