@@ -1,5 +1,5 @@
 import { setup, assign } from "xstate";
-import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
+import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
   generateApiActor,

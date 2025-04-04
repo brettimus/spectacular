@@ -79,4 +79,21 @@ export async function autoSpectacular({
     schema: schemaGenOutput.dbSchemaTs,
     spec,
   });
+
+  // HACK - Await final state
+  await waitFor(apiGeneratorActor, (state) => {
+    return !!state.output || !!state.error;
+  });
+
+  const finalApiGeneratorState = apiGeneratorActor.getSnapshot();
+
+  console.log("Auto-spectacular completed, see:", projectDir);
+  
+  if (!finalApiGeneratorState.matches("Success")) {
+    console.error(
+      "API generation failed",
+      JSON.stringify(finalState.toJSON(), null, 2),
+    );
+    throw new Error("API generation failed");
+  }  
 }
