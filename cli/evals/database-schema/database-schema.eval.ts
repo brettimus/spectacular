@@ -1,6 +1,6 @@
 import path from "node:path";
 import { evalite } from "evalite";
-import { SchemaAgentService } from "../../src/agents/schema-agent";
+import { SchemaAgentService } from "../../src/deprecated-cli/agents/schema-agent";
 import {
   getEvalRunProjectDir,
   getProjectLogger,

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createScorer } from "evalite";
-import { validateTypeScript } from "../../../src/utils/typechecking";
+import { validateTypeScript } from "../../../src/deprecated-cli/utils/typechecking";
 import type { DatabaseSchemaEvalInput } from "../../database-schema";
 import {
   createNewProject,

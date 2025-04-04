@@ -16,7 +16,7 @@ if (!testSpec) {
 }
 
 const OPENAI_STRATEGY = {
-  modelName: "gpt-4o-mini",
+  modelName: "gpt-4o",
   modelProvider: "openai",
 } as const;
 
@@ -39,7 +39,7 @@ const GeneratedSpecSchema = z.object({
   spec: z
     .string()
     .describe(
-      "A detailed implementation plan / handoff document for a developer to implement the project (in markdown).",
+      "A CREATIVE AND NOVEL and detailed implementation plan / handoff document for a developer to implement the project (in markdown).",
     ),
 });
 
@@ -69,6 +69,15 @@ You should create a spec at random, but with the following constraints:
 
 - The spec is for a data api
 - Do not copy the example spec idea, try to think of a novel idea for a data api
+
+Create a spec that conforms to the following json shape:
+
+{
+  "projectDirName": "<project-dir-name>",
+  "spec": "<spec-content>"
+}
+
+IT IS VERY IMPORTANT THAT YOU RESPOND IN JSON. I AM TALKING TO YOU CLAUDE!!!!!!! DO NOT FUCK THIS UP.
 `;
 
 // TODO - Create a spec
@@ -82,7 +91,6 @@ export async function createSpec({
     model,
     system: SYSTEM_PROMPT,
     prompt: "Create a spec",
-    mode: "json",
     schema: GeneratedSpecSchema,
     temperature: 0.55,
   });

@@ -4,6 +4,7 @@
   "version": "0.0.13",
   "description": "An interactive CLI to iterate on project specifications with AI",
   "scripts": {
+    "print-package-manager": "tsx src/xstate-prototypes/smoketests/autonomous/print-package-manager.ts",
     "chat": "tsx src/xstate-prototypes/index.ts",
     "schemagen": "tsx src/xstate-prototypes/smoketests/schemagen.smoketest.ts",
     "autospectacular": "tsx src/xstate-prototypes/smoketests/autonomous/autonomous.smoketest.ts",

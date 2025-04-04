@@ -1,6 +1,3 @@
-import type { Context } from "@/context";
-import type { ErrorInfo } from "@/utils/typechecking/types";
-
 export interface ApiGenerationOptions {
   schema: string;
   spec: string;
@@ -28,33 +25,4 @@ export interface ApiErrorAnalysisResult {
 
 export interface ApiFixResult {
   code: string;
-}
-
-export interface ApiAgentInterface {
-  generateApiRoutes(
-    context: Context,
-    options: ApiGenerationOptions,
-  ): Promise<string>;
-
-  generateApiWithReasoning(
-    context: Context,
-    options: ApiGenerationOptions,
-  ): Promise<ApiGenerationResult>;
-
-  verifyApi(
-    context: Context,
-    options: ApiVerificationOptions,
-  ): Promise<ApiVerificationResult>;
-
-  analyzeApiErrors(
-    context: Context,
-    apiCode: string,
-    errors: ErrorInfo[],
-  ): Promise<ApiErrorAnalysisResult | null>;
-
-  fixApiErrors(
-    context: Context,
-    fixContent: string,
-    originalApiCode: string,
-  ): Promise<ApiFixResult | null>;
 }

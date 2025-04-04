@@ -1,6 +1,6 @@
 import { setup, assign } from "xstate";
-import type { ErrorInfo } from "@/utils/typechecking/types";
-import type { SelectedRule } from "@/agents/schema-agent/types";
+import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
+import type { SelectedRule } from "@/xstate-prototypes/ai/codegen/schema/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
   analyzeTablesActor,
@@ -16,7 +16,7 @@ import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typech
 import { downloadTemplateActor } from "@/xstate-prototypes/download-template/download-template";
 import { installDependenciesActor } from "@/xstate-prototypes/download-template/install-dependencies";
 import { saveSchemaToDiskActor } from "./actors/save-schema-to-disk";
-import { getPackageManager } from "@/utils/package-manager";
+import { getPackageManager } from "@/deprecated-cli/utils/package-manager";
 
 interface SchemaCodegenMachineInput {
   /** The API key to use for AI calls */
@@ -154,7 +154,11 @@ export const schemaCodegenMachine = setup({
         input: ({ context }) => ({
           projectDir: context.projectDir,
           // TODO - Make this dynamic
-          packageManager: getPackageManager() as "npm" | "yarn" | "pnpm",
+          packageManager: getPackageManager() as
+            | "npm"
+            | "yarn"
+            | "pnpm"
+            | "bun",
         }),
         onDone: {
           target: "AnalyzingTables",
@@ -395,8 +399,6 @@ export const schemaCodegenMachine = setup({
           },
         }),
         onDone: {
-          // target: "VerifyingFixedSchema",
-          // TODO - FIX THIS TRANSITION
           target: "SavingFixedSchema",
           actions: assign({
             fixedSchema: ({ event }) => event.output?.code || null,
@@ -436,23 +438,11 @@ export const schemaCodegenMachine = setup({
       type: "final",
       entry: () =>
         log("info", "Schema generation successful", { stage: "complete" }),
-      output: ({ context }) => ({
-        dbSchemaTs: context.dbSchemaTs,
-        valid: context.valid,
-        issues: context.issues,
-        suggestions: context.suggestions,
-      }),
     },
     FailedToFix: {
       type: "final",
       entry: () =>
         log("warn", "Failed to fix all schema errors", { stage: "failed-fix" }),
-      output: ({ context }) => ({
-        dbSchemaTs: context.fixedSchema || context.dbSchemaTs,
-        valid: false,
-        issues: context.issues,
-        suggestions: context.suggestions,
-      }),
     },
     Failed: {
       type: "final",

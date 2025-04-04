@@ -183,7 +183,6 @@ export async function generateSpec(
     model,
     system: IMPLEMENTATION_PLAN_SYSTEM_PROMPT,
     messages,
-    mode: "json",
     schema: GeneratedPlanSchema,
     temperature: 0.35,
   });

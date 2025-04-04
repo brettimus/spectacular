@@ -1,17 +1,19 @@
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 import type { SnapshotFrom } from "xstate";
+import pico from "picocolors";
 
 export const createLogger = (logsDir: string, machineName: string) => {
   let previousState: string | undefined;
 
   // biome-ignore lint/suspicious/noExplicitAny: Moving fast
   return (snapshot: SnapshotFrom<any>) => {
-    console.log(`=== Received ${machineName} snapshot ===`);
-    console.log(`-> ${machineName}.snapshot.value`, snapshot.value);
-
     if (previousState !== snapshot.value) {
-      console.log(`-> ${machineName}.transition`, snapshot.value);
+      if (!previousState) {
+        console.log(`[${machineName}] ${pico.green(machineName)}.transition`, snapshot.value);
+      } else {
+        console.log(`[${machineName}] ${pico.gray(previousState)} -> ${pico.green(snapshot.value)}`);
+      }
 
       // Save the state machine context to a file when there's a state transition
       const timestamp = new Date().toISOString().replace(/:/g, "-");
@@ -33,7 +35,6 @@ export const createLogger = (logsDir: string, machineName: string) => {
           stateTransitionFile,
           JSON.stringify(contextToSave, null, 2),
         );
-        console.log(`State transition saved to: ${stateTransitionFile}`);
       } catch (error) {
         console.error("Failed to save state transition:", error);
       }

@@ -1,5 +1,5 @@
 import { setup, assign } from "xstate";
-import type { ErrorInfo } from "@/utils/typechecking/types";
+import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
   generateApiActor,
@@ -99,6 +99,8 @@ export const apiCodegenMachine = setup({
             schema: context.schema,
             spec: context.spec,
           },
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "SavingApiIndex",
@@ -199,6 +201,8 @@ export const apiCodegenMachine = setup({
           apiKey: context.apiKey,
           apiCode: context.apiCode,
           errors: context.errors,
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "FixingErrors",
@@ -227,6 +231,8 @@ export const apiCodegenMachine = setup({
           apiKey: context.apiKey,
           fixContent: context.errorAnalysis?.text || "",
           originalApiCode: context.apiCode,
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "SavingFixedApiIndex",

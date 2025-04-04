@@ -10,25 +10,30 @@ import {
 } from "./utils";
 import { createSpec } from "./create-spec";
 import { autoSpectacular } from "./auto-spectacular";
+import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import { getAiConfig } from "./ai-config";
+import { initializeLogger } from "@/xstate-prototypes/utils/logging/logger";
+
+await initializeLogger();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 config();
 
-const API_KEY = process.env.OPENAI_API_KEY;
-const AI_PROVIDER = "openai";
+const AI_PROVIDER: FpModelProvider = "anthropic";
+const AI_CONFIG = getAiConfig(AI_PROVIDER);
+
 const cliProjectRoot = process.cwd();
 
-if (!API_KEY) {
-  throw new Error("AI provider API key is not set");
+if (!AI_CONFIG.apiKey) {
+  throw new Error(`AI provider (${AI_PROVIDER}) API key is not set`);
 }
 
 console.log("Creating spec");
-const specDetails = await createSpec({
-  apiKey: API_KEY,
-  aiProvider: AI_PROVIDER,
-});
+
+const specDetails = await createSpec(AI_CONFIG);
+
 console.log("Spec created");
 console.log(`specDetails.spec: ${specDetails.spec.slice(0, 100)}...\n\n`);
 console.log(`specDetails.projectDirName: ${specDetails.projectDirName}`);
@@ -55,8 +60,8 @@ writeSpecToFile({ projectDir, spec: specDetails.spec });
 const logsDir = setUpLogsDir({ projectDir });
 
 autoSpectacular({
-  apiKey: API_KEY,
-  aiProvider: AI_PROVIDER,
+  apiKey: AI_CONFIG.apiKey,
+  aiProvider: AI_CONFIG.aiProvider,
   spec: specDetails.spec,
   projectDir,
   logsDir,

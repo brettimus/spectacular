@@ -1,5 +1,9 @@
-import type { ErrorInfo } from "@/utils/typechecking/types";
-import type { SelectedRule } from "@/agents/schema-agent/types";
+import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
+
+export interface SelectedRule {
+  ruleName: string;
+  reason: string;
+}
 
 export interface SchemaAnalysisOptions {
   specContent: string;

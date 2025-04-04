@@ -10,7 +10,8 @@ const OPENAI_STRATEGY = {
 
 // TODO - Enable thinking?
 const ANTHROPIC_STRATEGY = {
-  modelName: "claude-3-7-sonnet-20250219",
+  // modelName: "claude-3-7-sonnet-20250219",
+  modelName: "claude-3-5-sonnet-20241022",
   modelProvider: "anthropic",
 } as const;
 
@@ -20,7 +21,7 @@ const ApiGenerationSchema = z.object({
   reasoning: z
     .string()
     .describe("Your step by step thought process for designing the api"),
-  indexTs: z.string().describe("The generated api routes file, in typescript"),
+  indexTs: z.string().describe("The generated api routes file, in typescript, THIS IS REQUIRED"),
 });
 
 // Keep prompts and examples within this module
@@ -229,6 +230,17 @@ Think step by step in this order:
 Things you usually screw up (things to avoid):
 - result of a d1 query with drizzle does not have a .changed property
 - do not include example code in the generated api routes file unless it is for unimplemented features
+
+IMPORTANT:
+
+THE RESPONSE SHOULD BE IN JSON LIKE THIS:
+
+{
+  "reasoning": "<reasoning>",
+  "indexTs": "<index.ts file content>"
+}
+
+YOU MUST RESPOND IN JSON. I AM TALKING TO YOU CLAUDE!!!!!!! DO NOT FUCK THIS UP.
 `.trim();
 
     log("debug", "Generating API with reasoning", { apiPlan, dbSchema });
@@ -237,7 +249,11 @@ Things you usually screw up (things to avoid):
       model,
       schema: ApiGenerationSchema,
       prompt: PROMPT,
-      temperature: 0.2,
+      ...(aiProvider === "openai" ? {
+        temperature: 0.2,
+      } : {
+        temperature: 0,
+      }),
       abortSignal: signal,
     });
 
@@ -248,7 +264,7 @@ Things you usually screw up (things to avoid):
 
     return {
       indexTs: result.object.indexTs,
-      reasoning: result.object.reasoning,
+      reasoning: "" // result.object.reasoning,
     };
   } catch (error) {
     log(

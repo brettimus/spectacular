@@ -1,6 +1,6 @@
 import path from "node:path";
 import { evalite } from "evalite";
-import { ApiAgentService } from "../../src/agents/api-agent";
+import { ApiAgentService } from "../../src/deprecated-cli/agents/api-agent";
 import { getEvalRunProjectDir, getProjectLogger } from "../runner-utils";
 import {
   getProjectNameFromSchemaFile,

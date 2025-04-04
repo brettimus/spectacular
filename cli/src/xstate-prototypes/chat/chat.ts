@@ -1,6 +1,6 @@
 import { appendResponseMessages, type Message } from "ai";
 import { setup, assign } from "xstate";
-import { pathFromInput } from "@/utils/utils";
+import { pathFromInput } from "@/deprecated-cli/utils/utils";
 
 import { routeRequestActor } from "./actors/router";
 import type { RouterResponse } from "./actors";

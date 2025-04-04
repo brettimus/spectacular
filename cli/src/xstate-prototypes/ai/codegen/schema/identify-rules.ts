@@ -1,7 +1,7 @@
 import { generateObject } from "ai";
 import { z } from "zod";
 import { aiModelFactory, type FpModelProvider } from "../../ai-model-factory";
-import type { SelectedRule } from "@/agents/schema-agent/types";
+import type { SelectedRule } from "./types";
 
 const OPENAI_STRATEGY = {
   modelName: "gpt-4o",

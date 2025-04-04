@@ -1,16 +1,16 @@
-import { runShell } from "@/utils";
+import { runShell } from "@/deprecated-cli/utils";
 import { fromPromise } from "xstate/actors";
 
 export const installDependenciesActor = fromPromise<
   void,
-  { projectDir: string; packageManager?: "npm" | "yarn" | "pnpm" }
+  { projectDir: string; packageManager?: "npm" | "yarn" | "pnpm" | "bun" }
 >(async ({ input: { projectDir, packageManager = "npm" } }) => {
   await installDependencies(projectDir, packageManager);
 });
 
 export async function installDependencies(
   projectDir: string,
-  packageManager: "npm" | "yarn" | "pnpm",
+  packageManager: "npm" | "yarn" | "pnpm" | "bun",
 ): Promise<void> {
   if (!projectDir) {
     console.error("Project directory is not defined");

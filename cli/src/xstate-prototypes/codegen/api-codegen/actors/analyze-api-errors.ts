@@ -3,7 +3,7 @@ import {
   analyzeApiErrors,
   type ApiErrorAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/api/analyze-api-errors";
-import type { ErrorInfo } from "@/utils/typechecking/types";
+import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
 import type { FpModelProvider } from "@/xstate-prototypes/ai";
 
 /**

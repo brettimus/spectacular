@@ -4,7 +4,7 @@ import type {
   TypescriptErrorAnalysisOptions,
   SchemaErrorAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
-import type { ErrorInfo } from "@/utils/typechecking/types";
+import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
 import { aiModelFactory, type FpModelProvider } from "../../ai-model-factory";
 import { createOpenAI } from "@ai-sdk/openai";
 
