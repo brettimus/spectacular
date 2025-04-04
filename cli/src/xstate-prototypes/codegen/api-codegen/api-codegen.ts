@@ -1,19 +1,19 @@
 import { setup, assign } from "xstate";
-import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import {
-  generateApiActor,
-  analyzeApiErrorsActor,
-  fixApiErrorsActor,
-  type AnalyzeApiErrorsResult,
-} from "./actors";
 import {
   DEFAULT_AI_PROVIDER,
   type FpAiConfig,
   type FpModelProvider,
 } from "@/xstate-prototypes/ai";
-import { saveApiIndexToDiskActor } from "./actors/save-api-index-to-disk";
 import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typecheck";
+import type { ErrorInfo } from "@/xstate-prototypes/typechecking";
+import {
+  generateApiActor,
+  analyzeApiErrorsActor,
+  fixApiErrorsActor,
+  saveApiIndexToDiskActor,
+  type AnalyzeApiErrorsResult,
+} from "./actors";
 
 interface ApiCodegenMachineInput {
   apiKey: string;
