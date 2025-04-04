@@ -3,7 +3,7 @@ import type { ErrorInfo } from "@/utils/typechecking/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
   generateApiActor,
-  verifyApiActor,
+  // verifyApiActor,
   analyzeApiErrorsActor,
   fixApiErrorsActor,
   // type ApiGenerationResult,
@@ -12,6 +12,7 @@ import {
   // type ApiFixResult
 } from "./actors";
 import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import { saveApiIndexToDiskActor } from "./actors/save-api-index-to-disk";
 
 interface ApiCodegenMachineInput {
   apiKey: string;
@@ -19,13 +20,19 @@ interface ApiCodegenMachineInput {
   aiGatewayUrl?: string;
   schema?: string;
   spec?: string;
+  projectDir: string;
 }
 
 interface ApiCodegenMachineContext {
   apiKey: string;
+  aiProvider?: FpModelProvider;
+  aiGatewayUrl?: string;
   schema: string;
   spec: string;
   apiCode: string;
+  projectDir: string;
+
+
   reasoning: string;
   errors: ErrorInfo[];
   errorAnalysis: ApiErrorAnalysisResult | null;
@@ -47,9 +54,10 @@ export const apiCodegenMachine = setup({
   },
   actors: {
     generateApi: generateApiActor,
-    verifyApi: verifyApiActor,
+    // verifyApi: verifyApiActor,
     analyzeApiErrors: analyzeApiErrorsActor,
     fixApiErrors: fixApiErrorsActor,
+    saveApiIndex: saveApiIndexToDiskActor,
   },
 }).createMachine({
   id: "api-codegen",
@@ -61,6 +69,10 @@ export const apiCodegenMachine = setup({
       input.spec ||
       "Create a simple REST API with CRUD operations for all tables in the schema.",
     apiCode: "",
+    projectDir: input.projectDir,
+    aiProvider: input.aiProvider,
+    aiGatewayUrl: input.aiGatewayUrl,
+
     reasoning: "",
     errors: [],
     errorAnalysis: null,
@@ -109,46 +121,7 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-    VerifyingApi: {
-      entry: () => log("info", "Verifying API code", { stage: "verification" }),
-      invoke: {
-        id: "verifyApi",
-        src: "verifyApi",
-        input: ({ context }) => ({
-          apiKey: context.apiKey,
-          options: {
-            schema: context.schema,
-            apiCode: context.apiCode,
-          },
-        }),
-        onDone: [
-          {
-            target: "Success",
-            guard: ({ event }) => event.output?.valid === true,
-            actions: assign({
-              valid: ({ event }) => event.output?.valid || false,
-              issues: ({ event }) => event.output?.issues || [],
-            }),
-          },
-          {
-            target: "WaitingForErrors",
-            guard: ({ event }) => event.output?.valid !== true,
-            actions: assign({
-              valid: ({ event }) => event.output?.valid || false,
-              issues: ({ event }) => event.output?.issues || [],
-            }),
-          },
-        ],
-        onError: {
-          target: "Failed",
-          actions: ({ event }) => {
-            if (event.error) {
-              log("error", "Failed to verify API", { error: event.error });
-            }
-          },
-        },
-      },
-    },
+
     WaitingForErrors: {
       entry: () =>
         log("info", "API verification failed. Waiting for errors to analyze", {
@@ -218,59 +191,59 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-    VerifyingFixedApi: {
-      entry: () =>
-        log("info", "Verifying fixed API code", {
-          stage: "verification-fixed",
-        }),
-      invoke: {
-        id: "verifyFixedApi",
-        src: "verifyApi",
-        input: ({ context }) => ({
-          apiKey: context.apiKey,
-          options: {
-            schema: context.schema,
-            apiCode: context.fixedApiCode || context.apiCode,
-          },
-        }),
-        onDone: [
-          {
-            target: "Success",
-            guard: ({ event }) => event.output?.valid === true,
-            actions: [
-              assign({
-                valid: ({ event }) => event.output?.valid || false,
-                issues: ({ event }) => event.output?.issues || [],
-                apiCode: ({ context }) =>
-                  context.fixedApiCode || context.apiCode,
-              }),
-              () =>
-                log("info", "API code fixed and verified", {
-                  stage: "success",
-                }),
-            ],
-          },
-          {
-            target: "FailedToFix",
-            guard: ({ event }) => event.output?.valid !== true,
-            actions: assign({
-              valid: ({ event }) => event.output?.valid || false,
-              issues: ({ event }) => event.output?.issues || [],
-            }),
-          },
-        ],
-        onError: {
-          target: "Failed",
-          actions: ({ event }) => {
-            if (event.error) {
-              log("error", "Failed to verify fixed API", {
-                error: event.error,
-              });
-            }
-          },
-        },
-      },
-    },
+    // VerifyingFixedApi: {
+    //   entry: () =>
+    //     log("info", "Verifying fixed API code", {
+    //       stage: "verification-fixed",
+    //     }),
+    //   invoke: {
+    //     id: "verifyFixedApi",
+    //     src: "verifyApi",
+    //     input: ({ context }) => ({
+    //       apiKey: context.apiKey,
+    //       options: {
+    //         schema: context.schema,
+    //         apiCode: context.fixedApiCode || context.apiCode,
+    //       },
+    //     }),
+    //     onDone: [
+    //       {
+    //         target: "Success",
+    //         guard: ({ event }) => event.output?.valid === true,
+    //         actions: [
+    //           assign({
+    //             valid: ({ event }) => event.output?.valid || false,
+    //             issues: ({ event }) => event.output?.issues || [],
+    //             apiCode: ({ context }) =>
+    //               context.fixedApiCode || context.apiCode,
+    //           }),
+    //           () =>
+    //             log("info", "API code fixed and verified", {
+    //               stage: "success",
+    //             }),
+    //         ],
+    //       },
+    //       {
+    //         target: "FailedToFix",
+    //         guard: ({ event }) => event.output?.valid !== true,
+    //         actions: assign({
+    //           valid: ({ event }) => event.output?.valid || false,
+    //           issues: ({ event }) => event.output?.issues || [],
+    //         }),
+    //       },
+    //     ],
+    //     onError: {
+    //       target: "Failed",
+    //       actions: ({ event }) => {
+    //         if (event.error) {
+    //           log("error", "Failed to verify fixed API", {
+    //             error: event.error,
+    //           });
+    //         }
+    //       },
+    //     },
+    //   },
+    // },
     FailedToFix: {
       entry: () =>
         log("warn", "Failed to fix API errors. Manual intervention required.", {

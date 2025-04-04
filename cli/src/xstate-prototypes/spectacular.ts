@@ -103,6 +103,7 @@ export const spectacularMachine = setup({
           apiKey: context.apiKey,
           schema: context.dbSchemaTs,
           spec: context.spec,
+          projectDir: context.projectDir,
         }),
         onDone: {
           target: "Done",
