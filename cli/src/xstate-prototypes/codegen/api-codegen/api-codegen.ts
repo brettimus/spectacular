@@ -37,6 +37,14 @@ interface ApiCodegenMachineContext {
   issues: string[];
 }
 
+interface ApiCodegenMachineOutput {
+  apiCode: string;
+  reasoning: string;
+  errors: ErrorInfo[];
+  errorAnalysis: ApiErrorAnalysisResult | null;
+  fixedApiCode: string | null;
+}
+
 export const apiCodegenMachine = setup({
   types: {
     context: {} as ApiCodegenMachineContext,
@@ -47,6 +55,7 @@ export const apiCodegenMachine = setup({
       | { type: "analyze.errors"; errors: ErrorInfo[] }
       | { type: "fix.errors" }
       | { type: "regenerate.api" },
+    output: {} as ApiCodegenMachineOutput,
   },
   actors: {
     generateApi: generateApiActor,
@@ -291,4 +300,11 @@ export const apiCodegenMachine = setup({
       entry: () => log("error", "API generation failed", { stage: "failed" }),
     },
   },
+  output: ({ context }) => ({
+    apiCode: context.apiCode,
+    reasoning: context.reasoning,
+    errors: context.errors,
+    errorAnalysis: context.errorAnalysis,
+    fixedApiCode: context.fixedApiCode,
+  }),
 });
