@@ -1,6 +1,5 @@
 import { appendResponseMessages, type Message } from "ai";
 import { setup, assign } from "xstate";
-import { pathFromInput } from "@/xstate-prototypes/utils";
 import {
   generateSpecActor,
   askNextQuestionActor,
@@ -16,6 +15,7 @@ import {
 import { createUserMessage } from "../utils";
 import type { FpAiConfig, FpModelProvider } from "../ai";
 import { DEFAULT_AI_PROVIDER } from "../ai";
+import { pathFromInput } from "../utils";
 
 interface ChatMachineInput {
   apiKey: string;
