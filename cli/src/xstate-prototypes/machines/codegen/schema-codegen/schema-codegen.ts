@@ -17,11 +17,11 @@ import {
 import {
   validateTypeScriptActor,
   type ErrorInfo,
-} from "@/xstate-prototypes/typechecking";
+} from "@/xstate-prototypes/machines/typechecking";
 import {
   downloadTemplateActor,
   installDependenciesActor,
-} from "@/xstate-prototypes/download-template";
+} from "@/xstate-prototypes/machines/download-template";
 import { saveSchemaToDiskActor } from "./actors";
 import { getPackageManager } from "@/xstate-prototypes/utils";
 

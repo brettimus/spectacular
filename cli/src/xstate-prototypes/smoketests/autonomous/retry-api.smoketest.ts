@@ -8,7 +8,7 @@ import { initializeLogger } from "@/xstate-prototypes/utils/logging/logger";
 import { readFileSync } from "node:fs";
 import { createActor } from "xstate";
 import { createLogger } from "./logger";
-import { apiCodegenMachine } from "@/xstate-prototypes/codegen/api-codegen/api-codegen";
+import { apiCodegenMachine } from "@/xstate-prototypes/machines/codegen/api-codegen/api-codegen";
 
 await initializeLogger();
 

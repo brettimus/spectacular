@@ -1,6 +1,6 @@
 import { createActor, waitFor } from "xstate";
-import { schemaCodegenMachine } from "../../codegen/schema-codegen/schema-codegen";
-import { apiCodegenMachine } from "../../codegen/api-codegen/api-codegen";
+import { schemaCodegenMachine } from "../../machines/codegen/schema-codegen/schema-codegen";
+import { apiCodegenMachine } from "../../machines/codegen/api-codegen/api-codegen";
 import { createLogger } from "./logger";
 import type { FpModelProvider } from "../../ai";
 

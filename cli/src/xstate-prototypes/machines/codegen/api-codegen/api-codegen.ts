@@ -5,8 +5,8 @@ import {
   type FpAiConfig,
   type FpModelProvider,
 } from "@/xstate-prototypes/ai";
-import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typecheck";
-import type { ErrorInfo } from "@/xstate-prototypes/typechecking";
+import { validateTypeScriptActor } from "@/xstate-prototypes/machines/typechecking/typecheck";
+import type { ErrorInfo } from "@/xstate-prototypes/machines/typechecking";
 import {
   generateApiActor,
   analyzeApiErrorsActor,

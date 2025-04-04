@@ -5,17 +5,19 @@ import {
   askNextQuestionActor,
   saveSpecToDiskActor,
   routeRequestActor,
+  type RouterResponse,
 } from "./actors";
-import type { RouterResponse } from "./actors";
 import {
   aiTextStreamMachine,
   type AiTextStreamResult,
   type AiResponseMessage,
 } from "../streaming";
-import { createUserMessage } from "../utils";
-import type { FpAiConfig, FpModelProvider } from "../ai";
-import { DEFAULT_AI_PROVIDER } from "../ai";
-import { pathFromInput } from "../utils";
+import {
+  DEFAULT_AI_PROVIDER,
+  type FpAiConfig,
+  type FpModelProvider,
+} from "../../ai";
+import { createUserMessage, pathFromInput } from "../../utils";
 
 interface ChatMachineInput {
   apiKey: string;

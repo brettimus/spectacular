@@ -3,8 +3,8 @@ import { spinner, text, log, stream, isCancel } from "@clack/prompts";
 import pico from "picocolors";
 import type { Message } from "ai";
 import { config } from "dotenv";
-import { chatMachine } from "../chat";
-import type { AiTextStreamResult } from "../streaming/types";
+import { chatMachine } from "@/xstate-prototypes/machines/chat";
+import type { AiTextStreamResult } from "@/xstate-prototypes/machines/streaming";
 
 config();
 

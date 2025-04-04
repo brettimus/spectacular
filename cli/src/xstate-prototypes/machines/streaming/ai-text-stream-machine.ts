@@ -1,6 +1,6 @@
 import { setup, assign } from "xstate";
 import { consumeStreamActor } from "./consume-stream";
-import { normalizeError } from "../utils";
+import { normalizeError } from "../../utils";
 import type { AiTextStreamResult, AiResponseMessage } from "./types";
 import type { CancelEvent, ChunkEvent } from "./events";
 

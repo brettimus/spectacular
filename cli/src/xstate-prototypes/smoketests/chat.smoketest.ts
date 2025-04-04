@@ -1,6 +1,6 @@
 import { createActor } from "xstate";
 import { config } from "dotenv";
-import { chatMachine } from "../chat";
+import { chatMachine } from "../machines/chat";
 
 config();
 

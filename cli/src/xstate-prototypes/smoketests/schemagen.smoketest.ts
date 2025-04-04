@@ -1,5 +1,5 @@
 import { createActor } from "xstate";
-import { schemaCodegenMachine } from "../codegen/schema-codegen/schema-codegen";
+import { schemaCodegenMachine } from "../machines/codegen/schema-codegen/schema-codegen";
 import { config } from "dotenv";
 import { readFileSync } from "node:fs";
 import path, { dirname } from "node:path";

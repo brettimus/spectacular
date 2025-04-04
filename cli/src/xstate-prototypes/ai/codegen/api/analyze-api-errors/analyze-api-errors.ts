@@ -2,7 +2,7 @@ import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { aiModelFactory } from "../../../ai-model-factory";
-import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
+import type { ErrorInfo } from "@/xstate-prototypes/machines/typechecking/types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 

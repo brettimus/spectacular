@@ -1,7 +1,7 @@
 import { setup, assign } from "xstate";
-import { chatMachine } from "./chat/chat";
-import { schemaCodegenMachine } from "./codegen/schema-codegen/schema-codegen";
-import { apiCodegenMachine } from "./codegen/api-codegen/api-codegen";
+import { chatMachine } from "./machines/chat/chat";
+import { schemaCodegenMachine } from "./machines/codegen/schema-codegen/schema-codegen";
+import { apiCodegenMachine } from "./machines/codegen/api-codegen/api-codegen";
 import type { Message } from "ai";
 
 interface SpectacularMachineInput {
