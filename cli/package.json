@@ -11,7 +11,6 @@
     "dev": "node ./scripts/dev-deprecated.mjs",
     "dev:init": "pnpm dev",
     "dev:xstate:inspect": "vite --config vite.ui.config.ts",
-    "clear-fix-tracking": "pnpm build && node dist/index.js autogander:clear",
     "eval:dev": "evalite watch",
     "eval:db:schema": "evalite evals/database-schema/database-schema.eval.ts",
     "eval:db:schema:watch": "evalite watch evals/database-schema/database-schema.eval.ts",
@@ -22,13 +21,12 @@
     "clean": "rimraf dist",
     "clean:test-apps": "rimraf test-apps/* && touch test-apps/.gitkeep",
     "prepublishOnly": "pnpm build",
-    "test": "vitest",
-    "test:typechecking:manual": "tsx src/utils/typechecking/manual-test.ts"
+    "test": "vitest"
   },
   "exports": "./dist/index.js",
   "files": ["dist", "README.md", "LICENSE", ".gitignore"],
   "bin": {
-    "spectacular": "dist/index.js",
+    "spectacular": "dist/deprecated-cli.js",
     "spectacular-machine": "dist/machines/commands/cli-entry.js"
   },
   "author": "Fiberplane<info@fiberplane.com>",
