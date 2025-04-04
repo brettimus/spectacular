@@ -3,6 +3,7 @@ export const ANTHROPIC_STRATEGY = {
   modelProvider: "anthropic",
   temperature: 0.5,
   getSystemPrompt,
+  getTools: () => undefined,
 } as const;
 
 function getSystemPrompt() {

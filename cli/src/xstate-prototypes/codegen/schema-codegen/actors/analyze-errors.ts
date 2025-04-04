@@ -3,7 +3,7 @@ import type {
   TypescriptErrorAnalysisOptions,
   SchemaErrorAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
-import { analyzeErrors } from "@/xstate-prototypes/ai/codegen/schema/analyze-errors";
+import { analyzeErrors } from "@/xstate-prototypes/ai/codegen/schema/analyze-schema-errors";
 import type { FpModelProvider } from "@/xstate-prototypes/ai";
 
 export const analyzeErrorsActor = fromPromise<

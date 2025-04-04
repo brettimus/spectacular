@@ -9,14 +9,13 @@ import {
   aiModelFactory,
   type FpModelProvider,
 } from "../../../ai-model-factory";
-import { createOpenAI } from "@ai-sdk/openai";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 /**
  * Analyze schema errors using AI
  */
-export async function analyzeErrors(
+export async function analyzeSchemaErrors(
   apiKey: string,
   options: TypescriptErrorAnalysisOptions,
   signal?: AbortSignal,
@@ -26,7 +25,7 @@ export async function analyzeErrors(
   const { schemaSpecification, schema, errors } = options;
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
-    const { temperature } = getStrategyForProvider(aiProvider);
+    const { temperature, getTools } = getStrategyForProvider(aiProvider);
 
     log("debug", "Analyzing schema errors", {
       errorsCount: errors.length,
@@ -44,15 +43,7 @@ export async function analyzeErrors(
       prompt,
       temperature,
       // HACK - Conditionally add web search tools based on the model type and provider
-      tools:
-        model.provider === "openai"
-          ? {
-              web_search_preview: createOpenAI({
-                apiKey,
-                baseURL: aiGatewayUrl,
-              }).tools.webSearchPreview(),
-            }
-          : undefined,
+      tools: getTools(apiKey, aiGatewayUrl),
       abortSignal: signal,
     });
 
@@ -70,7 +61,7 @@ export async function analyzeErrors(
       "error",
       error instanceof Error
         ? error
-        : new Error("Unknown error in analyze errors"),
+        : new Error("Unknown error while analyzing schema errors"),
     );
     return null;
   }
@@ -108,10 +99,12 @@ function getStrategyForProvider(aiProvider: FpModelProvider) {
     case "openai":
       return {
         temperature: OPENAI_STRATEGY.temperature,
+        getTools: OPENAI_STRATEGY.getTools,
       };
     case "anthropic":
       return {
         temperature: ANTHROPIC_STRATEGY.temperature,
+        getTools: ANTHROPIC_STRATEGY.getTools,
       };
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);

@@ -1,5 +1,5 @@
 export { generateSchema } from "./generate-schema";
-export { analyzeErrors } from "./analyze-errors";
+export { analyzeErrors } from "./analyze-schema-errors";
 export { fixSchema } from "./fix-schema";
 export { identifyRules } from "./identify-rules";
 export { analyzeTables } from "./analyze-tables";

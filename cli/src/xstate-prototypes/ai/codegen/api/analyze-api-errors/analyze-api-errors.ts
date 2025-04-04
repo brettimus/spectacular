@@ -1,4 +1,3 @@
-import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { FpModelProvider } from "../../../ai-model-factory";
@@ -30,7 +29,7 @@ export async function analyzeApiErrors(
 ): Promise<ApiErrorAnalysisResult | null> {
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
-    const { temperature } = getStrategyForProvider(aiProvider);
+    const { temperature, getTools } = getStrategyForProvider(aiProvider);
 
     log("debug", "Analyzing API errors", {
       errorsCount: errors.length,
@@ -43,14 +42,7 @@ export async function analyzeApiErrors(
       model,
       prompt,
       temperature,
-      // Assuming tools might vary based on provider/model
-      tools: {
-        // TODO - Need to configure this based on the model provider!!!
-        web_search_preview: createOpenAI({
-          apiKey,
-          baseURL: aiGatewayUrl,
-        }).tools.webSearchPreview(),
-      },
+      tools: getTools(apiKey, aiGatewayUrl),
       abortSignal: signal,
     });
 
@@ -105,10 +97,12 @@ function getStrategyForProvider(aiProvider: FpModelProvider) {
     case "openai":
       return {
         temperature: OPENAI_STRATEGY.temperature,
+        getTools: OPENAI_STRATEGY.getTools,
       };
     case "anthropic":
       return {
         temperature: ANTHROPIC_STRATEGY.temperature,
+        getTools: ANTHROPIC_STRATEGY.getTools,
       };
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);

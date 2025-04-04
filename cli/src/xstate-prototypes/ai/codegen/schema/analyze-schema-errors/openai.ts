@@ -15,7 +15,6 @@ export const OPENAI_STRATEGY = {
     };
   },
 } as const;
-
 function getSystemPrompt() {
   return "";
 }
