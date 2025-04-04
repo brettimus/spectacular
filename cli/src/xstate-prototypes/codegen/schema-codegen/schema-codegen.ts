@@ -362,6 +362,8 @@ export const schemaCodegenMachine = setup({
             schema: context.dbSchemaTs,
             errors: context.errors,
           },
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "FixingErrors",
@@ -397,6 +399,8 @@ export const schemaCodegenMachine = setup({
             fixContent: context.errorAnalysis?.text || "",
             originalSchema: context.dbSchemaTs,
           },
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "SavingFixedSchema",

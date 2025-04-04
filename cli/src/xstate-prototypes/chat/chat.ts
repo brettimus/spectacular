@@ -131,6 +131,8 @@ const chatMachine = setup({
         input: ({ context }) => ({
           apiKey: context.apiKey,
           messages: context.messages,
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: [
           {
@@ -162,6 +164,8 @@ const chatMachine = setup({
         input: ({ context }) => ({
           apiKey: context.apiKey,
           messages: context.messages,
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "ProcessingAiResponse",
@@ -204,6 +208,8 @@ const chatMachine = setup({
         input: ({ context }) => ({
           apiKey: context.apiKey,
           messages: context.messages,
+          aiProvider: context.aiProvider,
+          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           actions: [
