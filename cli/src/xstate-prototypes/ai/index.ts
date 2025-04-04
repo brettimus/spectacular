@@ -13,6 +13,8 @@ export {
   generateSpec,
   GeneratedPlanSchema,
   type GeneratedPlan,
+  routeRequest,
+  type RouterResponse,
 } from "./chat";
 
 // TODO - Implement rule identification

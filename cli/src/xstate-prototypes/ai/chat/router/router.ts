@@ -5,18 +5,14 @@ import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 import { aiModelFactory } from "../../ai-model-factory";
 
-export type RouterResponse = {
-  nextStep: "ask_follow_up_question" | "generate_implementation_plan";
-  reasoning: string;
-};
-
-// Schema remains the same
-const RouterSchema = z.object({
+const RouteRequestResponseSchema = z.object({
   reasoning: z
     .string()
     .describe("A brief explanation of your reasoning for the classification."),
   nextStep: z.enum(["ask_follow_up_question", "generate_implementation_plan"]),
 });
+
+export type RouterResponse = z.infer<typeof RouteRequestResponseSchema>;
 
 export type RouteRequestOptions = {
   messages: Message[];
@@ -33,7 +29,7 @@ export async function routeRequest(
 
   const { object: classification } = await generateObject({
     model,
-    schema: RouterSchema,
+    schema: RouteRequestResponseSchema,
     messages: options.messages,
     system: getSystemPrompt(),
     temperature,

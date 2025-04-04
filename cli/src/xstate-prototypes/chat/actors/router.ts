@@ -4,10 +4,13 @@ import type { Message } from "ai";
 import {
   routeRequest,
   type RouterResponse,
-} from "@/xstate-prototypes/ai/chat/router";
-import type { FpAiConfig } from "@/xstate-prototypes/ai";
+  type FpAiConfig,
+} from "@/xstate-prototypes/ai";
 
+// Re-exporting these types because they are used by the main machine
+// and it makes sense to have them in the same file as the actor
 export type { RouterResponse };
+export type RouterResponseType = RouterResponse["nextStep"];
 
 export const routeRequestActor = fromPromise<
   RouterResponse,
