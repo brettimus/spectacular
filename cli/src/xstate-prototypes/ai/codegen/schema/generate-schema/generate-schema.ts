@@ -4,8 +4,8 @@ import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { SchemaGenerationOptions, SchemaGenerationResult } from "../types";
 import {
   aiModelFactory,
-  type FpModelProvider,
 } from "../../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
@@ -13,13 +13,12 @@ import { ANTHROPIC_STRATEGY } from "./anthropic";
  * Generate Drizzle ORM schema using AI
  */
 export async function generateSchema(
-  apiKey: string,
+  aiConfig: FpAiConfig,
   options: SchemaGenerationOptions,
   signal?: AbortSignal,
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
 ): Promise<SchemaGenerationResult> {
   try {
+    const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
     const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 

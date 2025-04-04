@@ -7,7 +7,7 @@ import {
   fixApiErrorsActor,
   type ApiErrorAnalysisResult,
 } from "./actors";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import { DEFAULT_AI_PROVIDER, type FpAiConfig, type FpModelProvider } from "@/xstate-prototypes/ai";
 import { saveApiIndexToDiskActor } from "./actors/save-api-index-to-disk";
 import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typecheck";
 
@@ -21,9 +21,7 @@ interface ApiCodegenMachineInput {
 }
 
 interface ApiCodegenMachineContext {
-  apiKey: string;
-  aiProvider?: FpModelProvider;
-  aiGatewayUrl?: string;
+  aiConfig: FpAiConfig;
   schema: string;
   spec: string;
   apiCode: string;
@@ -68,15 +66,17 @@ export const apiCodegenMachine = setup({
   id: "api-codegen",
   initial: "Idle",
   context: ({ input }) => ({
-    apiKey: input.apiKey,
+    aiConfig: {
+      apiKey: input.apiKey,
+      aiProvider: input.aiProvider ?? DEFAULT_AI_PROVIDER,
+      aiGatewayUrl: input.aiGatewayUrl,
+    },
     schema: input.schema || "",
     spec:
       input.spec ||
       "Create a simple REST API with CRUD operations for all tables in the schema.",
     apiCode: "",
     projectDir: input.projectDir,
-    aiProvider: input.aiProvider,
-    aiGatewayUrl: input.aiGatewayUrl,
 
     reasoning: "",
     errors: [],
@@ -103,13 +103,11 @@ export const apiCodegenMachine = setup({
         id: "generateApi",
         src: "generateApi",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           options: {
             schema: context.schema,
             spec: context.spec,
           },
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "SavingApiIndex",
@@ -207,11 +205,9 @@ export const apiCodegenMachine = setup({
         id: "analyzeApiErrors",
         src: "analyzeApiErrors",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           apiCode: context.apiCode,
           errors: context.errors,
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "FixingErrors",
@@ -237,11 +233,9 @@ export const apiCodegenMachine = setup({
         id: "fixApiErrors",
         src: "fixApiErrors",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           fixContent: context.errorAnalysis?.text || "",
           originalApiCode: context.apiCode,
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "SavingFixedApiIndex",

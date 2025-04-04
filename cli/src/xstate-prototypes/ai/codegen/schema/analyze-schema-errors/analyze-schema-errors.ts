@@ -7,8 +7,9 @@ import type {
 import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
 import {
   aiModelFactory,
-  type FpModelProvider,
 } from "../../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../../types";
+
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
@@ -16,12 +17,11 @@ import { ANTHROPIC_STRATEGY } from "./anthropic";
  * Analyze schema errors using AI
  */
 export async function analyzeSchemaErrors(
-  apiKey: string,
+  aiConfig: FpAiConfig,
   options: TypescriptErrorAnalysisOptions,
   signal?: AbortSignal,
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
 ): Promise<SchemaErrorAnalysisResult | null> {
+  const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
   const { schemaSpecification, schema, errors } = options;
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);

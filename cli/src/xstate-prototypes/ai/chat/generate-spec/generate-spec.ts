@@ -1,7 +1,7 @@
 import type { Message } from "ai";
 import { generateObject } from "ai";
 import { z } from "zod";
-import type { FpModelProvider } from "../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../types";
 import { aiModelFactory } from "../../ai-model-factory";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
@@ -18,21 +18,26 @@ export const GeneratedPlanSchema = z.object({
 
 export type GeneratedPlan = z.infer<typeof GeneratedPlanSchema>;
 
+export type GenerateSpecOptions = {
+  messages: Message[];
+}
+
 export async function generateSpec(
-  apiKey: string,
-  messages: Message[],
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
+  aiConfig: FpAiConfig,
+  options: GenerateSpecOptions,
+  signal?: AbortSignal,
 ): Promise<GeneratedPlan> {
+  const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
   const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
   const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 
   const result = await generateObject({
     model,
     system: getSystemPrompt(),
-    messages,
+    messages: options.messages,
     schema: GeneratedPlanSchema,
     temperature,
+    abortSignal: signal,
   });
 
   return result.object;

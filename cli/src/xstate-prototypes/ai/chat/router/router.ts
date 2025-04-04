@@ -1,8 +1,9 @@
 import { generateObject, type Message } from "ai";
 import { z } from "zod";
-import { aiModelFactory, type FpModelProvider } from "../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
+import { aiModelFactory } from "../../ai-model-factory";
 
 export type RouterResponse = {
   nextStep: "ask_follow_up_question" | "generate_implementation_plan";
@@ -17,20 +18,23 @@ const RouterSchema = z.object({
   nextStep: z.enum(["ask_follow_up_question", "generate_implementation_plan"]),
 });
 
+export type RouteRequestOptions = {
+  messages: Message[];
+}
+
 export async function routeRequest(
-  apiKey: string,
-  messages: Message[],
+  aiConfig: FpAiConfig,
+  options: RouteRequestOptions,
   signal?: AbortSignal,
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
 ): Promise<RouterResponse> {
+  const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
   const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
   const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 
   const { object: classification } = await generateObject({
     model,
     schema: RouterSchema,
-    messages: messages,
+    messages: options.messages,
     system: getSystemPrompt(),
     temperature,
     abortSignal: signal,

@@ -3,8 +3,8 @@ import { z } from "zod";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
   aiModelFactory,
-  type FpModelProvider,
 } from "../../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
@@ -94,21 +94,25 @@ const getCommonHonoMistakes = () => {
 `;
 };
 
+export type GenerateApiOptions = {
+  spec: string;
+  schema: string;
+}
+
 /**
  * Generate API code using AI
  */
 export async function generateApi(
-  apiKey: string,
-  spec: string,
-  schema: string,
+  aiConfig: FpAiConfig,
+  options: GenerateApiOptions,
   signal?: AbortSignal,
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
 ): Promise<ApiGenerationResult> {
   try {
+    const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
     const { temperature, getSystemPrompt } = getStrategyForProvider(aiProvider);
 
+    const { spec, schema } = options;
     const dbSchema = schema;
     const apiPlan =
       spec ||

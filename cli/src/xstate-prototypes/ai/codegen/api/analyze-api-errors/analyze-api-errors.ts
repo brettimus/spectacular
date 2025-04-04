@@ -1,36 +1,39 @@
 import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { FpModelProvider } from "../../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
-// Infer the sources type from the generateText return type
+// Infer the `sources` type from the generateText return type
 type GenerateTextReturnType = Awaited<ReturnType<typeof generateText>>;
 type SourcesType = GenerateTextReturnType["sources"];
 
-// Result type remains the same, using any for sources type for now
 export type ApiErrorAnalysisResult = {
   text: string;
-  sources: SourcesType; // Use the inferred type
+  sources: SourcesType;
 };
+
+export type AnalyzeApiErrorsOptions = {
+  apiCode: string;
+  errors: ErrorInfo[];
+}
 
 /**
  * Analyze API errors using AI
  */
 export async function analyzeApiErrors(
-  apiKey: string,
-  apiCode: string,
-  errors: ErrorInfo[],
+  aiConfig: FpAiConfig,
+  options: AnalyzeApiErrorsOptions,
   signal?: AbortSignal,
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
 ): Promise<ApiErrorAnalysisResult | null> {
   try {
+    const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
     const { temperature, getTools } = getStrategyForProvider(aiProvider);
 
+    const { apiCode, errors } = options;
     log("debug", "Analyzing API errors", {
       errorsCount: errors.length,
       apiCodeLength: apiCode.length,

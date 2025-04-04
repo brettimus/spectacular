@@ -4,22 +4,18 @@ import type {
   SchemaGenerationResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
 import { generateSchema } from "@/xstate-prototypes/ai/codegen/schema/generate-schema";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 export const generateSchemaActor = fromPromise<
   SchemaGenerationResult,
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     options: SchemaGenerationOptions;
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
 >(({ input, signal }) =>
   generateSchema(
-    input.apiKey,
+    input.aiConfig,
     input.options,
     signal,
-    input.aiProvider,
-    input.aiGatewayUrl,
   ),
 );

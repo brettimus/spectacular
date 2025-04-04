@@ -1,24 +1,30 @@
 import { streamText } from "ai";
 import type { Message } from "ai";
-import { aiModelFactory, type FpModelProvider } from "../../ai-model-factory";
+import { aiModelFactory } from "../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 import { ollama } from "ollama-ai-provider";
 
+export type AskNextQuestionOptions = {
+  messages: Message[];
+}
+
 export async function askNextQuestion(
-  apiKey: string,
-  messages: Message[],
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
+  aiConfig: FpAiConfig,
+  options: AskNextQuestionOptions,
+  signal?: AbortSignal,
 ) {
+  const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
   const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
   const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 
   return streamText({
     model,
     system: getSystemPrompt(),
-    messages,
+    messages: options.messages,
     temperature,
+    abortSignal: signal,
   });
 }
 

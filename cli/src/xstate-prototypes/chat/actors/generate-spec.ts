@@ -5,7 +5,7 @@ import {
   type GeneratedPlan,
   GeneratedPlanSchema,
 } from "@/xstate-prototypes/ai/chat/generate-spec";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 // Re-exporting schema for backwards compatibility within this module
 export { GeneratedPlanSchema, type GeneratedPlan };
@@ -13,17 +13,9 @@ export { GeneratedPlanSchema, type GeneratedPlan };
 export const generateSpecActor = fromPromise<
   GeneratedPlan,
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     messages: Message[];
-    // Add new optional inputs
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
->(async ({ input }) => {
-  return generateSpec(
-    input.apiKey,
-    input.messages,
-    input.aiProvider,
-    input.aiGatewayUrl,
-  );
+>(async ({ input, signal }) => {
+  return generateSpec(input.aiConfig, { messages: input.messages }, signal);
 });

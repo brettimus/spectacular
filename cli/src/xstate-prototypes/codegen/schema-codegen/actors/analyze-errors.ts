@@ -4,22 +4,18 @@ import type {
   SchemaErrorAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
 import { analyzeErrors } from "@/xstate-prototypes/ai/codegen/schema/analyze-schema-errors";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 export const analyzeErrorsActor = fromPromise<
   SchemaErrorAnalysisResult | null,
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     options: TypescriptErrorAnalysisOptions;
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
 >(({ input, signal }) =>
   analyzeErrors(
-    input.apiKey,
+    input.aiConfig,
     input.options,
     signal,
-    input.aiProvider,
-    input.aiGatewayUrl,
   ),
 );

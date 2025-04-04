@@ -10,7 +10,7 @@ import {
   fixSchemaActor,
 } from "./actors";
 import type { SchemaErrorAnalysisResult } from "@/xstate-prototypes/ai/codegen/schema/types";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import { DEFAULT_AI_PROVIDER, type FpAiConfig, type FpModelProvider } from "@/xstate-prototypes/ai";
 import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typecheck";
 import { downloadTemplateActor } from "@/xstate-prototypes/download-template/download-template";
 import { installDependenciesActor } from "@/xstate-prototypes/download-template/install-dependencies";
@@ -31,9 +31,7 @@ interface SchemaCodegenMachineInput {
 }
 
 interface SchemaCodegenMachineContext {
-  apiKey: string;
-  aiProvider: FpModelProvider;
-  aiGatewayUrl?: string;
+  aiConfig: FpAiConfig;
   spec: string;
   projectDir: string;
 
@@ -88,9 +86,11 @@ export const schemaCodegenMachine = setup({
   description: "generate db/schema.ts file",
   initial: "Idle",
   context: ({ input }) => ({
-    apiKey: input.apiKey,
-    aiProvider: input.aiProvider || "openai",
-    aiGatewayUrl: input.aiGatewayUrl,
+    aiConfig: {
+      apiKey: input.apiKey,
+      aiProvider: input.aiProvider || DEFAULT_AI_PROVIDER,
+      aiGatewayUrl: input.aiGatewayUrl,
+    },
     spec: input.spec,
     projectDir: input.projectDir || process.cwd(),
 
@@ -178,12 +178,10 @@ export const schemaCodegenMachine = setup({
         id: "analyzeTables",
         src: "analyzeTables",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           options: {
             specContent: context.spec,
           },
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "IdentifyingRules",
@@ -224,14 +222,13 @@ export const schemaCodegenMachine = setup({
         id: "identifyRules",
         src: "identifyRules",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           schemaSpecification: context.schemaSpecification,
           /**
-           * NOTE - This `noop` flag skips rule selection from a knowledge base, since we don't have a knowledge base yet
+           * NOTE - This `noop` flag skips rule selection from a knowledge base
+           *        since we don't have a knowledge base yet.
            */
           noop: true,
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "GeneratingSchema",
@@ -262,13 +259,11 @@ export const schemaCodegenMachine = setup({
         id: "generateSchema",
         src: "generateSchema",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           options: {
             schemaSpecification: context.schemaSpecification,
             relevantRules: context.relevantRules,
           },
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "SavingSchema",
@@ -354,14 +349,12 @@ export const schemaCodegenMachine = setup({
         id: "analyzeSchemaErrors",
         src: "analyzeErrors",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           options: {
             schemaSpecification: context.schemaSpecification,
             schema: context.dbSchemaTs,
             errors: context.errors,
           },
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "FixingErrors",
@@ -392,13 +385,11 @@ export const schemaCodegenMachine = setup({
         id: "fixSchemaErrors",
         src: "fixSchema",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           options: {
             fixContent: context.errorAnalysis?.text || "",
             originalSchema: context.dbSchemaTs,
           },
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "SavingFixedSchema",

@@ -4,25 +4,23 @@ import {
   type ApiGenerationResult,
 } from "@/xstate-prototypes/ai/codegen/api/generate-api";
 import type { ApiGenerationOptions } from "./types";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 export type { ApiGenerationOptions, ApiGenerationResult };
 
 export const generateApiActor = fromPromise<
   ApiGenerationResult,
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     options: ApiGenerationOptions;
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
 >(({ input, signal }) =>
   generateApi(
-    input.apiKey,
-    input.options.spec,
-    input.options.schema,
+    input.aiConfig,
+    {
+      spec: input.options.spec,
+      schema: input.options.schema,
+    },
     signal,
-    input.aiProvider,
-    input.aiGatewayUrl,
   ),
 );

@@ -4,7 +4,7 @@ import type {
   SchemaAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
 import { analyzeTables } from "@/xstate-prototypes/ai/codegen/schema/analyze-tables";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 /**
  * Analyze tables from specification using AI
@@ -12,17 +12,13 @@ import type { FpModelProvider } from "@/xstate-prototypes/ai";
 export const analyzeTablesActor = fromPromise<
   SchemaAnalysisResult,
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     options: SchemaAnalysisOptions;
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
 >(({ input, signal }) =>
   analyzeTables(
-    input.apiKey,
+    input.aiConfig,
     input.options,
     signal,
-    input.aiProvider,
-    input.aiGatewayUrl,
   ),
 );

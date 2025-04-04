@@ -1,6 +1,6 @@
 import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { FpModelProvider } from "../../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { aiModelFactory } from "../../../ai-model-factory";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
@@ -9,6 +9,11 @@ export type ApiFixResult = {
   code: string;
 };
 
+export type FixApiErrorsOptions = {
+  fixContent: string;
+  originalApiCode: string;
+}
+
 /**
  * Generate a fixed API code based on the analysis results
  *
@@ -16,17 +21,16 @@ export type ApiFixResult = {
  *        so we just use generateText
  */
 export async function fixApiErrors(
-  apiKey: string,
-  fixContent: string,
-  originalApiCode: string,
+  aiConfig: FpAiConfig,
+  options: FixApiErrorsOptions,
   signal?: AbortSignal,
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
 ): Promise<ApiFixResult | null> {
   try {
+    const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
     const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 
+    const { fixContent, originalApiCode } = options;
     log("debug", "Fixing API errors", {
       fixContentLength: fixContent.length,
       originalApiCodeLength: originalApiCode.length,
@@ -60,15 +64,15 @@ Return only the fixed code. It should be valid TypeScript code. DO NOT INCLUDE A
         },
       ],
       temperature,
-      // Provider options like prediction removed as they are specific to the original implementation context
-      // providerOptions: {
-      //   openai: {
-      //     prediction: {
-      //       type: "content",
-      //       content: originalApiCode,
-      //     }
-      //   }
-      // },
+      // TODO - Only use this for openai
+      providerOptions: {
+        openai: {
+          prediction: {
+            type: "content",
+            content: originalApiCode,
+          }
+        }
+      },
       abortSignal: signal,
     });
 

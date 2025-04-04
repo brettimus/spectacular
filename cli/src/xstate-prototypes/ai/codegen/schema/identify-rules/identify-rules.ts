@@ -2,26 +2,30 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import {
   aiModelFactory,
-  type FpModelProvider,
 } from "../../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../../types";
 import type { SelectedRule } from "../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
+
+export type IdentifyRulesOptions = {
+  schemaSpecification: string;
+}
 
 /**
  * Identify relevant rules from schema specification using AI
  */
 export async function identifyRules(
-  apiKey: string,
-  schemaSpecification: string,
+  aiConfig: FpAiConfig,
+  options: IdentifyRulesOptions,
   noop: boolean,
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
   signal?: AbortSignal,
 ): Promise<{ relevantRules: SelectedRule[] }> {
   if (noop) {
     return { relevantRules: [] };
   }
+  const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
+  const { schemaSpecification } = options;
 
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);

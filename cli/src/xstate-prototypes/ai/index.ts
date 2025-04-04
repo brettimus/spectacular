@@ -1,4 +1,9 @@
 export { aiModelFactory } from "./ai-model-factory";
-export type { FpModelDetails, FpModelProvider } from "./ai-model-factory";
+export type { FpModelDetails, FpModelProvider, FpAiConfig } from "./types";
+export { DEFAULT_AI_PROVIDER } from "./constants";
+// TODO - Finish exports
+//
 export { askNextQuestion } from "./chat";
-export { identifyRules } from "./codegen/schema/identify-rules";
+// TODO - Implement rule identification
+//
+export { identifyRules } from "./codegen/schema/identify-rules/identify-rules";

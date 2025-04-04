@@ -4,7 +4,7 @@ import type {
   SchemaFixResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
 import { fixSchema as fixSchemaAi } from "@/xstate-prototypes/ai/codegen/schema/fix-schema";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 /**
  * Fix schema errors using AI
@@ -12,17 +12,13 @@ import type { FpModelProvider } from "@/xstate-prototypes/ai";
 export const fixSchemaActor = fromPromise<
   SchemaFixResult | null,
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     options: SchemaFixOptions;
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
 >(({ input, signal }) =>
   fixSchemaAi(
-    input.apiKey,
+    input.aiConfig,
     input.options,
     signal,
-    input.aiProvider,
-    input.aiGatewayUrl,
   ),
 );

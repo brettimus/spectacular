@@ -7,8 +7,8 @@ import type {
 } from "@/xstate-prototypes/ai/codegen/schema/types";
 import {
   aiModelFactory,
-  type FpModelProvider,
 } from "../../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
@@ -30,13 +30,12 @@ const SchemaAnalysisOutputSchema = z.object({
  * Analyze tables from specification using AI
  */
 export async function analyzeTables(
-  apiKey: string,
+  aiConfig: FpAiConfig,
   options: SchemaAnalysisOptions,
   signal?: AbortSignal,
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
 ): Promise<SchemaAnalysisResult> {
   try {
+    const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
     const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 

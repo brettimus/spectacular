@@ -1,21 +1,21 @@
 import { appendResponseMessages, type Message } from "ai";
 import { setup, assign } from "xstate";
 import { pathFromInput } from "@/xstate-prototypes/utils";
-
-import { routeRequestActor } from "./actors/router";
-import type { RouterResponse } from "./actors";
 import {
   generateSpecActor,
   askNextQuestionActor,
   saveSpecToDiskActor,
+  routeRequestActor,
 } from "./actors";
+import type { RouterResponse } from "./actors";
 import {
   aiTextStreamMachine,
   type AiTextStreamResult,
   type AiResponseMessage,
 } from "../streaming";
 import { createUserMessage } from "../utils";
-import type { FpModelProvider } from "../ai";
+import type { FpAiConfig, FpModelProvider } from "../ai";
+import { DEFAULT_AI_PROVIDER } from "../ai";
 
 interface ChatMachineInput {
   apiKey: string;
@@ -25,9 +25,7 @@ interface ChatMachineInput {
 }
 
 export interface ChatMachineContext {
-  apiKey: string;
-  aiProvider: FpModelProvider;
-  aiGatewayUrl?: string;
+  aiConfig: FpAiConfig;
   messages: Message[];
   cwd: string;
   spec: string | null;
@@ -94,9 +92,11 @@ const chatMachine = setup({
     "A chat agent that ideates on a software project idea to produce a spec",
   initial: "AwaitingUserInput",
   context: ({ input }) => ({
-    apiKey: input.apiKey,
-    aiProvider: input.aiProvider ?? "openai",
-    aiGatewayUrl: input.aiGatewayUrl,
+    aiConfig: {
+      apiKey: input.apiKey,
+      aiProvider: input.aiProvider ?? DEFAULT_AI_PROVIDER,
+      aiGatewayUrl: input.aiGatewayUrl,
+    },
     messages: [],
     cwd: input.cwd,
     spec: null,
@@ -129,10 +129,8 @@ const chatMachine = setup({
         id: "routeRequest",
         src: "routeRequest",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           messages: context.messages,
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: [
           {
@@ -162,10 +160,8 @@ const chatMachine = setup({
         id: "askNextQuestion",
         src: "askNextQuestion",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           messages: context.messages,
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           target: "ProcessingAiResponse",
@@ -206,10 +202,8 @@ const chatMachine = setup({
         id: "generateSpec",
         src: "generateSpec",
         input: ({ context }) => ({
-          apiKey: context.apiKey,
+          aiConfig: context.aiConfig,
           messages: context.messages,
-          aiProvider: context.aiProvider,
-          aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
           actions: [

@@ -4,7 +4,7 @@ import {
   type ApiErrorAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/api/analyze-api-errors";
 import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 /**
  * Analyze API errors using AI
@@ -12,19 +12,17 @@ import type { FpModelProvider } from "@/xstate-prototypes/ai";
 export const analyzeApiErrorsActor = fromPromise<
   ApiErrorAnalysisResult | null,
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     apiCode: string;
     errors: ErrorInfo[];
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
 >(({ input, signal }) =>
   analyzeApiErrors(
-    input.apiKey,
-    input.apiCode,
-    input.errors,
+    input.aiConfig,
+    {
+      apiCode: input.apiCode,
+      errors: input.errors,
+    },
     signal,
-    input.aiProvider,
-    input.aiGatewayUrl,
   ),
 );

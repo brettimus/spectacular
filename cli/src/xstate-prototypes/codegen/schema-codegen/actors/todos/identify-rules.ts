@@ -1,26 +1,23 @@
 import { fromPromise } from "xstate";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { SelectedRule } from "@/xstate-prototypes/ai/codegen/schema/types";
-import { identifyRules as identifyRulesAi } from "@/xstate-prototypes/ai/codegen/schema/identify-rules";
-import type { FpModelProvider } from "@/xstate-prototypes/ai/ai-model-factory";
+import { identifyRules as identifyRulesAi } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 export const identifyRulesActor = fromPromise<
   { relevantRules: SelectedRule[] },
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     schemaSpecification: string;
     noop: boolean;
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
 >(async ({ input, signal }) => {
   const {
-    apiKey,
+    aiConfig,
     schemaSpecification,
-    noop,
-    aiProvider = "openai",
-    aiGatewayUrl,
+    noop: isNoop,
   } = input;
+
 
   try {
     log("debug", "Identifying rules for schema", {
@@ -28,11 +25,11 @@ export const identifyRulesActor = fromPromise<
     });
 
     const result = await identifyRulesAi(
-      apiKey,
-      schemaSpecification,
-      noop,
-      aiProvider,
-      aiGatewayUrl,
+      aiConfig,
+      {
+        schemaSpecification,
+      },
+      isNoop,
       signal,
     );
 

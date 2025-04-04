@@ -3,24 +3,22 @@ import {
   fixApiErrors,
   type ApiFixResult,
 } from "@/xstate-prototypes/ai/codegen/api/fix-api";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 export const fixApiErrorsActor = fromPromise<
   ApiFixResult | null,
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     fixContent: string;
     originalApiCode: string;
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
 >(({ input, signal }) =>
   fixApiErrors(
-    input.apiKey,
-    input.fixContent,
-    input.originalApiCode,
+    input.aiConfig,
+    {
+      fixContent: input.fixContent,
+      originalApiCode: input.originalApiCode,
+    },
     signal,
-    input.aiProvider,
-    input.aiGatewayUrl,
   ),
 );

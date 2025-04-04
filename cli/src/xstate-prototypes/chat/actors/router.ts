@@ -5,24 +5,16 @@ import {
   routeRequest,
   type RouterResponse,
 } from "@/xstate-prototypes/ai/chat/router";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpAiConfig } from "@/xstate-prototypes/ai";
 
 export type { RouterResponse };
 
 export const routeRequestActor = fromPromise<
   RouterResponse,
   {
-    apiKey: string;
+    aiConfig: FpAiConfig;
     messages: Message[];
-    aiProvider?: FpModelProvider;
-    aiGatewayUrl?: string;
   }
 >(async ({ input, signal }) => {
-  return routeRequest(
-    input.apiKey,
-    input.messages,
-    signal,
-    input.aiProvider,
-    input.aiGatewayUrl,
-  );
+  return routeRequest(input.aiConfig, { messages: input.messages }, signal);
 });
