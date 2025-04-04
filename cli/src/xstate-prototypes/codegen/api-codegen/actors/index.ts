@@ -1,5 +1,7 @@
-// Export all actors and types
-export { analyzeApiErrorsActor } from "./analyze-api-errors";
+export {
+  analyzeApiErrorsActor,
+  type AnalyzeApiErrorsResult,
+} from "./analyze-api-errors";
 export { fixApiErrorsActor } from "./fix-api";
 export { generateApiActor } from "./generate-api";
-export type { ApiErrorAnalysisResult } from "./types";
+export { saveApiIndexToDiskActor } from "./save-api-index-to-disk";

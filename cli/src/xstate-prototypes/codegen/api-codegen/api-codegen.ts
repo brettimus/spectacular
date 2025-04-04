@@ -5,7 +5,7 @@ import {
   generateApiActor,
   analyzeApiErrorsActor,
   fixApiErrorsActor,
-  type ApiErrorAnalysisResult,
+  type AnalyzeApiErrorsResult,
 } from "./actors";
 import {
   DEFAULT_AI_PROVIDER,
@@ -33,7 +33,7 @@ interface ApiCodegenMachineContext {
 
   reasoning: string;
   errors: ErrorInfo[];
-  errorAnalysis: ApiErrorAnalysisResult | null;
+  errorAnalysis: AnalyzeApiErrorsResult | null;
   fixedApiCode: string | null;
   valid: boolean;
   issues: string[];
@@ -43,7 +43,7 @@ interface ApiCodegenMachineOutput {
   apiCode: string;
   reasoning: string;
   errors: ErrorInfo[];
-  errorAnalysis: ApiErrorAnalysisResult | null;
+  errorAnalysis: AnalyzeApiErrorsResult | null;
   fixedApiCode: string | null;
 }
 
