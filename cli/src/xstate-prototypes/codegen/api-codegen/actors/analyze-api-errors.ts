@@ -1,16 +1,16 @@
 import { fromPromise } from "xstate";
 import {
   analyzeApiErrors,
-  type ApiErrorAnalysisResult,
-} from "@/xstate-prototypes/ai/codegen/api/analyze-api-errors";
-import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
-import type { FpAiConfig } from "@/xstate-prototypes/ai";
+  type AnalyzeApiErrorsResult,
+  type FpAiConfig,
+} from "@/xstate-prototypes/ai";
+import type { ErrorInfo } from "@/xstate-prototypes/typechecking";
 
 /**
  * Analyze API errors using AI
  */
 export const analyzeApiErrorsActor = fromPromise<
-  ApiErrorAnalysisResult | null,
+  AnalyzeApiErrorsResult | null,
   {
     aiConfig: FpAiConfig;
     apiCode: string;

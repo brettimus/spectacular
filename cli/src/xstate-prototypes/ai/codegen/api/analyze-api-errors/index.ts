@@ -1,4 +1,4 @@
 export {
   analyzeApiErrors,
-  type ApiErrorAnalysisResult,
+  type AnalyzeApiErrorsResult,
 } from "./analyze-api-errors";

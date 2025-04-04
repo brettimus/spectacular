@@ -10,7 +10,7 @@ import { ANTHROPIC_STRATEGY } from "./anthropic";
 type GenerateTextReturnType = Awaited<ReturnType<typeof generateText>>;
 type SourcesType = GenerateTextReturnType["sources"];
 
-export type ApiErrorAnalysisResult = {
+export type AnalyzeApiErrorsResult = {
   text: string;
   sources: SourcesType;
 };
@@ -27,7 +27,7 @@ export async function analyzeApiErrors(
   aiConfig: FpAiConfig,
   options: AnalyzeApiErrorsOptions,
   signal?: AbortSignal,
-): Promise<ApiErrorAnalysisResult | null> {
+): Promise<AnalyzeApiErrorsResult | null> {
   try {
     const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);

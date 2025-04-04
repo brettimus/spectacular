@@ -5,7 +5,14 @@ export type {
   AnalyzeTablesResult,
   AnalyzeTablesOptions,
 } from "./codegen/schema";
-
+export {
+  generateApi,
+  type ApiGenerationResult,
+  analyzeApiErrors,
+  type AnalyzeApiErrorsResult,
+  fixApiErrors,
+  type ApiFixResult,
+} from "./codegen/api";
 // TODO - Finish exports
 //
 export {
