@@ -2,5 +2,4 @@
 export { analyzeApiErrorsActor } from "./analyze-api-errors";
 export { fixApiErrorsActor } from "./fix-api";
 export { generateApiActor } from "./generate-api";
-export { verifyApiActor } from "./verify-api";
 export type { ApiErrorAnalysisResult } from "./types";

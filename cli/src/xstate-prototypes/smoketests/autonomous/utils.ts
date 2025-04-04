@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import { mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
 
@@ -9,12 +9,12 @@ export function verifyCurrentDir({
   cliProjectRoot: string;
   __dirname: string;
 }) {
-  if (cliProjectRoot !== path.join(__dirname, "..", "..", "..")) {
+  if (cliProjectRoot !== path.join(__dirname, "..", "..", "..", "..")) {
     console.log("cliProjectRoot", cliProjectRoot);
     console.log("__dirname", __dirname);
     console.log(
-      "path.join(__dirname, '..', '..', '..')",
-      path.join(__dirname, "..", "..", ".."),
+      "path.join(__dirname, '..', '..', '..', '..')",
+      path.join(__dirname, "..", "..", "..", ".."),
     );
     throw new Error("Something is unexpected about the cwd");
   }
@@ -49,4 +49,24 @@ export function setUpLogsDir({
     console.log(`Created logs directory: ${logsDir}`);
   } 
   return logsDir;
+}
+
+export function addTimestampToProjectDirName(projectDirName: string) {
+  const timestamp = new Date().toISOString().replace(/[-:Z]/g, "");
+  const lastDotIndex = projectDirName.lastIndexOf('.');
+  
+  // Always strip extension if present
+  const name = lastDotIndex === -1 ? projectDirName : projectDirName.substring(0, lastDotIndex);
+  return `${timestamp}-${name}`;
+}
+
+export function writeSpecToFile({
+  projectDir,
+  spec,
+}: {
+  projectDir: string;
+  spec: string;
+}) {
+  const specFilePath = path.join(projectDir, "spec.md");
+  writeFileSync(specFilePath, spec);
 }

@@ -3,16 +3,13 @@ import type { ErrorInfo } from "@/utils/typechecking/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
   generateApiActor,
-  // verifyApiActor,
   analyzeApiErrorsActor,
   fixApiErrorsActor,
-  // type ApiGenerationResult,
-  // type ApiVerificationResult,
   type ApiErrorAnalysisResult,
-  // type ApiFixResult
 } from "./actors";
 import type { FpModelProvider } from "@/xstate-prototypes/ai";
 import { saveApiIndexToDiskActor } from "./actors/save-api-index-to-disk";
+import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typecheck";
 
 interface ApiCodegenMachineInput {
   apiKey: string;
@@ -54,10 +51,10 @@ export const apiCodegenMachine = setup({
   },
   actors: {
     generateApi: generateApiActor,
-    // verifyApi: verifyApiActor,
+    saveApiIndex: saveApiIndexToDiskActor,
+    validateTypeScript: validateTypeScriptActor,
     analyzeApiErrors: analyzeApiErrorsActor,
     fixApiErrors: fixApiErrorsActor,
-    saveApiIndex: saveApiIndexToDiskActor,
   },
 }).createMachine({
   id: "api-codegen",
@@ -105,7 +102,7 @@ export const apiCodegenMachine = setup({
           },
         }),
         onDone: {
-          target: "VerifyingApi",
+          target: "SavingApiIndex",
           actions: assign({
             apiCode: ({ event }) => event.output?.indexTs || "",
             reasoning: ({ event }) => event.output?.reasoning || "",
@@ -121,18 +118,71 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-
-    WaitingForErrors: {
-      entry: () =>
-        log("info", "API verification failed. Waiting for errors to analyze", {
-          stage: "error-wait",
+    SavingApiIndex: {
+      entry: () => log("info", "Saving API index", { stage: "saving" }),
+      invoke: {
+        id: "saveApiIndex",
+        src: "saveApiIndex",
+        input: ({ context }) => ({
+          projectDir: context.projectDir,
+          indexTs: context.apiCode,
         }),
-      on: {
-        "analyze.errors": {
+        onDone: {
           target: "AnalyzingErrors",
-          actions: assign({
-            errors: ({ event }) => event.errors,
-          }),
+        },
+        onError: {
+          target: "Failed",
+          actions: ({ event }) => {
+            log("error", "Failed to save API index", { error: event.error });
+          },
+        },
+      },
+    },
+
+    CheckingTypescript: {
+      entry: () =>
+        log(
+          "info",
+          "Schema verification failed. Waiting for errors to analyze",
+          { stage: "error-wait" },
+        ),
+      invoke: {
+        id: "validateTypeScript",
+        src: "validateTypeScript",
+        input: ({ context }) => ({
+          projectDir: context.projectDir,
+        }),
+        onDone: [
+          {
+            target: "FixingErrors",
+            guard: ({ event }) => {
+              const apiErrors = event.output.filter((e: ErrorInfo) => e?.location?.includes("index.ts"));
+              return apiErrors.length > 0;
+            },
+            actions: [
+              assign({
+                errors: ({ event }) => {
+                  return event.output;
+                },
+              }),
+            ],           
+          },
+          {
+            target: "Success",
+            actions: [
+              assign({
+                errors: ({ event }) => {
+                  return event.output;
+                },
+              }),
+            ],
+          },
+        ],
+        onError: {
+          target: "Failed",
+          actions: ({ event }) => {
+            log("error", "Failed to validate TypeScript", { error: event.error });
+          },
         },
       },
     },
@@ -176,7 +226,7 @@ export const apiCodegenMachine = setup({
           originalApiCode: context.apiCode,
         }),
         onDone: {
-          target: "VerifyingFixedApi",
+          target: "SavingFixedApiIndex",
           actions: assign({
             fixedApiCode: ({ event }) => event.output?.code || null,
           }),
@@ -191,59 +241,25 @@ export const apiCodegenMachine = setup({
         },
       },
     },
-    // VerifyingFixedApi: {
-    //   entry: () =>
-    //     log("info", "Verifying fixed API code", {
-    //       stage: "verification-fixed",
-    //     }),
-    //   invoke: {
-    //     id: "verifyFixedApi",
-    //     src: "verifyApi",
-    //     input: ({ context }) => ({
-    //       apiKey: context.apiKey,
-    //       options: {
-    //         schema: context.schema,
-    //         apiCode: context.fixedApiCode || context.apiCode,
-    //       },
-    //     }),
-    //     onDone: [
-    //       {
-    //         target: "Success",
-    //         guard: ({ event }) => event.output?.valid === true,
-    //         actions: [
-    //           assign({
-    //             valid: ({ event }) => event.output?.valid || false,
-    //             issues: ({ event }) => event.output?.issues || [],
-    //             apiCode: ({ context }) =>
-    //               context.fixedApiCode || context.apiCode,
-    //           }),
-    //           () =>
-    //             log("info", "API code fixed and verified", {
-    //               stage: "success",
-    //             }),
-    //         ],
-    //       },
-    //       {
-    //         target: "FailedToFix",
-    //         guard: ({ event }) => event.output?.valid !== true,
-    //         actions: assign({
-    //           valid: ({ event }) => event.output?.valid || false,
-    //           issues: ({ event }) => event.output?.issues || [],
-    //         }),
-    //       },
-    //     ],
-    //     onError: {
-    //       target: "Failed",
-    //       actions: ({ event }) => {
-    //         if (event.error) {
-    //           log("error", "Failed to verify fixed API", {
-    //             error: event.error,
-    //           });
-    //         }
-    //       },
-    //     },
-    //   },
-    // },
+    SavingFixedApiIndex: {
+      entry: () =>
+        log("info", "Saving fixed API", { stage: "save-fixed-api" }),
+      invoke: {
+        id: "saveFixedApi",
+        src: "saveApiIndex",
+        input: ({ context }) => ({
+          projectDir: context.projectDir,
+          // TODO - fixme
+          indexTs: context.fixedApiCode || context.apiCode,
+        }),
+        onDone: {
+          target: "Success",
+        },
+        onError: {
+          target: "Failed",
+        },
+      },
+    },
     FailedToFix: {
       entry: () =>
         log("warn", "Failed to fix API errors. Manual intervention required.", {

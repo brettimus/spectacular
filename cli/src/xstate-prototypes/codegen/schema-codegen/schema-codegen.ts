@@ -82,17 +82,7 @@ export const schemaCodegenMachine = setup({
     analyzeErrors: analyzeErrorsActor,
     fixSchema: fixSchemaActor,
     validateTypeScript: validateTypeScriptActor,
-  },
-  guards: {
-    hasErrors: ({ context }) => context.errors.length > 0,
-    // HACK
-    eventHasErrors: ({ event }) => {
-      if ("output" in event && Array.isArray(event.output)) {
-        return event.output.length > 0;
-      }
-      return false;
-    },
-  },
+  }
 }).createMachine({
   id: "db-schema-codegen",
   description: "generate db/schema.ts file",
@@ -277,8 +267,6 @@ export const schemaCodegenMachine = setup({
           aiGatewayUrl: context.aiGatewayUrl,
         }),
         onDone: {
-          // target: "VerifyingSchema",
-          // TODO - FIX THIS TRANSITION
           target: "SavingSchema",
           actions: assign({
             dbSchemaTs: ({ event }) => event.output?.dbSchemaTs || "",
@@ -311,8 +299,6 @@ export const schemaCodegenMachine = setup({
         },
       },
     },
-    // TODO - Can shell out to an actor that does typescript compilation here
-    //        Then allow others to provide alternative implementations on derived machine instances
     CheckingTypescript: {
       entry: () =>
         log(
@@ -329,7 +315,10 @@ export const schemaCodegenMachine = setup({
         onDone: [
           {
             target: "AnalyzingErrors",
-            guard: ({ event }) => event.output.length > 0,
+            guard: ({ event }) => {
+              const schemaErrors = event.output.filter((e: ErrorInfo) => e?.location?.includes("schema.ts"));
+              return schemaErrors.length > 0;
+            },
             actions: [
               assign({
                 errors: ({ event }) => {
@@ -340,6 +329,13 @@ export const schemaCodegenMachine = setup({
           },
           {
             target: "Success",
+            actions: [
+              assign({
+                errors: ({ event }) => {
+                  return event.output;
+                },
+              }),
+            ],
           },
         ],
       },
