@@ -1,24 +1,30 @@
 import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type {
-  TypescriptErrorAnalysisOptions,
-  SchemaErrorAnalysisResult,
-} from "@/xstate-prototypes/ai/codegen/schema/types";
-import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
+import type { ErrorInfo } from "@/xstate-prototypes/typechecking";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
-
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
+
+export type AnalyzeSchemaErrorsResult = {
+  text: string;
+  sources?: Record<string, unknown>[];
+};
+
+export type AnalyzeSchemaErrorsOptions = {
+  schemaSpecification: string;
+  schema: string;
+  errors: ErrorInfo[];
+};
 
 /**
  * Analyze schema errors using AI
  */
 export async function analyzeSchemaErrors(
   aiConfig: FpAiConfig,
-  options: TypescriptErrorAnalysisOptions,
+  options: AnalyzeSchemaErrorsOptions,
   signal?: AbortSignal,
-): Promise<SchemaErrorAnalysisResult | null> {
+): Promise<AnalyzeSchemaErrorsResult | null> {
   const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
   const { schemaSpecification, schema, errors } = options;
   try {

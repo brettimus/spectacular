@@ -7,9 +7,9 @@ import {
   identifyRulesActor,
   generateSchemaActor,
   analyzeErrorsActor,
+  type AnalyzeSchemaErrorsResult,
   fixSchemaActor,
 } from "./actors";
-import type { SchemaErrorAnalysisResult } from "@/xstate-prototypes/ai/codegen/schema/types";
 import {
   DEFAULT_AI_PROVIDER,
   type FpAiConfig,
@@ -45,7 +45,7 @@ interface SchemaCodegenMachineContext {
   relevantRules: SelectedRule[];
   dbSchemaTs: string;
   errors: ErrorInfo[];
-  errorAnalysis: SchemaErrorAnalysisResult | null;
+  errorAnalysis: AnalyzeSchemaErrorsResult | null;
   fixedSchema: string | null;
   valid: boolean;
   issues: string[];

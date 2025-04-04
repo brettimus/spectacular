@@ -1,5 +1,3 @@
-import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
-
 export interface SelectedRule {
   ruleName: string;
   reason: string;
@@ -19,12 +17,6 @@ export interface SchemaFixOptions {
   originalSchema: string;
 }
 
-export interface TypescriptErrorAnalysisOptions {
-  schema: string;
-  schemaSpecification: string;
-  errors: ErrorInfo[];
-}
-
 export interface SchemaGenerationResult {
   explanation: string;
   dbSchemaTs: string;
@@ -35,11 +27,6 @@ export interface SchemaVerificationResult {
   issues: string[];
   suggestions: string[];
   fixedSchema: string;
-}
-
-export interface SchemaErrorAnalysisResult {
-  text: string;
-  sources?: Record<string, unknown>[];
 }
 
 export interface SchemaFixResult {

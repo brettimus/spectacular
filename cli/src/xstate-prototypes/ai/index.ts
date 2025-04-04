@@ -14,6 +14,8 @@ export {
 export type {
   AnalyzeTablesResult,
   AnalyzeTablesOptions,
+  AnalyzeSchemaErrorsOptions,
+  AnalyzeSchemaErrorsResult,
 } from "./codegen/schema";
 
 export {

@@ -1,15 +1,15 @@
 import { fromPromise } from "xstate";
-import type {
-  TypescriptErrorAnalysisOptions,
-  SchemaErrorAnalysisResult,
-} from "@/xstate-prototypes/ai/codegen/schema/types";
 import { analyzeErrors } from "@/xstate-prototypes/ai/codegen/schema/analyze-schema-errors";
 import type { FpAiConfig } from "@/xstate-prototypes/ai";
+import type { AnalyzeSchemaErrorsOptions, AnalyzeSchemaErrorsResult } from "@/xstate-prototypes/ai";
+
+// Re-export the result type so it can be referenced in the machine
+export type { AnalyzeSchemaErrorsResult };
 
 export const analyzeErrorsActor = fromPromise<
-  SchemaErrorAnalysisResult | null,
+  AnalyzeSchemaErrorsResult | null,
   {
     aiConfig: FpAiConfig;
-    options: TypescriptErrorAnalysisOptions;
+    options: AnalyzeSchemaErrorsOptions;
   }
 >(({ input, signal }) => analyzeErrors(input.aiConfig, input.options, signal));

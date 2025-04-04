@@ -1,5 +1,8 @@
-export * from "./analyze-tables";
-export * from "./todos/identify-rules";
-export * from "./generate-schema";
-export * from "./analyze-errors";
-export * from "./fix-schema";
+export { analyzeTablesActor } from "./analyze-tables";
+export { identifyRulesActor } from "./todos/identify-rules";
+export { generateSchemaActor } from "./generate-schema";
+export {
+  analyzeErrorsActor,
+  type AnalyzeSchemaErrorsResult,
+} from "./analyze-errors";
+export { fixSchemaActor } from "./fix-schema";
