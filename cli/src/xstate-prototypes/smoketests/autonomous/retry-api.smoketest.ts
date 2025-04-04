@@ -1,10 +1,7 @@
 import { config } from "dotenv";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  setUpLogsDir,
-  verifyCurrentDir,
-} from "./utils";
+import { setUpLogsDir, verifyCurrentDir } from "./utils";
 import type { FpModelProvider } from "@/xstate-prototypes/ai";
 import { getAiConfig } from "./ai-config";
 import { initializeLogger } from "@/xstate-prototypes/utils/logging/logger";
@@ -41,7 +38,7 @@ console.log("Creating spec");
 const specDetails = {
   spec: readFileSync(path.join(RETRY_PROJECT_DIR, "spec.md"), "utf8"),
   projectDirName: path.basename(RETRY_PROJECT_DIR),
-}; 
+};
 
 if (!specDetails.spec) {
   throw new Error("Spec file not found");
@@ -61,7 +58,10 @@ const projectDir = path.join(
 
 const logsDir = setUpLogsDir({ projectDir });
 
-const dbSchemaTs = readFileSync(path.join(projectDir, "src", "db", "schema.ts"), "utf8");
+const dbSchemaTs = readFileSync(
+  path.join(projectDir, "src", "db", "schema.ts"),
+  "utf8",
+);
 
 const apiGeneratorActor = createActor(apiCodegenMachine, {
   input: {

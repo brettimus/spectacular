@@ -10,9 +10,14 @@ export const createLogger = (logsDir: string, machineName: string) => {
   return (snapshot: SnapshotFrom<any>) => {
     if (previousState !== snapshot.value) {
       if (!previousState) {
-        console.log(`[${machineName}] ${pico.green(machineName)}.transition`, snapshot.value);
+        console.log(
+          `[${machineName}] ${pico.green(machineName)}.transition`,
+          snapshot.value,
+        );
       } else {
-        console.log(`[${machineName}] ${pico.gray(previousState)} -> ${pico.green(snapshot.value)}`);
+        console.log(
+          `[${machineName}] ${pico.gray(previousState)} -> ${pico.green(snapshot.value)}`,
+        );
       }
 
       // Save the state machine context to a file when there's a state transition

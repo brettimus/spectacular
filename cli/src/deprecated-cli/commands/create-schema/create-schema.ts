@@ -7,7 +7,10 @@ import { actionDownloadTemplate } from "@/deprecated-cli/actions/download-templa
 import { SPECTACULAR_TITLE } from "@/deprecated-cli/const";
 import { type Context, initContext } from "@/deprecated-cli/context";
 import { promptOpenAiKey } from "@/deprecated-cli/openai-api-key";
-import { appendToLog, saveGlobalDebugInfo } from "@/deprecated-cli/utils/credentials";
+import {
+  appendToLog,
+  saveGlobalDebugInfo,
+} from "@/deprecated-cli/utils/credentials";
 import { handleResult } from "@/deprecated-cli/utils/result";
 import { confirm, intro, outro } from "@clack/prompts";
 import pico from "picocolors";

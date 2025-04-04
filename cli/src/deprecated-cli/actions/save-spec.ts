@@ -1,6 +1,9 @@
 import { writeFileSync } from "node:fs";
 import type { Context } from "@/deprecated-cli/context";
-import { convertSpecNameToFilename, pathFromInput } from "@/deprecated-cli/utils/utils";
+import {
+  convertSpecNameToFilename,
+  pathFromInput,
+} from "@/deprecated-cli/utils/utils";
 import { log } from "@clack/prompts";
 
 export async function actionSaveSpec(ctx: Context) {

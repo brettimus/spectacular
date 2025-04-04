@@ -1,5 +1,5 @@
 import { setup, assign } from "xstate";
-import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
+import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
 import type { SelectedRule } from "@/xstate-prototypes/ai/codegen/schema/types";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
@@ -16,7 +16,7 @@ import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typech
 import { downloadTemplateActor } from "@/xstate-prototypes/download-template/download-template";
 import { installDependenciesActor } from "@/xstate-prototypes/download-template/install-dependencies";
 import { saveSchemaToDiskActor } from "./actors/save-schema-to-disk";
-import { getPackageManager } from "@/deprecated-cli/utils/package-manager";
+import { getPackageManager } from "@/xstate-prototypes/utils";
 
 interface SchemaCodegenMachineInput {
   /** The API key to use for AI calls */

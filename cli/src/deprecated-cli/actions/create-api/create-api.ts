@@ -6,7 +6,10 @@ import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
 import { note, spinner } from "@clack/prompts";
 import pico from "picocolors";
 import { AutoganderClient } from "@/autogander-client";
-import { initCommandLogSession, logActionExecution } from "@/deprecated-cli/utils/logging";
+import {
+  initCommandLogSession,
+  logActionExecution,
+} from "@/deprecated-cli/utils/logging";
 import { loadExistingSchema } from "./load-existing-schema";
 import { saveApiCode } from "./save-api-code";
 

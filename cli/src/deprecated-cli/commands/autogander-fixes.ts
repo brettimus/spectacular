@@ -15,7 +15,10 @@ import { AutoganderClient } from "@/autogander-client";
 import { SPECTACULAR_TITLE } from "@/deprecated-cli/const";
 import { initContext } from "@/deprecated-cli/context";
 import { handleCancel } from "@/deprecated-cli/utils";
-import { initCommandLogSession, logActionExecution } from "@/deprecated-cli/utils/logging";
+import {
+  initCommandLogSession,
+  logActionExecution,
+} from "@/deprecated-cli/utils/logging";
 
 // Constants from logging.ts
 const SPECTACULAR_HOME_DIR_NAME = ".spectacular_stuff";

@@ -21,7 +21,9 @@ const ApiGenerationSchema = z.object({
   reasoning: z
     .string()
     .describe("Your step by step thought process for designing the api"),
-  indexTs: z.string().describe("The generated api routes file, in typescript, THIS IS REQUIRED"),
+  indexTs: z
+    .string()
+    .describe("The generated api routes file, in typescript, THIS IS REQUIRED"),
 });
 
 // Keep prompts and examples within this module
@@ -249,11 +251,13 @@ YOU MUST RESPOND IN JSON. I AM TALKING TO YOU CLAUDE!!!!!!! DO NOT FUCK THIS UP.
       model,
       schema: ApiGenerationSchema,
       prompt: PROMPT,
-      ...(aiProvider === "openai" ? {
-        temperature: 0.2,
-      } : {
-        temperature: 0,
-      }),
+      ...(aiProvider === "openai"
+        ? {
+            temperature: 0.2,
+          }
+        : {
+            temperature: 0,
+          }),
       abortSignal: signal,
     });
 
@@ -264,7 +268,7 @@ YOU MUST RESPOND IN JSON. I AM TALKING TO YOU CLAUDE!!!!!!! DO NOT FUCK THIS UP.
 
     return {
       indexTs: result.object.indexTs,
-      reasoning: "" // result.object.reasoning,
+      reasoning: "", // result.object.reasoning,
     };
   } catch (error) {
     log(

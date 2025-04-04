@@ -13,7 +13,7 @@ const CLI_DIR = path.resolve(__dirname, "../");
 
 // Get command line arguments (skip the first two as they are node and script path)
 const args = process.argv.slice(2);
-const command = args.join(" ").trim();
+const command = args.join(" ").trim() || "help";
 
 const env = {
   ...process.env,
@@ -35,8 +35,8 @@ if (command === "create-api" && env.SPECTACULAR_CWD === CLI_DIR) {
 
 // Construct the onSuccess command
 const onSuccessCommand = command
-  ? `node dist/index.js ${command}`
-  : "node dist/index.js";
+  ? `node dist/deprecated-cli.js ${command}`
+  : "node dist/deprecated-cli.js";
 
 // Use pnpm to run tsup (let pnpm handle path resolution)
 const tsup = spawn(

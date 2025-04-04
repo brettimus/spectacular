@@ -1,4 +1,4 @@
-import { runShell } from "@/deprecated-cli/utils";
+import { runShell } from "@/xstate-prototypes/utils";
 import { fromPromise } from "xstate/actors";
 
 export const installDependenciesActor = fromPromise<

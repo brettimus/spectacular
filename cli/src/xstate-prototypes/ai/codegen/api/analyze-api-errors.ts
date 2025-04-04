@@ -4,7 +4,7 @@ import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { FpModelProvider } from "../../ai-model-factory";
 import { aiModelFactory } from "../../ai-model-factory";
-import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
+import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
 
 // Infer the sources type from the generateText return type
 type GenerateTextReturnType = Awaited<ReturnType<typeof generateText>>;

@@ -1,4 +1,4 @@
-import type { ErrorInfo } from "@/deprecated-cli/utils/typechecking/types";
+import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
 
 export interface SelectedRule {
   ruleName: string;
