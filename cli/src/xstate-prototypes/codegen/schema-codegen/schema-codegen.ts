@@ -15,10 +15,12 @@ import {
   type FpAiConfig,
   type FpModelProvider,
 } from "@/xstate-prototypes/ai";
-import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking/typecheck";
-import { downloadTemplateActor } from "@/xstate-prototypes/download-template/download-template";
-import { installDependenciesActor } from "@/xstate-prototypes/download-template/install-dependencies";
-import { saveSchemaToDiskActor } from "./actors/save-schema-to-disk";
+import { validateTypeScriptActor } from "@/xstate-prototypes/typechecking";
+import {
+  downloadTemplateActor,
+  installDependenciesActor,
+} from "@/xstate-prototypes/download-template";
+import { saveSchemaToDiskActor } from "./actors";
 import { getPackageManager } from "@/xstate-prototypes/utils";
 
 interface SchemaCodegenMachineInput {
