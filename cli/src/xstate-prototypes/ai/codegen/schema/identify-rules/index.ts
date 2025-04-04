@@ -1,1 +1,1 @@
-export { identifyRules } from "./identify-rules"; 
+export { identifyRules } from "./identify-rules";

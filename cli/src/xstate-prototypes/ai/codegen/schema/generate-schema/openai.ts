@@ -1,4 +1,8 @@
-import { getD1SchemaExample, getDrizzleSchemaExamples, getD1AdditionalTips } from "./examples";
+import {
+  getD1SchemaExample,
+  getDrizzleSchemaExamples,
+  getD1AdditionalTips,
+} from "./examples";
 
 export const OPENAI_STRATEGY = {
   modelName: "gpt-4o",
@@ -28,4 +32,4 @@ ${getD1AdditionalTips()}
 [ADDITIONAL INSTRUCTIONS]
 - Make sure all dependencies were properly imported
 `;
-} 
+}

@@ -1,7 +1,10 @@
 import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { SchemaFixOptions, SchemaFixResult } from "../types";
-import { aiModelFactory, type FpModelProvider } from "../../../ai-model-factory";
+import {
+  aiModelFactory,
+  type FpModelProvider,
+} from "../../../ai-model-factory";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
@@ -101,4 +104,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-} 
+}

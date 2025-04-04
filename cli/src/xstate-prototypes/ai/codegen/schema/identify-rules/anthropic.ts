@@ -12,4 +12,4 @@ Your task is to analyze a list of database tables and operations and determine w
 
 A rule is a guideline or pattern for implementing specific database features like authentication, real-time data, etc.
 `;
-} 
+}

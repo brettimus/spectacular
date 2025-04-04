@@ -88,12 +88,12 @@ export async function autoSpectacular({
   const finalApiGeneratorState = apiGeneratorActor.getSnapshot();
 
   console.log("Auto-spectacular completed, see:", projectDir);
-  
+
   if (!finalApiGeneratorState.matches("Success")) {
     console.error(
       "API generation failed",
       JSON.stringify(finalState.toJSON(), null, 2),
     );
     throw new Error("API generation failed");
-  }  
+  }
 }

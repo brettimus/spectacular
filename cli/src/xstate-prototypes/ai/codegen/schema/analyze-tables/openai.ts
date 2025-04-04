@@ -65,4 +65,4 @@ Use the following outline:
 
 Be thorough and detailed. This is important to my career.
 `;
-} 
+}

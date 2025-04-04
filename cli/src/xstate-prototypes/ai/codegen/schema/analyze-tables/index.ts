@@ -1,1 +1,1 @@
-export { analyzeTables } from "./analyze-tables"; 
+export { analyzeTables } from "./analyze-tables";

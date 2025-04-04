@@ -5,7 +5,10 @@ import type {
   SchemaAnalysisOptions,
   SchemaAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
-import { aiModelFactory, type FpModelProvider } from "../../../ai-model-factory";
+import {
+  aiModelFactory,
+  type FpModelProvider,
+} from "../../../ai-model-factory";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
@@ -121,4 +124,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-} 
+}

@@ -19,4 +19,4 @@ Consider the user's intent, as well as the following:
 - Do we have a clear idea of the domain of the project?
 - Have we asked about user authentication yet? We should always ask about auth, just to be sure, unless it's obvious that the user doesn't need it.
 - Do we have an idea of features like auth, email, realtime, etc?`;
-} 
+}

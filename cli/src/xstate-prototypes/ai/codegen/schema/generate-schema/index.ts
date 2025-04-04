@@ -1,2 +1,6 @@
-export { generateSchema } from "./generate-schema"; 
-export { getD1SchemaExample, getDrizzleSchemaExamples, getD1AdditionalTips } from "./examples";
+export { generateSchema } from "./generate-schema";
+export {
+  getD1SchemaExample,
+  getDrizzleSchemaExamples,
+  getD1AdditionalTips,
+} from "./examples";

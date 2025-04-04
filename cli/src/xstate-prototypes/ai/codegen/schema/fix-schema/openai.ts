@@ -24,4 +24,4 @@ When defining relations:
 - Always specify \`fields\` (the foreign key fields in the current table)
 - Always specify \`references\` (the primary key fields in the referenced table)
 `;
-} 
+}

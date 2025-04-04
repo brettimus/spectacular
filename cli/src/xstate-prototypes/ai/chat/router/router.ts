@@ -80,4 +80,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-} 
+}

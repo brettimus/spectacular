@@ -254,4 +254,4 @@ export const events = sqliteTable(
 export type EventSelect = typeof events.$inferSelect;
 \`\`\`
 `;
-} 
+}

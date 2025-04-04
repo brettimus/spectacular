@@ -1,1 +1,1 @@
-export { fixSchema } from "./fix-schema"; 
+export { fixSchema } from "./fix-schema";

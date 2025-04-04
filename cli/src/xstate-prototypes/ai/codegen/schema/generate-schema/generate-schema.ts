@@ -2,7 +2,10 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
 import type { SchemaGenerationOptions, SchemaGenerationResult } from "../types";
-import { aiModelFactory, type FpModelProvider } from "../../../ai-model-factory";
+import {
+  aiModelFactory,
+  type FpModelProvider,
+} from "../../../ai-model-factory";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
@@ -118,4 +121,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-} 
+}

@@ -8,4 +8,4 @@ export const OPENAI_STRATEGY = {
 
 function getSystemPrompt() {
   return "";
-} 
+}

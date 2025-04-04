@@ -7,4 +7,4 @@ export const ANTHROPIC_STRATEGY = {
 
 function getSystemPrompt() {
   return "";
-} 
+}

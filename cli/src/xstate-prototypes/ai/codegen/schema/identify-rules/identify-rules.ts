@@ -1,6 +1,9 @@
 import { generateObject } from "ai";
 import { z } from "zod";
-import { aiModelFactory, type FpModelProvider } from "../../../ai-model-factory";
+import {
+  aiModelFactory,
+  type FpModelProvider,
+} from "../../../ai-model-factory";
 import type { SelectedRule } from "../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
@@ -107,4 +110,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-} 
+}

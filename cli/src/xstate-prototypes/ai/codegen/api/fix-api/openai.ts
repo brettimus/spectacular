@@ -17,4 +17,4 @@ Here are some key things to remember when writing Hono APIs for Cloudflare Worke
 - Import statements must be correct and complete
 - Error handling should be robust
 `;
-} 
+}

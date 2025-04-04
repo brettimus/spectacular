@@ -1,1 +1,1 @@
-export { generateApi, type ApiGenerationResult } from "./generate-api"; 
+export { generateApi, type ApiGenerationResult } from "./generate-api";
