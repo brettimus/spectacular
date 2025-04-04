@@ -1,25 +1,9 @@
 import { generateObject } from "ai";
 import { z } from "zod";
-import { aiModelFactory, type FpModelProvider } from "../../ai-model-factory";
-import type { SelectedRule } from "./types";
-
-const OPENAI_STRATEGY = {
-  modelName: "gpt-4o",
-  modelProvider: "openai",
-} as const;
-
-const ANTHROPIC_STRATEGY = {
-  modelName: "claude-3-7-sonnet-20250219",
-  modelProvider: "anthropic",
-} as const;
-
-// System prompt for rule identification
-const RULES_SYSTEM_PROMPT = `
-You are an expert in database schema design specializing in selecting the appropriate database rules.
-Your task is to analyze a list of database tables and operations and determine which rules should be applied.
-
-A rule is a guideline or pattern for implementing specific database features like authentication, real-time data, etc.
-`;
+import { aiModelFactory, type FpModelProvider } from "../../../ai-model-factory";
+import type { SelectedRule } from "../types";
+import { OPENAI_STRATEGY } from "./openai";
+import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 /**
  * Identify relevant rules from schema specification using AI
@@ -38,6 +22,7 @@ export async function identifyRules(
 
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
+    const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 
     // In a real implementation, you would load rules from a directory
     // For this prototype, we'll assume a fixed set of example rules
@@ -69,8 +54,8 @@ ${rules.join(", ")}
 [END AVAILABLE RULES]`,
         },
       ],
-      system: RULES_SYSTEM_PROMPT,
-      temperature: 0,
+      system: getSystemPrompt(),
+      temperature,
       abortSignal: signal,
     });
 
@@ -81,6 +66,23 @@ ${rules.join(", ")}
     throw error instanceof Error
       ? error
       : new Error("Unknown error in identify rules");
+  }
+}
+
+function getStrategyForProvider(aiProvider: FpModelProvider) {
+  switch (aiProvider) {
+    case "openai":
+      return {
+        getSystemPrompt: OPENAI_STRATEGY.getSystemPrompt,
+        temperature: OPENAI_STRATEGY.temperature,
+      };
+    case "anthropic":
+      return {
+        getSystemPrompt: ANTHROPIC_STRATEGY.getSystemPrompt,
+        temperature: ANTHROPIC_STRATEGY.temperature,
+      };
+    default:
+      throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
 }
 
@@ -105,4 +107,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-}
+} 

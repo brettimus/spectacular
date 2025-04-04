@@ -1,19 +1,9 @@
 import { generateObject } from "ai";
 import { z } from "zod";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import { aiModelFactory, type FpModelProvider } from "../../ai-model-factory";
-
-const OPENAI_STRATEGY = {
-  modelName: "o3-mini",
-  modelProvider: "openai",
-} as const;
-
-// TODO - Enable thinking?
-const ANTHROPIC_STRATEGY = {
-  // modelName: "claude-3-7-sonnet-20250219",
-  modelName: "claude-3-5-sonnet-20241022",
-  modelProvider: "anthropic",
-} as const;
+import { aiModelFactory, type FpModelProvider } from "../../../ai-model-factory";
+import { OPENAI_STRATEGY } from "./openai";
+import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 export type ApiGenerationResult = z.infer<typeof ApiGenerationSchema>;
 
@@ -114,6 +104,7 @@ export async function generateApi(
 ): Promise<ApiGenerationResult> {
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
+    const { temperature } = getStrategyForProvider(aiProvider);
 
     const dbSchema = schema;
     const apiPlan =
@@ -251,13 +242,7 @@ YOU MUST RESPOND IN JSON. I AM TALKING TO YOU CLAUDE!!!!!!! DO NOT FUCK THIS UP.
       model,
       schema: ApiGenerationSchema,
       prompt: PROMPT,
-      ...(aiProvider === "openai"
-        ? {
-            temperature: 0.2,
-          }
-        : {
-            temperature: 0,
-          }),
+      temperature,
       abortSignal: signal,
     });
 
@@ -278,6 +263,21 @@ YOU MUST RESPOND IN JSON. I AM TALKING TO YOU CLAUDE!!!!!!! DO NOT FUCK THIS UP.
         : new Error("Unknown error in generate API"),
     );
     throw error;
+  }
+}
+
+function getStrategyForProvider(aiProvider: FpModelProvider) {
+  switch (aiProvider) {
+    case "openai":
+      return {
+        temperature: OPENAI_STRATEGY.temperature,
+      };
+    case "anthropic":
+      return {
+        temperature: ANTHROPIC_STRATEGY.temperature,
+      };
+    default:
+      throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
 }
 
@@ -302,4 +302,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-}
+} 

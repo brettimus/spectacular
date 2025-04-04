@@ -1,34 +1,12 @@
-import type { Message } from "ai";
-import { generateObject } from "ai";
-import { z } from "zod";
-import type { FpModelProvider } from "../ai-model-factory";
-import { aiModelFactory } from "../ai-model-factory";
-
-const OPENAI_STRATEGY = {
-  modelName: "o3-mini",
-  modelProvider: "openai",
-} as const;
-
-// TODO - Add thinking?
-const ANTHROPIC_STRATEGY = {
+export const ANTHROPIC_STRATEGY = {
   modelName: "claude-3-7-sonnet-20250219",
   modelProvider: "anthropic",
+  temperature: 0.35,
+  getSystemPrompt,
 } as const;
 
-// Schema remains the same
-export const GeneratedPlanSchema = z.object({
-  title: z.string().describe("A title for the project."),
-  plan: z
-    .string()
-    .describe(
-      "A detailed implementation plan / handoff document for a developer to implement the project (in markdown).",
-    ),
-});
-
-export type GeneratedPlan = z.infer<typeof GeneratedPlanSchema>;
-
-// Prompt remains the same
-const IMPLEMENTATION_PLAN_SYSTEM_PROMPT = `
+function getSystemPrompt() {
+  return `
 You are an expert AI assistant that helps generate a software specification to implement a software project.
 
 The user has approached you with an idea for a software project.
@@ -170,45 +148,4 @@ Remember, the specification is for a HONC-stack project:
 
 This is important to my career.
 `;
-
-export async function generateSpec(
-  apiKey: string,
-  messages: Message[],
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
-): Promise<GeneratedPlan> {
-  const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
-
-  const result = await generateObject({
-    model,
-    system: IMPLEMENTATION_PLAN_SYSTEM_PROMPT,
-    messages,
-    schema: GeneratedPlanSchema,
-    temperature: 0.35,
-  });
-
-  return result.object;
-}
-
-function fromModelProvider(
-  aiProvider: FpModelProvider,
-  apiKey: string,
-  aiGatewayUrl?: string,
-) {
-  switch (aiProvider) {
-    case "openai":
-      return aiModelFactory({
-        apiKey,
-        modelDetails: OPENAI_STRATEGY,
-        aiGatewayUrl,
-      });
-    case "anthropic":
-      return aiModelFactory({
-        apiKey,
-        modelDetails: ANTHROPIC_STRATEGY,
-        aiGatewayUrl,
-      });
-    default:
-      throw new Error(`Unsupported AI provider: ${aiProvider}`);
-  }
-}
+} 

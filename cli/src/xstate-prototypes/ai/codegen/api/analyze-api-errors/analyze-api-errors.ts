@@ -1,10 +1,11 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
-// import type { TextResultSource } from "ai"; // Removed as it's not exported
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { FpModelProvider } from "../../ai-model-factory";
-import { aiModelFactory } from "../../ai-model-factory";
+import type { FpModelProvider } from "../../../ai-model-factory";
+import { aiModelFactory } from "../../../ai-model-factory";
 import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
+import { OPENAI_STRATEGY } from "./openai";
+import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 // Infer the sources type from the generateText return type
 type GenerateTextReturnType = Awaited<ReturnType<typeof generateText>>;
@@ -16,18 +17,6 @@ export type ApiErrorAnalysisResult = {
   sources: SourcesType; // Use the inferred type
 };
 
-const OPENAI_STRATEGY = {
-  modelName: "gpt-4o",
-  modelProvider: "openai",
-  responsesApi: true,
-} as const;
-
-const ANTHROPIC_STRATEGY = {
-  modelName: "claude-3-7-sonnet-20250219",
-  modelProvider: "anthropic",
-} as const;
-
-// TODO - MODEL PROVIDER OPTIONS SHOULD BE PART OF STRATEGY
 /**
  * Analyze API errors using AI
  */
@@ -41,6 +30,7 @@ export async function analyzeApiErrors(
 ): Promise<ApiErrorAnalysisResult | null> {
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
+    const { temperature } = getStrategyForProvider(aiProvider);
 
     log("debug", "Analyzing API errors", {
       errorsCount: errors.length,
@@ -52,6 +42,7 @@ export async function analyzeApiErrors(
     const result = await generateText({
       model,
       prompt,
+      temperature,
       // Assuming tools might vary based on provider/model
       tools: {
         // TODO - Need to configure this based on the model provider!!!
@@ -109,6 +100,21 @@ Focus specifically on:
 `;
 }
 
+function getStrategyForProvider(aiProvider: FpModelProvider) {
+  switch (aiProvider) {
+    case "openai":
+      return {
+        temperature: OPENAI_STRATEGY.temperature,
+      };
+    case "anthropic":
+      return {
+        temperature: ANTHROPIC_STRATEGY.temperature,
+      };
+    default:
+      throw new Error(`Unsupported AI provider: ${aiProvider}`);
+  }
+}
+
 function fromModelProvider(
   aiProvider: FpModelProvider,
   apiKey: string,
@@ -130,4 +136,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-}
+} 

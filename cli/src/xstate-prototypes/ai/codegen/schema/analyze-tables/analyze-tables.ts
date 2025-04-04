@@ -5,18 +5,9 @@ import type {
   SchemaAnalysisOptions,
   SchemaAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
-import { aiModelFactory, type FpModelProvider } from "../../ai-model-factory";
-
-// Define strategies
-const OPENAI_STRATEGY = {
-  modelName: "gpt-4o", // Based on original actor
-  modelProvider: "openai",
-} as const;
-
-const ANTHROPIC_STRATEGY = {
-  modelName: "claude-3-7-sonnet-20250219", // Example
-  modelProvider: "anthropic",
-} as const;
+import { aiModelFactory, type FpModelProvider } from "../../../ai-model-factory";
+import { OPENAI_STRATEGY } from "./openai";
+import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 // Schema definition for the output object
 const SchemaAnalysisOutputSchema = z.object({
@@ -32,67 +23,6 @@ const SchemaAnalysisOutputSchema = z.object({
     ),
 });
 
-// System prompt
-const SCHEMA_SYSTEM_PROMPT = `
-You are an expert database schema designer specializing in Drizzle ORM with SQLite (Cloudflare D1).
-
-Your task is to analyze a software specification and draft a document describing the appropriate database schema for the project.
-
-The schema should follow best practices for relational database design:
-- Use appropriate data types
-- Define proper relationships (foreign keys)
-- Include timestamps where appropriate
-- Use indexes for columns that will be frequently queried
-- Follow naming conventions (snake_case for tables and columns)
-
-The output should be a markdown document describing the tables and their relationships.
-
-Use the following outline:
-
-[Outline]
-# <name of the project> Database Schema
-
-## Tables
-
-### <table name>
-
-<description of the table>
-
-#### <column name>
-
-- <description of the column>
-- <data type>
-- <constraints>
-  - <primary key? foreign key?>
-  - <unique?>
-  - <required? nullable?>
-
-### <indexes>
-
-#### <index name>
-- <description of the index>
-- <columns>
-  - <column name>
-  - <column name>
-
-## Relations
-
-### <relationship name>
-
-- <description of the relationship>
-- <table name>
-- <column name>
-
-## Additional Notes and Future Considerations
-
-<description of additional notes and future considerations>
-
-[END OF OUTLINE]
-***
-
-Be thorough and detailed. This is important to my career.
-`;
-
 /**
  * Analyze tables from specification using AI
  */
@@ -105,6 +35,7 @@ export async function analyzeTables(
 ): Promise<SchemaAnalysisResult> {
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
+    const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 
     // Ensure we have the spec content
     if (!options.specContent) {
@@ -126,8 +57,8 @@ export async function analyzeTables(
 ${options.specContent}`,
         },
       ],
-      system: SCHEMA_SYSTEM_PROMPT,
-      temperature: 0.2,
+      system: getSystemPrompt(),
+      temperature,
       abortSignal: signal,
     });
 
@@ -148,6 +79,23 @@ ${options.specContent}`,
         : new Error("Unknown error in analyze tables"),
     );
     throw error;
+  }
+}
+
+function getStrategyForProvider(aiProvider: FpModelProvider) {
+  switch (aiProvider) {
+    case "openai":
+      return {
+        getSystemPrompt: OPENAI_STRATEGY.getSystemPrompt,
+        temperature: OPENAI_STRATEGY.temperature,
+      };
+    case "anthropic":
+      return {
+        getSystemPrompt: ANTHROPIC_STRATEGY.getSystemPrompt,
+        temperature: ANTHROPIC_STRATEGY.temperature,
+      };
+    default:
+      throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
 }
 
@@ -173,4 +121,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-}
+} 

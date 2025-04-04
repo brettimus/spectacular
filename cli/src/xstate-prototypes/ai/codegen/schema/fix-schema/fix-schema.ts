@@ -1,19 +1,9 @@
 import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { SchemaFixOptions, SchemaFixResult } from "./types";
-import { aiModelFactory, type FpModelProvider } from "../../ai-model-factory";
-
-// Define strategies
-const OPENAI_STRATEGY = {
-  modelName: "gpt-4o", // Based on original code
-  modelProvider: "openai",
-} as const;
-
-// TODO - Add Anthropic strategy details if needed
-const ANTHROPIC_STRATEGY = {
-  modelName: "claude-3-7-sonnet-20250219", // Example
-  modelProvider: "anthropic",
-} as const;
+import type { SchemaFixOptions, SchemaFixResult } from "../types";
+import { aiModelFactory, type FpModelProvider } from "../../../ai-model-factory";
+import { OPENAI_STRATEGY } from "./openai";
+import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 /**
  * Fix schema errors using AI
@@ -27,6 +17,7 @@ export async function fixSchema(
 ): Promise<SchemaFixResult | null> {
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
+    const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 
     log("debug", "Fixing schema errors", {
       fixContentLength: options.fixContent.length,
@@ -35,24 +26,7 @@ export async function fixSchema(
 
     const result = await generateText({
       model,
-      system: `
-You are a world class software engineer, and an expert in Drizzle ORM, a relational database query building library written in Typescript.
-
-Here are some key things to remember when writing Drizzle ORM schemas:
-- \`.primaryKey().autoIncrement()\` is NOT VALID for D1
-  BETTER: use \`.primaryKey({ autoIncrement: true })\` instead
-- Make sure all dependencies are properly imported
-- IMPORTANT: \`import { sql } from "drizzle-orm"\`, not from \`drizzle-orm/sqlite-core\`
-- Relations must be properly defined using the relations helper from drizzle-orm
-- For SQLite tables, use \`sqliteTable\` from \`drizzle-orm/sqlite-core\`
-- For indexes, use \`index\` and \`uniqueIndex\` from \`drizzle-orm/sqlite-core\`
-
-When defining relations:
-- Use \`one\` for one-to-one or many-to-one relations
-- Use \`many\` for one-to-many or many-to-many relations
-- Always specify \`fields\` (the foreign key fields in the current table)
-- Always specify \`references\` (the primary key fields in the referenced table)
-`,
+      system: getSystemPrompt(),
       messages: [
         {
           role: "user",
@@ -69,7 +43,7 @@ Return only the fixed schema code. It should be valid TypeScript code. DO NOT IN
 `,
         },
       ],
-      temperature: 0.2,
+      temperature,
       abortSignal: signal,
     });
 
@@ -86,6 +60,23 @@ Return only the fixed schema code. It should be valid TypeScript code. DO NOT IN
       error instanceof Error ? error : new Error("Unknown error in fix schema"),
     );
     return null;
+  }
+}
+
+function getStrategyForProvider(aiProvider: FpModelProvider) {
+  switch (aiProvider) {
+    case "openai":
+      return {
+        getSystemPrompt: OPENAI_STRATEGY.getSystemPrompt,
+        temperature: OPENAI_STRATEGY.temperature,
+      };
+    case "anthropic":
+      return {
+        getSystemPrompt: ANTHROPIC_STRATEGY.getSystemPrompt,
+        temperature: ANTHROPIC_STRATEGY.temperature,
+      };
+    default:
+      throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
 }
 
@@ -110,4 +101,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-}
+} 

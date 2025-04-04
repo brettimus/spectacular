@@ -1,20 +1,12 @@
-import { streamText } from "ai";
-import type { Message } from "ai";
-import { aiModelFactory, type FpModelProvider } from "../ai-model-factory";
-import { ollama } from "ollama-ai-provider";
-
-const OPENAI_STRATEGY = {
-  modelName: "gpt-4o",
-  modelProvider: "openai",
-} as const;
-
-const ANTHROPIC_STRATEGY = {
+export const ANTHROPIC_STRATEGY = {
   modelName: "claude-3-7-sonnet-20250219",
   modelProvider: "anthropic",
+  temperature: 0.7,
+  getSystemPrompt,
 } as const;
 
-// https://harper.blog/2025/02/16/my-llm-codegen-workflow-atm/
-const IDEATING_SYSTEM_PROMPT = `
+function getSystemPrompt() {
+  return `
 You are a friendly, expert AI assistant specializing in iterating on coding ideas to develop comprehensive software specifications for data API projects. 
 
 You DO NOT develop user interfaces (UI).
@@ -50,43 +42,4 @@ Ask the user one question at a time so we can develop a thorough, step-by-step s
 
 This is important to my career.
 `;
-
-export async function askNextQuestion(
-  apiKey: string,
-  messages: Message[],
-  aiProvider: FpModelProvider = "openai",
-  aiGatewayUrl?: string,
-) {
-  const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
-
-  return streamText({
-    model,
-    system: IDEATING_SYSTEM_PROMPT,
-    messages,
-  });
-}
-
-function fromModelProvider(
-  aiProvider: FpModelProvider,
-  apiKey: string,
-  aiGatewayUrl?: string,
-) {
-  switch (aiProvider) {
-    case "openai":
-      return aiModelFactory({
-        apiKey,
-        modelDetails: OPENAI_STRATEGY,
-        aiGatewayUrl,
-      });
-    case "anthropic":
-      return aiModelFactory({
-        apiKey,
-        modelDetails: ANTHROPIC_STRATEGY,
-        aiGatewayUrl,
-      });
-    case "ollama":
-      return ollama("gemma3:4b");
-    default:
-      throw new Error(`Unsupported AI provider: ${aiProvider}`);
-  }
-}
+} 

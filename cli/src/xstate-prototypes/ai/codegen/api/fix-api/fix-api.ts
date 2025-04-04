@@ -1,18 +1,9 @@
 import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { FpModelProvider } from "../../ai-model-factory";
-import { aiModelFactory } from "../../ai-model-factory";
-
-const OPENAI_STRATEGY = {
-  modelName: "gpt-4o",
-  modelProvider: "openai",
-} as const;
-
-// TODO - Add thinking?
-const ANTHROPIC_STRATEGY = {
-  modelName: "claude-3-7-sonnet-20250219",
-  modelProvider: "anthropic",
-} as const;
+import type { FpModelProvider } from "../../../ai-model-factory";
+import { aiModelFactory } from "../../../ai-model-factory";
+import { OPENAI_STRATEGY } from "./openai";
+import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 export type ApiFixResult = {
   code: string;
@@ -34,23 +25,12 @@ export async function fixApiErrors(
 ): Promise<ApiFixResult | null> {
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
+    const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 
     log("debug", "Fixing API errors", {
       fixContentLength: fixContent.length,
       originalApiCodeLength: originalApiCode.length,
     });
-
-    const systemPrompt = `
-You are a world class software engineer, and an expert in Hono.js and Drizzle ORM for Cloudflare Workers.
-
-Here are some key things to remember when writing Hono APIs for Cloudflare Workers:
-- Environment variables must be accessed via the context parameter (c.env), not process.env
-- For Drizzle with D1, use \`drizzle(c.env.DB)\` where DB is a D1Database binding
-- Properly handle async/await in request handlers
-- Ensure proper typing for request and response objects
-- Import statements must be correct and complete
-- Error handling should be robust
-`;
 
     const userPrompt = `
 I need you to generate a fixed version of a Hono.js API file. The original code had TypeScript errors that were analyzed, and I'm providing you with the analysis results.
@@ -72,14 +52,14 @@ Return only the fixed code. It should be valid TypeScript code. DO NOT INCLUDE A
 
     const result = await generateText({
       model,
-      system: systemPrompt,
+      system: getSystemPrompt(),
       messages: [
         {
           role: "user",
           content: userPrompt,
         },
       ],
-      temperature: 0.2,
+      temperature,
       // Provider options like prediction removed as they are specific to the original implementation context
       // providerOptions: {
       //   openai: {
@@ -108,6 +88,23 @@ Return only the fixed code. It should be valid TypeScript code. DO NOT INCLUDE A
   }
 }
 
+function getStrategyForProvider(aiProvider: FpModelProvider) {
+  switch (aiProvider) {
+    case "openai":
+      return {
+        getSystemPrompt: OPENAI_STRATEGY.getSystemPrompt,
+        temperature: OPENAI_STRATEGY.temperature,
+      };
+    case "anthropic":
+      return {
+        getSystemPrompt: ANTHROPIC_STRATEGY.getSystemPrompt,
+        temperature: ANTHROPIC_STRATEGY.temperature,
+      };
+    default:
+      throw new Error(`Unsupported AI provider: ${aiProvider}`);
+  }
+}
+
 function fromModelProvider(
   aiProvider: FpModelProvider,
   apiKey: string,
@@ -129,4 +126,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-}
+} 

@@ -5,21 +5,10 @@ import type {
   SchemaErrorAnalysisResult,
 } from "@/xstate-prototypes/ai/codegen/schema/types";
 import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
-import { aiModelFactory, type FpModelProvider } from "../../ai-model-factory";
+import { aiModelFactory, type FpModelProvider } from "../../../ai-model-factory";
 import { createOpenAI } from "@ai-sdk/openai";
-
-// Define strategies
-const OPENAI_STRATEGY = {
-  modelName: "gpt-4o", // Using gpt-4o with responses for search
-  modelProvider: "openai",
-  responsesApi: true, // Indicate that we need the .responses() variant
-} as const;
-
-const ANTHROPIC_STRATEGY = {
-  modelName: "claude-3-7-sonnet-20250219", // Example
-  modelProvider: "anthropic",
-  // Note: Anthropic via ai-sdk might not have direct web search tool like openai.responses
-} as const;
+import { OPENAI_STRATEGY } from "./openai";
+import { ANTHROPIC_STRATEGY } from "./anthropic";
 
 /**
  * Analyze schema errors using AI
@@ -34,6 +23,7 @@ export async function analyzeErrors(
   const { schemaSpecification, schema, errors } = options;
   try {
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
+    const { temperature } = getStrategyForProvider(aiProvider);
 
     log("debug", "Analyzing schema errors", {
       errorsCount: errors.length,
@@ -46,10 +36,10 @@ export async function analyzeErrors(
     );
 
     // Type assertion needed for accessing tools property dynamically
-
     const result = await generateText({
       model,
       prompt,
+      temperature,
       // HACK - Conditionally add web search tools based on the model type and provider
       tools:
         model.provider === "openai"
@@ -110,6 +100,21 @@ Please search the internet for the latest Drizzle ORM documentation on how to de
 `;
 }
 
+function getStrategyForProvider(aiProvider: FpModelProvider) {
+  switch (aiProvider) {
+    case "openai":
+      return {
+        temperature: OPENAI_STRATEGY.temperature,
+      };
+    case "anthropic":
+      return {
+        temperature: ANTHROPIC_STRATEGY.temperature,
+      };
+    default:
+      throw new Error(`Unsupported AI provider: ${aiProvider}`);
+  }
+}
+
 // Helper function for model selection
 function fromModelProvider(
   aiProvider: FpModelProvider,
@@ -132,4 +137,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-}
+} 
