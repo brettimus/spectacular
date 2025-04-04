@@ -6,7 +6,6 @@ import {
   analyzeTablesActor,
   identifyRulesActor,
   generateSchemaActor,
-  verifySchemaActor,
   analyzeErrorsActor,
   fixSchemaActor,
 } from "./actors";
@@ -80,7 +79,6 @@ export const schemaCodegenMachine = setup({
     identifyRules: identifyRulesActor,
     generateSchema: generateSchemaActor,
     saveSchema: saveSchemaToDiskActor,
-    verifySchema: verifySchemaActor,
     analyzeErrors: analyzeErrorsActor,
     fixSchema: fixSchemaActor,
     validateTypeScript: validateTypeScriptActor,

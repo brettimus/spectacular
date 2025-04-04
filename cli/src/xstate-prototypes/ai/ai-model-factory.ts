@@ -49,6 +49,7 @@ export function aiModelFactory(
 ): LanguageModelV1 {
   const { apiKey, modelDetails, aiGatewayUrl } = options;
   const model = fromModelDetails(apiKey, modelDetails, aiGatewayUrl);
+  
   return traceAISDKModel(model);
 }
 
