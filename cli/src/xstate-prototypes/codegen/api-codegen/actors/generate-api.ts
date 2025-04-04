@@ -1,18 +1,16 @@
 import { fromPromise } from "xstate";
 import {
   generateApi,
-  type ApiGenerationResult,
-} from "@/xstate-prototypes/ai/codegen/api/generate-api";
-import type { ApiGenerationOptions } from "./types";
-import type { FpAiConfig } from "@/xstate-prototypes/ai";
-
-export type { ApiGenerationOptions, ApiGenerationResult };
+  type GenerateApiResult,
+  type GenerateApiOptions,
+  type FpAiConfig,
+} from "@/xstate-prototypes/ai";
 
 export const generateApiActor = fromPromise<
-  ApiGenerationResult,
+  GenerateApiResult,
   {
     aiConfig: FpAiConfig;
-    options: ApiGenerationOptions;
+    options: GenerateApiOptions;
   }
 >(({ input, signal }) =>
   generateApi(

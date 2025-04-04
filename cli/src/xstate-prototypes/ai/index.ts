@@ -1,20 +1,7 @@
 export { aiModelFactory } from "./ai-model-factory";
 export type { FpModelDetails, FpModelProvider, FpAiConfig } from "./types";
 export { DEFAULT_AI_PROVIDER } from "./constants";
-export type {
-  AnalyzeTablesResult,
-  AnalyzeTablesOptions,
-} from "./codegen/schema";
-export {
-  generateApi,
-  type ApiGenerationResult,
-  analyzeApiErrors,
-  type AnalyzeApiErrorsResult,
-  fixApiErrors,
-  type FixApiErrorsResult,
-} from "./codegen/api";
-// TODO - Finish exports
-//
+
 export {
   askNextQuestion,
   generateSpec,
@@ -23,6 +10,21 @@ export {
   routeRequest,
   type RouterResponse,
 } from "./chat";
+
+export type {
+  AnalyzeTablesResult,
+  AnalyzeTablesOptions,
+} from "./codegen/schema";
+
+export {
+  generateApi,
+  type GenerateApiResult,
+  type GenerateApiOptions,
+  analyzeApiErrors,
+  type AnalyzeApiErrorsResult,
+  fixApiErrors,
+  type FixApiErrorsResult,
+} from "./codegen/api";
 
 // TODO - Implement rule identification
 //

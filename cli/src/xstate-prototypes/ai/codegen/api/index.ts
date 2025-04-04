@@ -1,4 +1,8 @@
-export { generateApi, type ApiGenerationResult } from "./generate-api";
+export {
+  generateApi,
+  type GenerateApiResult,
+  type GenerateApiOptions,
+} from "./generate-api";
 export {
   analyzeApiErrors,
   type AnalyzeApiErrorsResult,

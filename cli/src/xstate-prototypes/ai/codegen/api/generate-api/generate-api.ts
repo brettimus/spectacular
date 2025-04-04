@@ -6,9 +6,9 @@ import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 
-export type ApiGenerationResult = z.infer<typeof ApiGenerationSchema>;
+export type GenerateApiResult = z.infer<typeof GenerateApiSchema>;
 
-const ApiGenerationSchema = z.object({
+const GenerateApiSchema = z.object({
   reasoning: z
     .string()
     .describe("Your step by step thought process for designing the api"),
@@ -54,44 +54,6 @@ app.post("/api/user", async (c) => {
 export default app;
 `;
 
-const getDrizzleOrmExamples = () => {
-  return `
-// Example of inserting a new record:
-await db.insert(schema.users).values({
-  name: "John Doe",
-  email: "john@example.com",
-});
-
-// Example of selecting records:
-const users = await db.select().from(schema.users);
-
-// Example of selecting with a filter:
-const user = await db.select()
-  .from(schema.users)
-  .where(eq(schema.users.id, userId));
-
-// Example of updating a record:
-await db.update(schema.users)
-  .set({ name: "Jane Doe" })
-  .where(eq(schema.users.id, userId));
-
-// Example of deleting a record:
-await db.delete(schema.users)
-  .where(eq(schema.users.id, userId));
-`;
-};
-
-const getCommonHonoMistakes = () => {
-  return `
-1. Don't use process.env, use c.env to access environment variables inside request handlers
-2. Don't forget to add async/await for database operations
-3. Don't include results of D1 queries with the .changed property, D1 queries don't have that
-4. Remember to parse request bodies with await c.req.json()
-5. Use proper error handling with try/catch blocks for database operations
-6. Remember to return the response from each route handler
-`;
-};
-
 export type GenerateApiOptions = {
   spec: string;
   schema: string;
@@ -104,7 +66,7 @@ export async function generateApi(
   aiConfig: FpAiConfig,
   options: GenerateApiOptions,
   signal?: AbortSignal,
-): Promise<ApiGenerationResult> {
+): Promise<GenerateApiResult> {
   try {
     const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
@@ -131,7 +93,7 @@ export async function generateApi(
 
     const result = await generateObject({
       model,
-      schema: ApiGenerationSchema,
+      schema: GenerateApiSchema,
       system: SYSTEM_PROMPT,
       prompt: `Please generate the api routes file for me, according to the following plan:\n\n${apiPlan}`,
       temperature,
@@ -196,4 +158,42 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
+}
+
+function getDrizzleOrmExamples() {
+  return `
+// Example of inserting a new record:
+await db.insert(schema.users).values({
+  name: "John Doe",
+  email: "john@example.com",
+});
+
+// Example of selecting records:
+const users = await db.select().from(schema.users);
+
+// Example of selecting with a filter:
+const user = await db.select()
+  .from(schema.users)
+  .where(eq(schema.users.id, userId));
+
+// Example of updating a record:
+await db.update(schema.users)
+  .set({ name: "Jane Doe" })
+  .where(eq(schema.users.id, userId));
+
+// Example of deleting a record:
+await db.delete(schema.users)
+  .where(eq(schema.users.id, userId));
+`;
+}
+
+function getCommonHonoMistakes() {
+  return `
+1. Don't use process.env, use c.env to access environment variables inside request handlers
+2. Don't forget to add async/await for database operations
+3. Don't include results of D1 queries with the .changed property, D1 queries don't have that
+4. Remember to parse request bodies with await c.req.json()
+5. Use proper error handling with try/catch blocks for database operations
+6. Remember to return the response from each route handler
+`;
 }
