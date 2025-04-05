@@ -3,7 +3,7 @@ import { setup, assign } from "xstate";
 import {
   generateSpecActor,
   askNextQuestionActor,
-  saveSpecToDiskActor,
+  saveSpecNoopActor,
   routeRequestActor,
   type RouterResponse,
 } from "./actors";
@@ -57,7 +57,7 @@ const chatMachine = setup({
     routeRequest: routeRequestActor,
     askNextQuestion: askNextQuestionActor,
     generateSpec: generateSpecActor,
-    saveSpec: saveSpecToDiskActor,
+    saveSpec: saveSpecNoopActor,
     processQuestionStream: aiTextStreamMachine,
   },
   guards: {

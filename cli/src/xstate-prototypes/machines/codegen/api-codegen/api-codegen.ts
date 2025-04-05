@@ -11,7 +11,7 @@ import {
   generateApiActor,
   analyzeApiErrorsActor,
   fixApiErrorsActor,
-  saveApiIndexToDiskActor,
+  saveApiIndexNoopActor,
   type AnalyzeApiErrorsResult,
 } from "./actors";
 
@@ -61,7 +61,7 @@ export const apiCodegenMachine = setup({
   },
   actors: {
     generateApi: generateApiActor,
-    saveApiIndex: saveApiIndexToDiskActor,
+    saveApiIndex: saveApiIndexNoopActor,
     validateTypeScript: validateTypeScriptActor,
     analyzeApiErrors: analyzeApiErrorsActor,
     fixApiErrors: fixApiErrorsActor,

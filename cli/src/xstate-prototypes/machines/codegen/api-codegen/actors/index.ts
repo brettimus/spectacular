@@ -4,4 +4,4 @@ export {
 } from "./analyze-api-errors";
 export { fixApiErrorsActor } from "./fix-api";
 export { generateApiActor } from "./generate-api";
-export { saveApiIndexToDiskActor } from "./save-api-index-to-disk";
+export { saveApiIndexNoopActor } from "./save-api-index-noop";

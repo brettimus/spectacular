@@ -22,7 +22,7 @@ import {
   downloadTemplateActor,
   installDependenciesActor,
 } from "@/xstate-prototypes/machines/download-template";
-import { saveSchemaToDiskActor } from "./actors";
+import { saveSchemaNoopActor } from "./actors";
 import { getPackageManager } from "@/xstate-prototypes/utils";
 
 interface SchemaCodegenMachineInput {
@@ -84,7 +84,7 @@ export const schemaCodegenMachine = setup({
     analyzeTables: analyzeTablesActor,
     identifyRules: identifyRulesActor,
     generateSchema: generateSchemaActor,
-    saveSchema: saveSchemaToDiskActor,
+    saveSchema: saveSchemaNoopActor,
     analyzeErrors: analyzeErrorsActor,
     fixSchema: fixSchemaActor,
     validateTypeScript: validateTypeScriptActor,
