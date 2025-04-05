@@ -50,7 +50,7 @@ const chatMachine = setup({
   types: {
     context: {} as ChatMachineContext,
     input: {} as ChatMachineInput,
-    events: {} as { type: "user.message"; prompt: string },
+    events: {} as { type: "user.message"; content: string },
     output: {} as ChatMachineOutput,
   },
   actors: {
@@ -70,9 +70,9 @@ const chatMachine = setup({
   },
   actions: {
     addUserMessage: assign({
-      messages: ({ context }, params: { prompt: string }) => [
+      messages: ({ context }, params: { content: string }) => [
         ...context.messages,
-        createUserMessage(params.prompt),
+        createUserMessage(params.content),
       ],
     }),
     updateAssistantMessages: assign({
@@ -115,14 +115,17 @@ const chatMachine = setup({
           description: "The user has sent a message to the chat agent",
           target: "Routing",
           // Update the internal messages state
-          actions: {
-            type: "addUserMessage",
-            params: ({ event }) => {
-              return {
-                prompt: event.prompt,
-              };
-            },
-          },
+          actions: [
+            ({ event }) => console.log("AwaitingUserInput got event:", event),
+            {
+              type: "addUserMessage",
+              params: ({ event }) => {
+                return {
+                  content: event.content,
+                };
+              },
+            }
+          ],
         },
       },
     },

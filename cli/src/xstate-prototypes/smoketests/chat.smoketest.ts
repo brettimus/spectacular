@@ -32,5 +32,5 @@ actor.start();
 
 actor.send({
   type: "user.message",
-  prompt: "api for geese",
+  content: "api for geese",
 });

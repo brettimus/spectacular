@@ -30,7 +30,7 @@ export const spectacularMachine = setup({
   types: {
     context: {} as SpectacularMachineContext,
     input: {} as SpectacularMachineInput,
-    events: {} as { type: "user.message"; prompt: string },
+    events: {} as { type: "user.message"; content: string },
     output: {} as SpectacularMachineOutput,
   },
   actors: {

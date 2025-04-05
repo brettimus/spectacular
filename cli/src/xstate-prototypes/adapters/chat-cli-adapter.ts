@@ -121,7 +121,7 @@ export class ChatCliAdapter {
       // Send prompt to state machine
       this.actor.send({
         type: "user.message",
-        prompt: userPrompt as string,
+        content: userPrompt as string,
       });
 
       await waitFor(

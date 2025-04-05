@@ -190,7 +190,7 @@ export class SpectacularCliAdapter {
       // Send prompt to state machine
       this.actor.send({
         type: "user.message",
-        prompt: userPrompt as string,
+        content: userPrompt as string,
       });
 
       const ideationActor = this.actor.getSnapshot().children?.ideation;
