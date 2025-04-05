@@ -7,7 +7,7 @@ import {
 import {
   downloadTemplateNoopActor,
   installDependenciesNoopActor,
-} from "@/xstate-prototypes/machines";
+} from "../../configure-workspace";
 import {
   type ErrorInfo,
   validateTypeScriptNoopActor,
