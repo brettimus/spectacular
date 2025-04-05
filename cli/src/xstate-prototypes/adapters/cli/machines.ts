@@ -1,12 +1,14 @@
-import { chatMachine } from "@/xstate-prototypes/machines/chat";
+import {
+  chatMachine,
+  schemaCodegenMachine,
+  apiCodegenMachine,
+} from "@/xstate-prototypes/machines";
 import {
   saveApiIndexToDiskActor,
   saveSchemaToDiskActor,
   saveSpecToDiskActor,
   validateTypeScriptOnDiskActor,
 } from "./actors";
-import { schemaCodegenMachine } from "@/xstate-prototypes/machines/codegen/schema-codegen";
-import { apiCodegenMachine } from "@/xstate-prototypes/machines/codegen/api-codegen";
 
 // NOTE - We need to provide filesystem actors to do things like save the spec and files to disk
 
