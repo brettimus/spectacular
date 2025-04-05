@@ -5,8 +5,10 @@ import {
   type FpAiConfig,
   type FpModelProvider,
 } from "@/xstate-prototypes/ai";
-import { validateTypeScriptActor } from "@/xstate-prototypes/machines/typechecking/typecheck";
-import type { ErrorInfo } from "@/xstate-prototypes/machines/typechecking";
+import {
+  type ErrorInfo,
+  validateTypeScriptNoopActor,
+} from "@/xstate-prototypes/typechecking";
 import {
   generateApiActor,
   analyzeApiErrorsActor,
@@ -62,7 +64,7 @@ export const apiCodegenMachine = setup({
   actors: {
     generateApi: generateApiActor,
     saveApiIndex: saveApiIndexNoopActor,
-    validateTypeScript: validateTypeScriptActor,
+    validateTypeScript: validateTypeScriptNoopActor,
     analyzeApiErrors: analyzeApiErrorsActor,
     fixApiErrors: fixApiErrorsActor,
   },

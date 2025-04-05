@@ -1,6 +1,6 @@
 import { generateText } from "ai";
 import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { ErrorInfo } from "@/xstate-prototypes/machines/typechecking";
+import type { ErrorInfo } from "@/xstate-prototypes/typechecking";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { OPENAI_STRATEGY } from "./openai";

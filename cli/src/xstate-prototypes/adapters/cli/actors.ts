@@ -1,7 +1,18 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-
 import { fromPromise } from "xstate";
+import {
+  type ErrorInfo,
+  type ValidateTypescriptInputs,
+  validateTypeScriptOnDisk,
+} from "@/xstate-prototypes/typechecking";
+
+export const validateTypeScriptOnDiskActor = fromPromise<
+  ErrorInfo[],
+  ValidateTypescriptInputs
+>(({ input, signal }) =>
+  validateTypeScriptOnDisk(input.projectDir, input.packageManager, signal),
+);
 
 export const saveSpecToDiskActor = fromPromise<
   void,

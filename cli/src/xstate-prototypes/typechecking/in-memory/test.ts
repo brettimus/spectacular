@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { validateTypeScript } from "../typecheck";
+import { validateTypeScriptOnDisk } from "../on-disk/typecheck";
 import { validateTypeScriptInMemory } from "./typecheck";
 import type { InMemoryFile } from "./types";
 import * as os from "node:os";
@@ -94,7 +94,7 @@ async function compareTypeCheckers() {
 
     // Run the filesystem-based type checker
     console.log("\nRunning filesystem-based type checker...");
-    const fsErrors = await validateTypeScript(tmpDir, "npm");
+    const fsErrors = await validateTypeScriptOnDisk(tmpDir, "npm");
 
     // Run the in-memory type checker
     console.log("\nRunning in-memory type checker...");

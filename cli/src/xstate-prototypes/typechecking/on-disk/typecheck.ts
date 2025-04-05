@@ -2,30 +2,17 @@ import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import util from "node:util";
-import type { ErrorInfo } from "./types";
-import { isExecError } from "./types";
-import { fromPromise } from "xstate";
+import type { ErrorInfo } from "../types";
+import { isExecError } from "../types";
 
 const execPromise = util.promisify(exec);
 
-type ValidateTypescriptInputs = {
-  projectDir: string;
-  packageManager?: string;
-};
-
 // type PromiseArgs<InputsType = unknown> = Parameters<Parameters<typeof fromPromise>[0]>[0] & { input: InputsType }
-
-export const validateTypeScriptActor = fromPromise<
-  ErrorInfo[],
-  ValidateTypescriptInputs
->(({ input, signal }) =>
-  validateTypeScript(input.projectDir, input.packageManager, signal),
-);
 
 /**
  * Validates TypeScript code by writing it to a file in the project directory and running the TypeScript compiler.
  */
-export async function validateTypeScript(
+export async function validateTypeScriptOnDisk(
   projectDir: string,
   packageManager = "npm",
   signal?: AbortSignal,

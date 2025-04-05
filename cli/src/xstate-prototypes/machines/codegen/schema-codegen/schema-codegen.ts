@@ -8,6 +8,7 @@ import {
   analyzeErrorsActor,
   type AnalyzeSchemaErrorsResult,
   fixSchemaActor,
+  saveSchemaNoopActor,
 } from "./actors";
 import {
   DEFAULT_AI_PROVIDER,
@@ -15,14 +16,13 @@ import {
   type FpModelProvider,
 } from "@/xstate-prototypes/ai";
 import {
-  validateTypeScriptActor,
   type ErrorInfo,
-} from "@/xstate-prototypes/machines/typechecking";
+  validateTypeScriptNoopActor,
+} from "@/xstate-prototypes/typechecking";
 import {
   downloadTemplateActor,
   installDependenciesActor,
 } from "@/xstate-prototypes/machines/download-template";
-import { saveSchemaNoopActor } from "./actors";
 import { getPackageManager } from "@/xstate-prototypes/utils";
 
 interface SchemaCodegenMachineInput {
@@ -87,7 +87,7 @@ export const schemaCodegenMachine = setup({
     saveSchema: saveSchemaNoopActor,
     analyzeErrors: analyzeErrorsActor,
     fixSchema: fixSchemaActor,
-    validateTypeScript: validateTypeScriptActor,
+    validateTypeScript: validateTypeScriptNoopActor,
   },
 }).createMachine({
   id: "db-schema-codegen",
