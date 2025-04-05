@@ -2,7 +2,10 @@ import {
   chatMachine,
   schemaCodegenMachine,
   apiCodegenMachine,
+  downloadTemplateActor,
+  installDependenciesActor,
 } from "@/xstate-prototypes/machines";
+
 import {
   saveApiIndexToDiskActor,
   saveSchemaToDiskActor,
@@ -22,6 +25,8 @@ export const cliSchemaCodegenMachine = schemaCodegenMachine.provide({
   actors: {
     saveSchema: saveSchemaToDiskActor,
     validateTypeScript: validateTypeScriptOnDiskActor,
+    downloadTemplate: downloadTemplateActor,
+    installDependencies: installDependenciesActor,
   },
 });
 

@@ -1,9 +1,14 @@
 import { runShell } from "@/xstate-prototypes/utils";
 import { fromPromise } from "xstate/actors";
 
+export type InstallDependenciesInput = {
+  projectDir: string;
+  packageManager?: "npm" | "yarn" | "pnpm" | "bun";
+};
+
 export const installDependenciesActor = fromPromise<
   void,
-  { projectDir: string; packageManager?: "npm" | "yarn" | "pnpm" | "bun" }
+  InstallDependenciesInput
 >(async ({ input: { projectDir, packageManager = "npm" } }) => {
   await installDependencies(projectDir, packageManager);
 });

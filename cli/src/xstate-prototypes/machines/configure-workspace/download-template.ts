@@ -1,7 +1,11 @@
 import { downloadTemplate as gigetDownloadTemplate } from "giget";
 import { fromPromise } from "xstate/actors";
 
-export const downloadTemplateActor = fromPromise<void, { projectDir: string }>(
+export type DownloadTemplateInput = {
+  projectDir: string;
+};
+
+export const downloadTemplateActor = fromPromise<void, DownloadTemplateInput>(
   async ({ input: { projectDir } }) => {
     await downloadTemplate(projectDir);
   },

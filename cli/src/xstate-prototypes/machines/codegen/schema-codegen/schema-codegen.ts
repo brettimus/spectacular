@@ -20,9 +20,9 @@ import {
   validateTypeScriptNoopActor,
 } from "@/xstate-prototypes/typechecking";
 import {
-  downloadTemplateActor,
-  installDependenciesActor,
-} from "@/xstate-prototypes/machines/download-template";
+  downloadTemplateNoopActor,
+  installDependenciesNoopActor,
+} from "@/xstate-prototypes/machines";
 import { getPackageManager } from "@/xstate-prototypes/utils";
 
 interface SchemaCodegenMachineInput {
@@ -79,8 +79,8 @@ export const schemaCodegenMachine = setup({
     output: {} as SchemaCodegenMachineOutput,
   },
   actors: {
-    downloadTemplate: downloadTemplateActor,
-    installDependencies: installDependenciesActor,
+    downloadTemplate: downloadTemplateNoopActor,
+    installDependencies: installDependenciesNoopActor,
     analyzeTables: analyzeTablesActor,
     identifyRules: identifyRulesActor,
     generateSchema: generateSchemaActor,
