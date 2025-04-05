@@ -1,6 +1,6 @@
 import { chatMachine } from "./chat";
 import { apiCodegenMachine } from "./codegen/api-codegen";
-import { schemaCodegenMachine } from "./codegen/schema-codegen";
+import { dbSchemaCodegenMachine } from "./codegen/db-schema-codegen";
 import {
   downloadTemplateActor,
   downloadTemplateNoopActor,
@@ -10,7 +10,7 @@ import {
 
 export {
   chatMachine,
-  schemaCodegenMachine,
+  dbSchemaCodegenMachine,
   apiCodegenMachine,
   downloadTemplateNoopActor,
   installDependenciesNoopActor,

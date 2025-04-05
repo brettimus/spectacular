@@ -24,7 +24,7 @@ export {
   generateSchema,
   type GenerateSchemaOptions,
   type GenerateSchemaResult,
-} from "./codegen/schema";
+} from "./codegen/db-schema";
 
 export {
   generateApi,
@@ -39,4 +39,4 @@ export {
 // TODO - Implement rule identification
 //
 export type { SelectedRule } from "./codegen/types";
-export { identifyRules } from "./codegen/schema";
+export { identifyRules } from "./codegen/db-schema";

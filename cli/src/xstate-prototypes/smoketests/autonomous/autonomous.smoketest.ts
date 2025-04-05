@@ -106,12 +106,19 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     const logsDir = setUpLogsDir({ projectDir });
 
     // Link this run's logs to the central logs directory for easier access
+    const symlinkTarget = path.join(
+      CENTRAL_LOGS_DIR,
+      `iter-${iteration}-${path.basename(logsDir)}`,
+    );
+    
+    // Check if symlink target already exists and remove it if it does
+    if (fs.existsSync(symlinkTarget)) {
+      fs.rmSync(symlinkTarget, { recursive: true, force: true });
+    }
+    
     fs.symlinkSync(
       logsDir,
-      path.join(
-        CENTRAL_LOGS_DIR,
-        `iter-${iteration}-${path.basename(logsDir)}`,
-      ),
+      symlinkTarget,
       "dir",
     );
 

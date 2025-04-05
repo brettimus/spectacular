@@ -1,7 +1,7 @@
 import {
   apiCodegenMachine,
   chatMachine,
-  schemaCodegenMachine,
+  dbSchemaCodegenMachine,
 } from "@/xstate-prototypes/machines";
 import {
   saveApiIndexToApiActor,
@@ -24,7 +24,7 @@ export const cliChatMachine = chatMachine.provide({
   },
 });
 
-export const cliSchemaCodegenMachine = schemaCodegenMachine.provide({
+export const cliSchemaCodegenMachine = dbSchemaCodegenMachine.provide({
   actors: {
     saveSchema: saveSchemaToApiActor,
   },

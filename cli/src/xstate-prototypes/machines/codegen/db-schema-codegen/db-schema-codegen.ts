@@ -25,7 +25,7 @@ import {
   saveSchemaNoopActor,
 } from "./actors";
 
-interface SchemaCodegenMachineInput {
+interface DbSchemaCodegenMachineInput {
   /** The API key to use for AI calls */
   apiKey: string;
   /** The AI provider to use for AI calls */
@@ -38,7 +38,7 @@ interface SchemaCodegenMachineInput {
   projectDir?: string;
 }
 
-interface SchemaCodegenMachineContext {
+interface DbSchemaCodegenMachineContext {
   aiConfig: FpAiConfig;
   spec: string;
   projectDir: string;
@@ -58,17 +58,17 @@ interface SchemaCodegenMachineContext {
   machineError: null | Error | string;
 }
 
-interface SchemaCodegenMachineOutput {
+interface DbSchemaCodegenMachineOutput {
   dbSchemaTs: string;
   valid: boolean;
   issues: string[];
   suggestions: string[];
 }
 
-export const schemaCodegenMachine = setup({
+export const dbSchemaCodegenMachine = setup({
   types: {
-    context: {} as SchemaCodegenMachineContext,
-    input: {} as SchemaCodegenMachineInput,
+    context: {} as DbSchemaCodegenMachineContext,
+    input: {} as DbSchemaCodegenMachineInput,
     events: {} as
       | { type: "download.template" }
       | { type: "analyze.tables"; spec: string }
@@ -76,7 +76,7 @@ export const schemaCodegenMachine = setup({
       | { type: "verify.schema" }
       | { type: "fix.errors" }
       | { type: "regenerate.schema" },
-    output: {} as SchemaCodegenMachineOutput,
+    output: {} as DbSchemaCodegenMachineOutput,
   },
   actors: {
     downloadTemplate: downloadTemplateNoopActor,

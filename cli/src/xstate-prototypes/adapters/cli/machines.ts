@@ -3,7 +3,7 @@ import {
   chatMachine,
   downloadTemplateActor,
   installDependenciesActor,
-  schemaCodegenMachine,
+  dbSchemaCodegenMachine,
 } from "@/xstate-prototypes/machines";
 
 import {
@@ -21,7 +21,7 @@ export const cliChatMachine = chatMachine.provide({
   },
 });
 
-export const cliSchemaCodegenMachine = schemaCodegenMachine.provide({
+export const cliSchemaCodegenMachine = dbSchemaCodegenMachine.provide({
   actors: {
     saveSchema: saveSchemaToDiskActor,
     validateTypeScript: validateTypeScriptOnDiskActor,

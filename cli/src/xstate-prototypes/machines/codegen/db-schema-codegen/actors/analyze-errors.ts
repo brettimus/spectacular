@@ -3,7 +3,7 @@ import type {
   AnalyzeSchemaErrorsOptions,
   AnalyzeSchemaErrorsResult,
 } from "@/xstate-prototypes/ai";
-import { analyzeErrors } from "@/xstate-prototypes/ai/codegen/schema/analyze-schema-errors";
+import { analyzeErrors } from "@/xstate-prototypes/ai/codegen/db-schema/analyze-schema-errors";
 import { fromPromise } from "xstate";
 
 // Re-export the result type so it can be referenced in the machine

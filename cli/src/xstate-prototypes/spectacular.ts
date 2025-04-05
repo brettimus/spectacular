@@ -2,7 +2,7 @@ import type { Message } from "ai";
 import { assign, setup } from "xstate";
 import { chatMachine } from "./machines/chat/chat";
 import { apiCodegenMachine } from "./machines/codegen/api-codegen/api-codegen";
-import { schemaCodegenMachine } from "./machines/codegen/schema-codegen/schema-codegen";
+import { dbSchemaCodegenMachine } from "./machines/codegen/db-schema-codegen/db-schema-codegen";
 
 interface SpectacularMachineInput {
   cwd: string;
@@ -35,7 +35,7 @@ export const spectacularMachine = setup({
   },
   actors: {
     ideationActor: chatMachine,
-    schemaGenerationActor: schemaCodegenMachine,
+    schemaGenerationActor: dbSchemaCodegenMachine,
     apiGenerationActor: apiCodegenMachine,
   },
 }).createMachine({
