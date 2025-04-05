@@ -15,7 +15,7 @@ type AiTextStreamOutput = {
 
 /**
  * This state machine can consume a stream of text from the AI SDK.
- * It emits chunk events for each chunk of text.
+ * It emits chunk events for each chunk of text, sending them to the parent actor.
  */
 export const aiTextStreamMachine = setup({
   types: {

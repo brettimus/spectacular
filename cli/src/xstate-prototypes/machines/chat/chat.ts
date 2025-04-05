@@ -84,6 +84,16 @@ const chatMachine = setup({
         createUserMessage(params.content),
       ],
     }),
+    handleStreamChunk: (_, _params: { chunk: string }) => {
+      // NOTE - `handleStreamChunk` is a noop by default,
+      //         but it can be overridden with `.provide`
+    },
+    handleNewAssistantMessages: (
+      _,
+      _params: { responseMessages: AiResponseMessage[] },
+    ) => {
+      // NOTE - This is a noop by default, but it's a good place to add logic to handle new assistant messages via `.provide`
+    },
     updateAssistantMessages: assign({
       messages: (
         { context },
@@ -96,10 +106,6 @@ const chatMachine = setup({
       },
       streamResponse: null, // Clear the raw streaming response
     }),
-    handleStreamChunk: (_, _params: { chunk: string }) => {
-      // NOTE - `handleStreamChunk` is a noop by default,
-      //         but it can be overridden with `.provide`
-    },
     recordError: assign({
       error: (_, event: { error: unknown }) => event.error,
       errorHistory: ({ context }, event: { error: unknown }) => [
@@ -261,6 +267,14 @@ const chatMachine = setup({
           actions: [
             {
               type: "updateAssistantMessages",
+              params: ({ event }) => {
+                return {
+                  responseMessages: event.output.responseMessages,
+                };
+              },
+            },
+            {
+              type: "handleNewAssistantMessages",
               params: ({ event }) => {
                 return {
                   responseMessages: event.output.responseMessages,
