@@ -3,6 +3,7 @@ import {
   saveApiIndexToDiskActor,
   saveSchemaToDiskActor,
   saveSpecToDiskActor,
+  validateTypeScriptOnDiskActor,
 } from "./actors";
 import { schemaCodegenMachine } from "@/xstate-prototypes/machines/codegen/schema-codegen";
 import { apiCodegenMachine } from "@/xstate-prototypes/machines/codegen/api-codegen";
@@ -18,11 +19,13 @@ export const cliChatMachine = chatMachine.provide({
 export const cliSchemaCodegenMachine = schemaCodegenMachine.provide({
   actors: {
     saveSchema: saveSchemaToDiskActor,
+    validateTypeScript: validateTypeScriptOnDiskActor,
   },
 });
 
 export const cliApiCodegenMachine = apiCodegenMachine.provide({
   actors: {
     saveApiIndex: saveApiIndexToDiskActor,
+    validateTypeScript: validateTypeScriptOnDiskActor,
   },
 });
