@@ -1,4 +1,4 @@
-import { assign, setup } from "xstate";
+import { type AnyActorRef, assign, setup } from "xstate";
 import { normalizeError } from "../../utils";
 import { consumeStreamActor } from "./consume-stream";
 import type { CancelEvent, ChunkEvent } from "./events";
@@ -24,12 +24,22 @@ export const aiTextStreamMachine = setup({
       error: Error | null;
       streamResponse: AiTextStreamResult;
       responseMessages: AiResponseMessage[];
+      parent: AnyActorRef;
     },
     input: {} as {
       streamResponse: AiTextStreamResult;
+      parent: AnyActorRef;
     },
     events: {} as ChunkEvent | CancelEvent,
     output: {} as AiTextStreamOutput,
+  },
+  actions: {
+    appendChunk: assign({
+      chunks: ({ context }, params: { content: string }) => [
+        ...context.chunks,
+        params.content,
+      ],
+    }),
   },
   actors: {
     consumeStream: consumeStreamActor,
@@ -43,6 +53,7 @@ export const aiTextStreamMachine = setup({
     error: null,
     streamResponse: input.streamResponse,
     responseMessages: [],
+    parent: input.parent,
   }),
 
   states: {
@@ -79,9 +90,15 @@ export const aiTextStreamMachine = setup({
 
       on: {
         "textStream.chunk": {
-          actions: assign({
-            chunks: ({ context, event }) => [...context.chunks, event.content],
-          }),
+          actions: [
+            ({ event, context }) => {
+              context.parent.send(event);
+            },
+            {
+              type: "appendChunk",
+              params: ({ event }) => ({ content: event.content }),
+            },
+          ],
         },
         "textStream.error": {
           target: "Failed",

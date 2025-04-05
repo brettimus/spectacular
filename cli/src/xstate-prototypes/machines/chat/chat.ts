@@ -18,6 +18,7 @@ import {
   routeRequestActor,
   saveSpecNoopActor,
 } from "./actors";
+import type { ChunkEvent } from "../streaming";
 
 interface ChatMachineInput {
   apiKey: string;
@@ -39,9 +40,10 @@ export interface ChatMachineContext {
   streamResponse: AiTextStreamResult | null;
 }
 
-type ChatMachineEvent = 
+type ChatMachineEvent =
   | { type: "user.message"; content: string }
-  | { type: "cancel" };
+  | { type: "cancel" }
+  | ChunkEvent;
 
 interface ChatMachineOutput {
   messages: Message[];
@@ -94,6 +96,10 @@ const chatMachine = setup({
       },
       streamResponse: null, // Clear the raw streaming response
     }),
+    handleStreamChunk: (_, _params: { chunk: string }) => {
+      // NOTE - `handleStreamChunk` is a noop by default,
+      //         but it can be overridden with `.provide`
+    },
     recordError: assign({
       error: (_, event: { error: unknown }) => event.error,
       errorHistory: ({ context }, event: { error: unknown }) => [
@@ -147,7 +153,7 @@ const chatMachine = setup({
     },
     Routing: {
       on: {
-        "cancel": {
+        cancel: {
           target: "AwaitingUserInput",
         },
       },
@@ -190,7 +196,7 @@ const chatMachine = setup({
     },
     FollowingUp: {
       on: {
-        "cancel": {
+        cancel: {
           target: "AwaitingUserInput",
         },
       },
@@ -218,18 +224,37 @@ const chatMachine = setup({
     },
     ProcessingAiResponse: {
       on: {
-        "cancel": {
+        cancel: {
           target: "AwaitingUserInput",
           // TODO - Flush message somehow?
+          actions: ({ self }) => {
+            const processQuestionStream =
+              self.getSnapshot().children.processQuestionStream;
+            if (processQuestionStream) {
+              const cancelledActorContext =
+                processQuestionStream.getSnapshot().context;
+              console.log("cancelledActorContext", cancelledActorContext);
+            } else {
+              console.log("no processQuestionStream upon cancellation");
+            }
+          },
+        },
+        "textStream.chunk": {
+          actions: {
+            type: "handleStreamChunk",
+            params: ({ event }) => ({ chunk: event.content }),
+          },
         },
       },
       invoke: {
         id: "processQuestionStream",
         src: "processQuestionStream",
-        input: ({ context }) => ({
+        input: ({ context, self }) => ({
           // HACK - It's hard to strongly type this stuff without adding a lot of complexity
           // TODO - Investigate if we can assert the type on `entry` somehow
+          // TODO - Try to remove this reference to the streamResponse, it's only useful for the CLI
           streamResponse: context.streamResponse as AiTextStreamResult,
+          parent: self,
         }),
         onDone: {
           target: "AwaitingUserInput",
@@ -329,7 +354,6 @@ const chatMachine = setup({
               },
             },
           ],
-
         },
       },
     },
