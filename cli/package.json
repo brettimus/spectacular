@@ -10,7 +10,7 @@
     "build": "pnpm clean && tsup",
     "dev": "node ./scripts/dev-deprecated.mjs",
     "dev:init": "pnpm dev",
-    "dev:xstate:inspect": "SKIP_TRACING=true vite --config vite.ui.config.ts",
+    "dev:xstate:inspect": "vite --config vite.ui.config.ts",
     "eval:dev": "evalite watch",
     "eval:db:schema": "evalite evals/database-schema/database-schema.eval.ts",
     "eval:db:schema:watch": "evalite watch evals/database-schema/database-schema.eval.ts",

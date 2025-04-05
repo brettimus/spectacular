@@ -5,6 +5,7 @@ import type { Message } from "ai";
 import { config } from "dotenv";
 import { chatMachine } from "@/xstate-prototypes/machines/chat";
 import type { AiTextStreamResult } from "@/xstate-prototypes/machines/streaming";
+import { saveSpecToDiskActor } from "./actors";
 
 config();
 
@@ -20,9 +21,15 @@ export class ChatCliAdapter {
     if (!API_KEY) {
       throw new Error("OPENAI_API_KEY is not set");
     }
+    // NOTE - We need to provide filesystem actors to do things like save the spec and files to disk
+    const fsCompatibleMachine = chatMachine.provide({
+      actors: {
+        saveSpec: saveSpecToDiskActor,
+      },
+    });
     // TODO - Try to provide a `processQuestionStream` actor that can
     //        stream the response to the CLI
-    this.actor = createActor(chatMachine, {
+    this.actor = createActor(fsCompatibleMachine, {
       input: {
         apiKey: API_KEY,
         aiProvider: AI_PROVIDER,

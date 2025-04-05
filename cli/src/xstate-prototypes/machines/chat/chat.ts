@@ -124,7 +124,7 @@ const chatMachine = setup({
                   content: event.content,
                 };
               },
-            }
+            },
           ],
         },
       },

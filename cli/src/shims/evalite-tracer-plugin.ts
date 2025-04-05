@@ -2,7 +2,6 @@ import type { Plugin } from "vite";
 
 /**
  * Vite plugin to replace evalite's traceAISDKModel with an identity function
- * when the SKIP_TRACING environment variable is set.
  *
  * This avoids using AsyncLocalStorage which causes browser compatibility issues.
  */
@@ -31,7 +30,7 @@ export function evaliteTracerPlugin(): Plugin {
 
           // Replace the entire module with a simple identity function
           return `
-            // Evalite tracer replaced with identity function (SKIP_TRACING=true)
+            // Evalite tracer replaced with identity function so we can run this in the browser
             export const traceAISDKModel = (model) => model;
           `;
         }

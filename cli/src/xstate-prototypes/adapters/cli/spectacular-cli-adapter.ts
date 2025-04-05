@@ -7,12 +7,9 @@ import {
 import { spinner, text, log, stream, isCancel } from "@clack/prompts";
 import pico from "picocolors";
 import type { Message } from "ai";
-import { spectacularMachine } from "../spectacular";
-import type { AiTextStreamResult } from "../machines/streaming";
-import type {
-  chatMachine,
-  ChatMachineContext,
-} from "../machines/chat";
+import { spectacularMachine } from "../../spectacular";
+import type { AiTextStreamResult } from "../../machines/streaming";
+import type { chatMachine, ChatMachineContext } from "../../machines/chat";
 
 export class SpectacularCliAdapter {
   // private actor: ActorRefFrom<typeof chatMachine>;

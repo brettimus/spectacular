@@ -37,11 +37,5 @@ export default defineConfig(() => {
         "@": resolve(__dirname, "./src"),
       },
     },
-    // Make environment variables available to client code
-    define: {
-      "process.env.SKIP_TRACING": JSON.stringify(
-        process.env.SKIP_TRACING || "false",
-      ),
-    },
   };
 });

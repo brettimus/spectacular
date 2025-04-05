@@ -9,7 +9,7 @@ export const saveApiIndexToDiskActor = fromPromise<
   await saveApiIndexToDisk(projectDir, indexTs);
 });
 
-export async function saveApiIndexToDisk(
+async function saveApiIndexToDisk(
   projectDir: string,
   indexTs: string,
 ): Promise<void> {
