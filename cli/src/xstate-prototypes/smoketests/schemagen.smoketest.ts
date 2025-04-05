@@ -1,5 +1,5 @@
 import { createActor } from "xstate";
-import { schemaCodegenMachine } from "../machines/codegen/schema-codegen/schema-codegen";
+import { cliSchemaCodegenMachine } from "../adapters/cli";
 import { config } from "dotenv";
 import { readFileSync } from "node:fs";
 import path, { dirname } from "node:path";
@@ -65,7 +65,7 @@ if (!existsSync(logsDir)) {
   console.log(`Created logs directory: ${logsDir}`);
 }
 
-const actor = createActor(schemaCodegenMachine, {
+const actor = createActor(cliSchemaCodegenMachine, {
   input: {
     apiKey: API_KEY,
     aiProvider: AI_PROVIDER,

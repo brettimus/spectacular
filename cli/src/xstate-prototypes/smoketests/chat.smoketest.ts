@@ -1,10 +1,10 @@
 import { createActor } from "xstate";
 import { config } from "dotenv";
-import { chatMachine } from "../machines/chat";
+import { cliChatMachine } from "../adapters/cli";
 
 config();
 
-const actor = createActor(chatMachine, {
+const actor = createActor(cliChatMachine, {
   input: {
     apiKey: process.env.OPENAI_API_KEY ?? "",
     cwd: process.cwd(),

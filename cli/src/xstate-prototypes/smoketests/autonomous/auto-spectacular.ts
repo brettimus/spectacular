@@ -1,6 +1,8 @@
 import { createActor, waitFor } from "xstate";
-import { schemaCodegenMachine } from "../../machines/codegen/schema-codegen/schema-codegen";
-import { apiCodegenMachine } from "../../machines/codegen/api-codegen/api-codegen";
+import {
+  cliSchemaCodegenMachine,
+  cliApiCodegenMachine,
+} from "../../adapters/cli";
 import { createLogger } from "./logger";
 import type { FpModelProvider } from "../../ai";
 
@@ -19,7 +21,7 @@ export async function autoSpectacular({
   projectDir,
   logsDir,
 }: SpectacularOptions) {
-  const schemaGeneratorActor = createActor(schemaCodegenMachine, {
+  const schemaGeneratorActor = createActor(cliSchemaCodegenMachine, {
     input: {
       apiKey,
       aiProvider,
@@ -60,7 +62,7 @@ export async function autoSpectacular({
 
   const schemaGenOutput = finalState.output;
 
-  const apiGeneratorActor = createActor(apiCodegenMachine, {
+  const apiGeneratorActor = createActor(cliApiCodegenMachine, {
     input: {
       apiKey,
       aiProvider,
