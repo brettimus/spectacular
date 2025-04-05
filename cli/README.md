@@ -42,8 +42,8 @@ Configuring:
 
 NOTE:
 
-- Projects will be saved in the `<cli-root>/../spectacular-autonomous` directory
-- Logs will be saved in the `<cli-root>/../spectacular-autonomous-logs` directory
+- Projects will be saved in the `<cli-root>/../../spectacular-autonomous` directory
+- Logs will be saved in the `<cli-root>/../../spectacular-autonomous-logs` directory
 
 - Specs are created via an LLM call, instead of via chat.
   - See: `create-spec.ts`
