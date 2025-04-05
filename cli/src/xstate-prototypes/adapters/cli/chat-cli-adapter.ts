@@ -3,9 +3,8 @@ import { spinner, text, log, stream, isCancel } from "@clack/prompts";
 import pico from "picocolors";
 import type { Message } from "ai";
 import { config } from "dotenv";
-import { chatMachine } from "@/xstate-prototypes/machines/chat";
 import type { AiTextStreamResult } from "@/xstate-prototypes/machines/streaming";
-import { saveSpecToDiskActor } from "./actors";
+import { cliChatMachine } from "./machines";
 
 config();
 
@@ -13,7 +12,7 @@ const API_KEY = process.env.OPENAI_API_KEY;
 const AI_PROVIDER = "openai";
 
 export class ChatCliAdapter {
-  private actor: ActorRefFrom<typeof chatMachine>;
+  private actor: ActorRefFrom<typeof cliChatMachine>;
   private loadingSpinner: ReturnType<typeof spinner> | null = null;
 
   constructor() {
@@ -22,14 +21,10 @@ export class ChatCliAdapter {
       throw new Error("OPENAI_API_KEY is not set");
     }
     // NOTE - We need to provide filesystem actors to do things like save the spec and files to disk
-    const fsCompatibleMachine = chatMachine.provide({
-      actors: {
-        saveSpec: saveSpecToDiskActor,
-      },
-    });
+    
     // TODO - Try to provide a `processQuestionStream` actor that can
     //        stream the response to the CLI
-    this.actor = createActor(fsCompatibleMachine, {
+    this.actor = createActor(cliChatMachine, {
       input: {
         apiKey: API_KEY,
         aiProvider: AI_PROVIDER,
