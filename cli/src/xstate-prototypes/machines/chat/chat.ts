@@ -29,6 +29,8 @@ interface ChatMachineInput {
 export interface ChatMachineContext {
   aiConfig: FpAiConfig;
   messages: Message[];
+  error: unknown | null;
+  errorHistory: unknown[];
   cwd: string;
   spec: string | null;
   projectDir: string | null;
@@ -37,8 +39,13 @@ export interface ChatMachineContext {
   streamResponse: AiTextStreamResult | null;
 }
 
+type ChatMachineEvent = 
+  | { type: "user.message"; content: string }
+  | { type: "cancel" };
+
 interface ChatMachineOutput {
   messages: Message[];
+  errorHistory: unknown[];
   cwd: string;
   spec: string | null;
   specLocation: string | null;
@@ -50,7 +57,7 @@ const chatMachine = setup({
   types: {
     context: {} as ChatMachineContext,
     input: {} as ChatMachineInput,
-    events: {} as { type: "user.message"; content: string },
+    events: {} as ChatMachineEvent,
     output: {} as ChatMachineOutput,
   },
   actors: {
@@ -61,10 +68,10 @@ const chatMachine = setup({
     processQuestionStream: aiTextStreamMachine,
   },
   guards: {
-    shouldAskFollowUp: (_context, routerResponse: RouterResponse) => {
+    shouldAskFollowUp: (_, routerResponse: RouterResponse) => {
       return routerResponse.nextStep === "ask_follow_up_question";
     },
-    shouldGenerateSpec: (_context, routerResponse: RouterResponse) => {
+    shouldGenerateSpec: (_, routerResponse: RouterResponse) => {
       return routerResponse.nextStep === "generate_implementation_plan";
     },
   },
@@ -87,6 +94,16 @@ const chatMachine = setup({
       },
       streamResponse: null, // Clear the raw streaming response
     }),
+    recordError: assign({
+      error: (_, event: { error: unknown }) => event.error,
+      errorHistory: ({ context }, event: { error: unknown }) => [
+        ...context.errorHistory,
+        event.error,
+      ],
+    }),
+    resetError: assign({
+      error: () => null,
+    }),
   },
 }).createMachine({
   id: "ideation-agent",
@@ -100,23 +117,22 @@ const chatMachine = setup({
       aiGatewayUrl: input.aiGatewayUrl,
     },
     messages: [],
+    error: null,
+    errorHistory: [],
     cwd: input.cwd,
     spec: null,
     specLocation: null,
     title: "spec.md",
     streamResponse: null,
-    // TODO - set project dir
     projectDir: input.cwd,
   }),
   states: {
     AwaitingUserInput: {
       on: {
         "user.message": {
-          description: "The user has sent a message to the chat agent",
+          description: "The user sends a message to the chat agent",
           target: "Routing",
-          // Update the internal messages state
           actions: [
-            ({ event }) => console.log("AwaitingUserInput got event:", event),
             {
               type: "addUserMessage",
               params: ({ event }) => {
@@ -130,6 +146,11 @@ const chatMachine = setup({
       },
     },
     Routing: {
+      on: {
+        "cancel": {
+          target: "AwaitingUserInput",
+        },
+      },
       invoke: {
         id: "routeRequest",
         src: "routeRequest",
@@ -158,9 +179,21 @@ const chatMachine = setup({
             },
           },
         ],
+        onError: {
+          target: "Error",
+          actions: {
+            type: "recordError",
+            params: ({ event }) => ({ error: event.error }),
+          },
+        },
       },
     },
     FollowingUp: {
+      on: {
+        "cancel": {
+          target: "AwaitingUserInput",
+        },
+      },
       invoke: {
         id: "askNextQuestion",
         src: "askNextQuestion",
@@ -174,10 +207,22 @@ const chatMachine = setup({
             streamResponse: ({ event }) => event.output,
           }),
         },
-        // TODO - Add onError handler
+        onError: {
+          target: "Error",
+          actions: {
+            type: "recordError",
+            params: ({ event }) => ({ error: event.error }),
+          },
+        },
       },
     },
     ProcessingAiResponse: {
+      on: {
+        "cancel": {
+          target: "AwaitingUserInput",
+          // TODO - Flush message somehow?
+        },
+      },
       invoke: {
         id: "processQuestionStream",
         src: "processQuestionStream",
@@ -199,7 +244,13 @@ const chatMachine = setup({
             },
           ],
         },
-        // TODO - Add onError handler
+        onError: {
+          target: "Error",
+          actions: {
+            type: "recordError",
+            params: ({ event }) => ({ error: event.error }),
+          },
+        },
       },
     },
     GeneratingSpec: {
@@ -218,6 +269,13 @@ const chatMachine = setup({
             }),
           ],
           target: "SavingSpec",
+        },
+        onError: {
+          target: "Error",
+          actions: {
+            type: "recordError",
+            params: ({ event }) => ({ error: event.error }),
+          },
         },
       },
     },
@@ -241,13 +299,43 @@ const chatMachine = setup({
               pathFromInput(context.title, context.cwd),
           }),
         },
+        onError: {
+          target: "Error",
+          actions: {
+            type: "recordError",
+            params: ({ event }) => ({ error: event.error }),
+          },
+        },
       },
     },
     Done: {
       type: "final",
     },
+    Error: {
+      on: {
+        "user.message": {
+          target: "Routing",
+          actions: [
+            // Flush error state
+            {
+              type: "resetError",
+            },
+            {
+              type: "addUserMessage",
+              params: ({ event }) => {
+                return {
+                  content: event.content,
+                };
+              },
+            },
+          ],
+
+        },
+      },
+    },
   },
   output: ({ context }) => ({
+    errorHistory: context.errorHistory,
     spec: context.spec,
     specLocation: context.specLocation,
     messages: context.messages,
