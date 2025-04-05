@@ -21,7 +21,7 @@ export class ChatCliAdapter {
       throw new Error("OPENAI_API_KEY is not set");
     }
     // NOTE - We need to provide filesystem actors to do things like save the spec and files to disk
-    
+
     // TODO - Try to provide a `processQuestionStream` actor that can
     //        stream the response to the CLI
     this.actor = createActor(cliChatMachine, {

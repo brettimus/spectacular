@@ -10,16 +10,37 @@ import type { Message } from "ai";
 import { spectacularMachine } from "../../spectacular";
 import type { AiTextStreamResult } from "../../machines/streaming";
 import type { chatMachine, ChatMachineContext } from "../../machines/chat";
+import {
+  cliChatMachine,
+  cliSchemaCodegenMachine,
+  cliApiCodegenMachine,
+} from "./machines";
+import { config } from "dotenv";
+
+config();
+
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error("OPENAI_API_KEY is not set");
+}
+
+const API_KEY = process.env.OPENAI_API_KEY;
+
+const cliSpectacularMachine = spectacularMachine.provide({
+  actors: {
+    ideationActor: cliChatMachine,
+    schemaGenerationActor: cliSchemaCodegenMachine,
+    apiGenerationActor: cliApiCodegenMachine,
+  },
+});
 
 export class SpectacularCliAdapter {
-  // private actor: ActorRefFrom<typeof chatMachine>;
-  private actor: ActorRefFrom<typeof spectacularMachine>;
+  private actor: ActorRefFrom<typeof cliSpectacularMachine>;
   private loadingSpinner: ReturnType<typeof spinner> | null = null;
 
   constructor() {
-    this.actor = createActor(spectacularMachine, {
+    this.actor = createActor(cliSpectacularMachine, {
       input: {
-        apiKey: "123",
+        apiKey: API_KEY,
         cwd: process.cwd(),
       },
       // Add inspection to debug actor lifecycle
