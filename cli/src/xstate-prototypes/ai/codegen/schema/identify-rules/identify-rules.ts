@@ -3,8 +3,8 @@ import { z } from "zod";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import type { SelectedRule } from "../../types";
-import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
+import { OPENAI_STRATEGY } from "./openai";
 
 export type IdentifyRulesOptions = {
   schemaSpecification: string;

@@ -1,23 +1,23 @@
-import { appendResponseMessages, type Message } from "ai";
-import { setup, assign } from "xstate";
-import {
-  generateSpecActor,
-  askNextQuestionActor,
-  saveSpecNoopActor,
-  routeRequestActor,
-  type RouterResponse,
-} from "./actors";
-import {
-  aiTextStreamMachine,
-  type AiTextStreamResult,
-  type AiResponseMessage,
-} from "../streaming";
+import { type Message, appendResponseMessages } from "ai";
+import { assign, setup } from "xstate";
 import {
   DEFAULT_AI_PROVIDER,
   type FpAiConfig,
   type FpModelProvider,
 } from "../../ai";
 import { createUserMessage, pathFromInput } from "../../utils";
+import {
+  type AiResponseMessage,
+  type AiTextStreamResult,
+  aiTextStreamMachine,
+} from "../streaming";
+import {
+  type RouterResponse,
+  askNextQuestionActor,
+  generateSpecActor,
+  routeRequestActor,
+  saveSpecNoopActor,
+} from "./actors";
 
 interface ChatMachineInput {
   apiKey: string;

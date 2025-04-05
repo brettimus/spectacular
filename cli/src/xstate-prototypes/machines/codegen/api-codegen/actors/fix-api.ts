@@ -1,9 +1,9 @@
-import { fromPromise } from "xstate";
 import {
-  fixApiErrors,
   type FixApiErrorsResult,
   type FpAiConfig,
+  fixApiErrors,
 } from "@/xstate-prototypes/ai";
+import { fromPromise } from "xstate";
 
 export const fixApiErrorsActor = fromPromise<
   FixApiErrorsResult | null,

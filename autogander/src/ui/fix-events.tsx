@@ -1,8 +1,8 @@
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
-import * as schema from "../db/schema";
 import { FixesList, Layout, RulesList } from "../components";
+import * as schema from "../db/schema";
 import type { Bindings } from "../types";
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -28,20 +28,20 @@ app.get("/fix-events/:id", async (c) => {
     }
 
     return c.html(
-      <Layout title="Fix Events" >
+      <Layout title="Fix Events">
         <FixesList fixes={[fixEvent]} total={1} page={1} pageSize={1} />
-      </Layout>
+      </Layout>,
     );
   } catch (error) {
     console.error("Error fetching fix event:", error);
     return c.html(
-      <Layout title="Error" >
+      <Layout title="Error">
         <div>
           <h1>Error </h1>
-          < p > Failed to fetch fix event.Please try again later.</p>
-          < pre > {error instanceof Error ? error.message : String(error)} </pre>
+          <p> Failed to fetch fix event.Please try again later.</p>
+          <pre> {error instanceof Error ? error.message : String(error)} </pre>
         </div>
-      </Layout>
+      </Layout>,
     );
   }
 });
@@ -67,20 +67,20 @@ app.get("/fix-events/:id/rules", async (c) => {
     }
 
     return c.html(
-      <Layout title="Rules" >
+      <Layout title="Rules">
         <RulesList rules={rules} />
-      </Layout>
+      </Layout>,
     );
   } catch (error) {
     console.error("Error fetching fix event:", error);
     return c.html(
-      <Layout title="Error" >
+      <Layout title="Error">
         <div>
           <h1>Error </h1>
-          < p > Failed to fetch fix event.Please try again later.</p>
-          < pre > {error instanceof Error ? error.message : String(error)} </pre>
+          <p> Failed to fetch fix event.Please try again later.</p>
+          <pre> {error instanceof Error ? error.message : String(error)} </pre>
         </div>
-      </Layout>
+      </Layout>,
     );
   }
 });

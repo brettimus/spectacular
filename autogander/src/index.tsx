@@ -1,10 +1,10 @@
 import { createFiberplane, createOpenAPISpec } from "@fiberplane/hono";
 import { Hono } from "hono";
-import type { Bindings } from "./types";
-import home from "./ui/home";
-import fixEvents from "./ui/fix-events";
-import rules from "./ui/rules";
 import api from "./api/api";
+import type { Bindings } from "./types";
+import fixEvents from "./ui/fix-events";
+import home from "./ui/home";
+import rules from "./ui/rules";
 
 const app = new Hono<{ Bindings: Bindings }>();
 

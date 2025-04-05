@@ -1,6 +1,9 @@
-import type { FC, PropsWithChildren } from 'hono/jsx';
+import type { FC, PropsWithChildren } from "hono/jsx";
 
-export const Layout: FC<PropsWithChildren<{ title: string }>> = ({ title, children }) => {
+export const Layout: FC<PropsWithChildren<{ title: string }>> = ({
+  title,
+  children,
+}) => {
   return (
     <html lang="en">
       <head>
@@ -144,21 +147,38 @@ export const Layout: FC<PropsWithChildren<{ title: string }>> = ({ title, childr
             </nav>
           </div>
         </header>
-        
+
         <main class="container">
           {title.includes("Rules") && (
             <div class="rules-subnav">
               <nav class="subnav">
-                <a href="/rules" class={title === "All Rules" ? "active" : ""}>All</a>
-                <a href="/rules/pending" class={title === "Pending Rules" ? "active" : ""}>Pending</a>
-                <a href="/rules/approved" class={title === "Approved Rules" ? "active" : ""}>Approved</a>
-                <a href="/rules/rejected" class={title === "Rejected Rules" ? "active" : ""}>Rejected</a>
+                <a href="/rules" class={title === "All Rules" ? "active" : ""}>
+                  All
+                </a>
+                <a
+                  href="/rules/pending"
+                  class={title === "Pending Rules" ? "active" : ""}
+                >
+                  Pending
+                </a>
+                <a
+                  href="/rules/approved"
+                  class={title === "Approved Rules" ? "active" : ""}
+                >
+                  Approved
+                </a>
+                <a
+                  href="/rules/rejected"
+                  class={title === "Rejected Rules" ? "active" : ""}
+                >
+                  Rejected
+                </a>
               </nav>
             </div>
           )}
           {children}
         </main>
-        
+
         <style>{`
           .rules-subnav {
             margin-bottom: 1.5rem;
@@ -192,4 +212,4 @@ export const Layout: FC<PropsWithChildren<{ title: string }>> = ({ title, childr
       </body>
     </html>
   );
-}; 
+};

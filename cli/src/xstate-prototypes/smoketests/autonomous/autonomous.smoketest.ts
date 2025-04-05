@@ -1,7 +1,12 @@
-import { config } from "dotenv";
+import fs from "node:fs";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import fs from "node:fs";
+import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import { configure, getLogger } from "@logtape/logtape";
+import { config } from "dotenv";
+import { getAiConfig } from "./ai-config";
+import { autoSpectacular } from "./auto-spectacular";
+import { createSpec } from "./create-spec";
 import {
   addTimestampToProjectDirName,
   setUpLogsDir,
@@ -9,11 +14,6 @@ import {
   verifyCurrentDir,
   writeSpecToFile,
 } from "./utils";
-import { createSpec } from "./create-spec";
-import { autoSpectacular } from "./auto-spectacular";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
-import { getAiConfig } from "./ai-config";
-import { configure, getLogger } from "@logtape/logtape";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,7 +26,7 @@ const CENTRAL_LOGS_DIR = path.join(
   process.cwd(),
   "..",
   "..",
-  "spectacular-loop-logs",
+  "spectacular-autonomous-logs",
 );
 
 // Create the central logs directory if it doesn't exist

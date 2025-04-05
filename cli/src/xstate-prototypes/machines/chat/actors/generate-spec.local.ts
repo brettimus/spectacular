@@ -1,6 +1,6 @@
+import type { GeneratedPlan } from "@/xstate-prototypes/ai";
 import type { Message } from "ai";
 import { fromPromise } from "xstate";
-import type { GeneratedPlan } from "@/xstate-prototypes/ai";
 
 export const generateSpecActor = fromPromise<
   GeneratedPlan,

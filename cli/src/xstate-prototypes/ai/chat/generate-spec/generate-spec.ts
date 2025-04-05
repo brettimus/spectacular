@@ -1,10 +1,10 @@
 import type { Message } from "ai";
 import { generateObject } from "ai";
 import { z } from "zod";
-import type { FpAiConfig, FpModelProvider } from "../../types";
 import { aiModelFactory } from "../../ai-model-factory";
-import { OPENAI_STRATEGY } from "./openai";
+import type { FpAiConfig, FpModelProvider } from "../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
+import { OPENAI_STRATEGY } from "./openai";
 
 // Schema remains the same
 export const GeneratedPlanSchema = z.object({

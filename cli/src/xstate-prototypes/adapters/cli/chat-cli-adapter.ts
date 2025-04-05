@@ -1,9 +1,9 @@
-import { createActor, waitFor, type ActorRefFrom } from "xstate";
-import { spinner, text, log, stream, isCancel } from "@clack/prompts";
-import pico from "picocolors";
+import type { AiTextStreamResult } from "@/xstate-prototypes/machines/streaming";
+import { stream, isCancel, log, spinner, text } from "@clack/prompts";
 import type { Message } from "ai";
 import { config } from "dotenv";
-import type { AiTextStreamResult } from "@/xstate-prototypes/machines/streaming";
+import pico from "picocolors";
+import { type ActorRefFrom, createActor, waitFor } from "xstate";
 import { cliChatMachine } from "./machines";
 
 config();

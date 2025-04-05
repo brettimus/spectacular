@@ -1,29 +1,29 @@
-import { setup, assign } from "xstate";
 import type { SelectedRule } from "@/xstate-prototypes/ai";
-import { log } from "@/xstate-prototypes/utils/logging";
-import {
-  analyzeTablesActor,
-  identifyRulesActor,
-  generateSchemaActor,
-  analyzeErrorsActor,
-  type AnalyzeSchemaErrorsResult,
-  fixSchemaActor,
-  saveSchemaNoopActor,
-} from "./actors";
 import {
   DEFAULT_AI_PROVIDER,
   type FpAiConfig,
   type FpModelProvider,
 } from "@/xstate-prototypes/ai";
 import {
-  type ErrorInfo,
-  validateTypeScriptNoopActor,
-} from "@/xstate-prototypes/typechecking";
-import {
   downloadTemplateNoopActor,
   installDependenciesNoopActor,
 } from "@/xstate-prototypes/machines";
+import {
+  type ErrorInfo,
+  validateTypeScriptNoopActor,
+} from "@/xstate-prototypes/typechecking";
 import { getPackageManager } from "@/xstate-prototypes/utils";
+import { log } from "@/xstate-prototypes/utils/logging";
+import { assign, setup } from "xstate";
+import {
+  type AnalyzeSchemaErrorsResult,
+  analyzeErrorsActor,
+  analyzeTablesActor,
+  fixSchemaActor,
+  generateSchemaActor,
+  identifyRulesActor,
+  saveSchemaNoopActor,
+} from "./actors";
 
 interface SchemaCodegenMachineInput {
   /** The API key to use for AI calls */

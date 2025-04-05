@@ -1,21 +1,21 @@
-import {
-  createActor,
-  type SnapshotFrom,
-  waitFor,
-  type ActorRefFrom,
-} from "xstate";
-import { spinner, text, log, stream, isCancel } from "@clack/prompts";
-import pico from "picocolors";
+import { stream, isCancel, log, spinner, text } from "@clack/prompts";
 import type { Message } from "ai";
-import { spectacularMachine } from "../../spectacular";
-import type { AiTextStreamResult } from "../../machines/streaming";
-import type { chatMachine, ChatMachineContext } from "../../machines/chat";
+import { config } from "dotenv";
+import pico from "picocolors";
 import {
+  type ActorRefFrom,
+  type SnapshotFrom,
+  createActor,
+  waitFor,
+} from "xstate";
+import type { ChatMachineContext, chatMachine } from "../../machines/chat";
+import type { AiTextStreamResult } from "../../machines/streaming";
+import { spectacularMachine } from "../../spectacular";
+import {
+  cliApiCodegenMachine,
   cliChatMachine,
   cliSchemaCodegenMachine,
-  cliApiCodegenMachine,
 } from "./machines";
-import { config } from "dotenv";
 
 config();
 

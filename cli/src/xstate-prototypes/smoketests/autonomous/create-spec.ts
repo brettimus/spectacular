@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { generateObject } from "ai";
-import { z } from "zod";
 import type { FpModelProvider } from "@/xstate-prototypes/ai";
 import { aiModelFactory } from "@/xstate-prototypes/ai";
+import { generateObject } from "ai";
+import { z } from "zod";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

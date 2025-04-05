@@ -1,5 +1,3 @@
-import { setup, assign } from "xstate";
-import { log } from "@/xstate-prototypes/utils/logging/logger";
 import {
   DEFAULT_AI_PROVIDER,
   type FpAiConfig,
@@ -9,12 +7,14 @@ import {
   type ErrorInfo,
   validateTypeScriptNoopActor,
 } from "@/xstate-prototypes/typechecking";
+import { log } from "@/xstate-prototypes/utils/logging/logger";
+import { assign, setup } from "xstate";
 import {
-  generateApiActor,
+  type AnalyzeApiErrorsResult,
   analyzeApiErrorsActor,
   fixApiErrorsActor,
+  generateApiActor,
   saveApiIndexNoopActor,
-  type AnalyzeApiErrorsResult,
 } from "./actors";
 
 interface ApiCodegenMachineInput {

@@ -1,10 +1,10 @@
-import { generateText } from "ai";
-import { log } from "@/xstate-prototypes/utils/logging/logger";
-import type { FpAiConfig, FpModelProvider } from "../../../types";
-import { aiModelFactory } from "../../../ai-model-factory";
 import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
-import { OPENAI_STRATEGY } from "./openai";
+import { log } from "@/xstate-prototypes/utils/logging/logger";
+import { generateText } from "ai";
+import { aiModelFactory } from "../../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
+import { OPENAI_STRATEGY } from "./openai";
 
 // Infer the `sources` type from the generateText return type
 type GenerateTextReturnType = Awaited<ReturnType<typeof generateText>>;

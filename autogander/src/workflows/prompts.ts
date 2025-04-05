@@ -1,4 +1,4 @@
-import type { CoreMessage } from "ai"
+import type { CoreMessage } from "ai";
 
 export const RULE_GENERATION_SYSTEM_PROMPT = `You are an expert Typescript developer specializing in Hono.js and Drizzle ORM.
 
@@ -30,14 +30,14 @@ You can provide reasoning in the reasoning field.
 Skip rules that are not relevant to using Hono.js and Drizzle ORM.
 Do not share learnings about application logic that is specific to the project,
 instead take this as a moment to teach yourself more about the framework and libraries.
-`
+`;
 
 function createRuleGenerationPrompt(
   code: string,
   sourceCompilerErrors: Array<object>,
-  analysis: string, 
-  attemptedFix: string, 
-  fixedCompilerErrors: Array<object>
+  analysis: string,
+  attemptedFix: string,
+  fixedCompilerErrors: Array<object>,
 ) {
   return `
 [CODE]
@@ -59,7 +59,7 @@ ${attemptedFix}
 [REMAINING ERRORS]
 ${fixedCompilerErrors}
 [END REMAINING ERRORS]
-***`
+***`;
 }
 
 export function createRuleGenerationMessages(
@@ -67,18 +67,24 @@ export function createRuleGenerationMessages(
   sourceCompilerErrors: Array<object>,
   analysis: string,
   attemptedFix: string,
-  fixedCompilerErrors: Array<object>
+  fixedCompilerErrors: Array<object>,
 ): CoreMessage[] {
   return [
     {
-      role: 'system',
+      role: "system",
       content: RULE_GENERATION_SYSTEM_PROMPT,
     },
     {
-      role: 'user',
-      content: createRuleGenerationPrompt(code, sourceCompilerErrors, analysis, attemptedFix, fixedCompilerErrors),
+      role: "user",
+      content: createRuleGenerationPrompt(
+        code,
+        sourceCompilerErrors,
+        analysis,
+        attemptedFix,
+        fixedCompilerErrors,
+      ),
     },
-  ]
+  ];
 }
 
 function getExampleRule() {
@@ -102,5 +108,5 @@ function getExampleRule() {
 
   export default app;
   \`\`\`
-`
+`;
 }

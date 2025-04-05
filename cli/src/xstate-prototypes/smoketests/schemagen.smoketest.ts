@@ -1,10 +1,10 @@
-import { createActor } from "xstate";
-import { cliSchemaCodegenMachine } from "../adapters/cli";
-import { config } from "dotenv";
 import { readFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { config } from "dotenv";
+import { createActor } from "xstate";
+import { cliSchemaCodegenMachine } from "../adapters/cli";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

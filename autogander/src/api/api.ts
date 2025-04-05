@@ -13,13 +13,11 @@ app.get("/fix-events", async (c) => {
   return c.json(fixEvents);
 });
 
-
 app.get("/rules", async (c) => {
   const db = drizzle(c.env.DB);
   const rules = await db.select().from(schema.rules);
   return c.json(rules);
 });
-
 
 // POST /sessions/:id/fix-events
 app.post("/sessions/:id/fix-events", async (c) => {
@@ -45,11 +43,24 @@ app.post("/sessions/:id/fix-events", async (c) => {
     return c.json({ error: "Invalid JSON payload" }, 400);
   }
 
-  const { type, sourceCode, sourceCompilerErrors, analysis, fixedCode, fixedCompilerErrors } = payload;
+  const {
+    type,
+    sourceCode,
+    sourceCompilerErrors,
+    analysis,
+    fixedCode,
+    fixedCompilerErrors,
+  } = payload;
 
   console.log("payload", payload);
 
-  if (!type || !sourceCode || !sourceCompilerErrors || !analysis || !fixedCode) {
+  if (
+    !type ||
+    !sourceCode ||
+    !sourceCompilerErrors ||
+    !analysis ||
+    !fixedCode
+  ) {
     return c.json({ error: "Missing required fields in payload" }, 400);
   }
 
@@ -163,75 +174,88 @@ app.get("/sessions/:id/fix-events", async (c) => {
 });
 
 // Endpoint to manually trigger the rule workflow (for testing/admin purposes)
-app.post("/admin/trigger-rule-workflow", async (c, next) => {
-  if (!c.env.ADMIN_SECRET) {
-    return c.json({ error: "internal server error" }, 500);
-  }
-  if (c.req.header("Authorization") !== c.env.ADMIN_SECRET) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
-  await next();
-}, async (c) => {
-  try {
-    // Get the workflow binding
-    const workflow = c.env.AUTOGANDER_RULE_WORKFLOW;
-
-    if (!workflow) {
-      return c.json({ error: "Workflow binding not available" }, 500);
+app.post(
+  "/admin/trigger-rule-workflow",
+  async (c, next) => {
+    if (!c.env.ADMIN_SECRET) {
+      return c.json({ error: "internal server error" }, 500);
     }
+    if (c.req.header("Authorization") !== c.env.ADMIN_SECRET) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+    await next();
+  },
+  async (c) => {
+    try {
+      // Get the workflow binding
+      const workflow = c.env.AUTOGANDER_RULE_WORKFLOW;
 
-    // Trigger the workflow
-    const instance = await workflow.create({});
+      if (!workflow) {
+        return c.json({ error: "Workflow binding not available" }, 500);
+      }
 
-    return c.json({
-      message: "Rule workflow triggered successfully",
-      workflowId: instance.id,
-      status: await instance.status()
-    }, 200);
-  } catch (error) {
-    console.error("Error triggering rule workflow:", error);
-    return c.json({
-      error: "Failed to trigger rule workflow",
-      message: error instanceof Error ? error.message : "Unknown error"
-    }, 500);
-  }
-});
+      // Trigger the workflow
+      const instance = await workflow.create({});
+
+      return c.json(
+        {
+          message: "Rule workflow triggered successfully",
+          workflowId: instance.id,
+          status: await instance.status(),
+        },
+        200,
+      );
+    } catch (error) {
+      console.error("Error triggering rule workflow:", error);
+      return c.json(
+        {
+          error: "Failed to trigger rule workflow",
+          message: error instanceof Error ? error.message : "Unknown error",
+        },
+        500,
+      );
+    }
+  },
+);
 
 // Endpoint to review (approve/reject) rules
 app.post("/rules/:id/review", async (c) => {
   const db = drizzle(c.env.DB);
   const id = c.req.param("id");
-  
+
   if (!id) {
     return c.json({ error: "Missing rule id" }, 400);
   }
-  
+
   // Parse form data
   const formData = await c.req.parseBody();
   const action = formData.action as string;
   const returnUrl = (formData.returnUrl as string) || "/rules";
-  
+
   if (!action || (action !== "approve" && action !== "reject")) {
     return c.json({ error: "Invalid action" }, 400);
   }
-  
+
   const status = action === "approve" ? "approved" : "rejected";
-  
+
   try {
     // Update the rule status
     await db
       .update(schema.rules)
       .set({ status })
       .where(eq(schema.rules.id, Number.parseInt(id)));
-    
+
     // Redirect back to the rules page
     return c.redirect(returnUrl);
   } catch (error) {
     console.error("Error updating rule:", error);
-    return c.json({
-      error: "Failed to update rule",
-      message: error instanceof Error ? error.message : "Unknown error"
-    }, 500);
+    return c.json(
+      {
+        error: "Failed to update rule",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
   }
 });
 

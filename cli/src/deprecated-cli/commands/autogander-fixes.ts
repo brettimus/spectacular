@@ -2,6 +2,14 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { AutoganderClient } from "@/autogander-client";
+import { SPECTACULAR_TITLE } from "@/deprecated-cli/const";
+import { initContext } from "@/deprecated-cli/context";
+import { handleCancel } from "@/deprecated-cli/utils";
+import {
+  initCommandLogSession,
+  logActionExecution,
+} from "@/deprecated-cli/utils/logging";
 import {
   confirm,
   intro,
@@ -11,14 +19,6 @@ import {
   spinner,
 } from "@clack/prompts";
 import pico from "picocolors";
-import { AutoganderClient } from "@/autogander-client";
-import { SPECTACULAR_TITLE } from "@/deprecated-cli/const";
-import { initContext } from "@/deprecated-cli/context";
-import { handleCancel } from "@/deprecated-cli/utils";
-import {
-  initCommandLogSession,
-  logActionExecution,
-} from "@/deprecated-cli/utils/logging";
 
 // Constants from logging.ts
 const SPECTACULAR_HOME_DIR_NAME = ".spectacular_stuff";

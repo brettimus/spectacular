@@ -1,10 +1,10 @@
 import { createActor, waitFor } from "xstate";
 import {
-  cliSchemaCodegenMachine,
   cliApiCodegenMachine,
+  cliSchemaCodegenMachine,
 } from "../../adapters/cli";
-import { createLogger } from "./logger";
 import type { FpModelProvider } from "../../ai";
+import { createLogger } from "./logger";
 
 export interface SpectacularOptions {
   apiKey: string;

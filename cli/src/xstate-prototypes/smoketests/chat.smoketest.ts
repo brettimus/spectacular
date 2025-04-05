@@ -1,5 +1,5 @@
-import { createActor } from "xstate";
 import { config } from "dotenv";
+import { createActor } from "xstate";
 import { cliChatMachine } from "../adapters/cli";
 
 config();

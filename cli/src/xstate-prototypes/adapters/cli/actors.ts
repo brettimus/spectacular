@@ -1,11 +1,11 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fromPromise } from "xstate";
 import {
   type ErrorInfo,
   type ValidateTypescriptInputs,
   validateTypeScriptOnDisk,
 } from "@/xstate-prototypes/typechecking";
+import { fromPromise } from "xstate";
 
 export const validateTypeScriptOnDiskActor = fromPromise<
   ErrorInfo[],

@@ -1,6 +1,6 @@
+import { createBrowserInspector } from "@statelyai/inspect";
 import { createActor } from "xstate";
 import { chatMachine } from "../src/xstate-prototypes/chat/chat";
-import { createBrowserInspector } from "@statelyai/inspect";
 
 const inspector = createBrowserInspector();
 

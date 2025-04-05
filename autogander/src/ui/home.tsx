@@ -2,8 +2,8 @@ import { createFiberplane, createOpenAPISpec } from "@fiberplane/hono";
 import { and, count, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
-import * as schema from "../db/schema";
 import { FixesList, Layout, RulesList } from "../components";
+import * as schema from "../db/schema";
 import type { Bindings } from "../types";
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -37,9 +37,7 @@ app.get("/", async (c) => {
     }
 
     // Count query
-    const countQuery = db
-      .select({ count: count() })
-      .from(schema.fixEvents);
+    const countQuery = db.select({ count: count() }).from(schema.fixEvents);
 
     if (conditions.length > 0) {
       countQuery.where(and(...conditions));
@@ -52,9 +50,7 @@ app.get("/", async (c) => {
     }
 
     // Fix events query
-    const baseQuery = db
-      .select()
-      .from(schema.fixEvents);
+    const baseQuery = db.select().from(schema.fixEvents);
 
     if (conditions.length > 0) {
       baseQuery.where(and(...conditions));
@@ -67,8 +63,13 @@ app.get("/", async (c) => {
 
     return c.html(
       <Layout title="Fix Events">
-        <FixesList fixes={fixEvents} total={total} page={page} pageSize={pageSize} />
-      </Layout>
+        <FixesList
+          fixes={fixEvents}
+          total={total}
+          page={page}
+          pageSize={pageSize}
+        />
+      </Layout>,
     );
   } catch (error) {
     console.error("Error fetching fix events:", error);
@@ -79,7 +80,7 @@ app.get("/", async (c) => {
           <p>Failed to fetch fix events. Please try again later.</p>
           <pre>{error instanceof Error ? error.message : String(error)}</pre>
         </div>
-      </Layout>
+      </Layout>,
     );
   }
 });

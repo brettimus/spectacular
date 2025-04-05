@@ -1,14 +1,14 @@
-import { config } from "dotenv";
+import { readFileSync } from "node:fs";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { setUpLogsDir, verifyCurrentDir } from "./utils";
 import type { FpModelProvider } from "@/xstate-prototypes/ai";
-import { getAiConfig } from "./ai-config";
-import { initializeLogger } from "@/xstate-prototypes/utils/logging/logger";
-import { readFileSync } from "node:fs";
-import { createActor } from "xstate";
-import { createLogger } from "./logger";
 import { apiCodegenMachine } from "@/xstate-prototypes/machines/codegen/api-codegen/api-codegen";
+import { initializeLogger } from "@/xstate-prototypes/utils/logging/logger";
+import { config } from "dotenv";
+import { createActor } from "xstate";
+import { getAiConfig } from "./ai-config";
+import { createLogger } from "./logger";
+import { setUpLogsDir, verifyCurrentDir } from "./utils";
 
 await initializeLogger();
 

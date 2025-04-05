@@ -1,5 +1,5 @@
-import type { FC } from 'hono/jsx';
-import type { Rule } from '../db/schema';
+import type { FC } from "hono/jsx";
+import type { Rule } from "../db/schema";
 
 type RulesListProps = {
   rules: Rule[];
@@ -10,28 +10,35 @@ export const RulesList: FC<RulesListProps> = ({ rules, title }) => {
   // Sort rules: pending first, then approved, then rejected
   // Within each status group, sort by ID in descending order
   const sortedRules = [...rules].sort((a, b) => {
-    const statusOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2 };
-    const statusA = a.status || 'pending';
-    const statusB = b.status || 'pending';
-    
+    const statusOrder: Record<string, number> = {
+      pending: 0,
+      approved: 1,
+      rejected: 2,
+    };
+    const statusA = a.status || "pending";
+    const statusB = b.status || "pending";
+
     // First sort by status
     const orderA = statusOrder[statusA] ?? 0;
     const orderB = statusOrder[statusB] ?? 0;
-    
+
     if (orderA !== orderB) {
       return orderA - orderB;
     }
-    
+
     // Then sort by ID in descending order (within the same status)
     return b.id - a.id;
   });
 
   // Get count per status
-  const statusCount = sortedRules.reduce((acc, rule) => {
-    const status = rule.status || 'pending';
-    acc[status] = (acc[status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const statusCount = sortedRules.reduce(
+    (acc, rule) => {
+      const status = rule.status || "pending";
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   const pendingCount = statusCount.pending || 0;
   const approvedCount = statusCount.approved || 0;
@@ -39,8 +46,8 @@ export const RulesList: FC<RulesListProps> = ({ rules, title }) => {
 
   return (
     <div class="rules-container">
-      <h1>{title || 'Rules'}</h1>
-      
+      <h1>{title || "Rules"}</h1>
+
       <div class="rules-stats">
         <div class="stat-item">
           <span class="stat-label">Pending:</span>
@@ -55,7 +62,7 @@ export const RulesList: FC<RulesListProps> = ({ rules, title }) => {
           <span class="stat-value">{rejectedCount}</span>
         </div>
       </div>
-      
+
       <div class="rules-list">
         {sortedRules.length === 0 ? (
           <p>No rules found.</p>
@@ -65,46 +72,80 @@ export const RulesList: FC<RulesListProps> = ({ rules, title }) => {
               <div class="rule-header">
                 <h3 class="rule-title">Rule #{rule.id}</h3>
                 <div class="rule-metadata">
-                  <a href={`/fix-events/${rule.fixEventId}`} class="rule-fix-link">
+                  <a
+                    href={`/fix-events/${rule.fixEventId}`}
+                    class="rule-fix-link"
+                  >
                     Fix #{rule.fixEventId}
                   </a>
-                  <span class="rule-date">{new Date(rule.createdAt).toLocaleString()}</span>
-                  <span class={`rule-status status-${rule.status || 'pending'}`}>
-                    {rule.status ? rule.status.charAt(0).toUpperCase() + rule.status.slice(1) : 'Pending'}
+                  <span class="rule-date">
+                    {new Date(rule.createdAt).toLocaleString()}
+                  </span>
+                  <span
+                    class={`rule-status status-${rule.status || "pending"}`}
+                  >
+                    {rule.status
+                      ? rule.status.charAt(0).toUpperCase() +
+                        rule.status.slice(1)
+                      : "Pending"}
                   </span>
                 </div>
               </div>
-              
+
               <div class="rule-content">
                 <div class="section">
                   <h4 class="section-title">Rule</h4>
                   <pre class="code-block">{rule.rule}</pre>
                 </div>
-                
+
                 {rule.reasoning && (
                   <div class="section">
                     <h4 class="section-title">Reasoning</h4>
                     <pre class="code-block">{rule.reasoning}</pre>
                   </div>
                 )}
-                
+
                 {rule.additionalData && (
                   <div class="section">
                     <h4 class="section-title">Additional Data</h4>
-                    <pre class="code-block">{JSON.stringify(rule.additionalData, null, 2)}</pre>
+                    <pre class="code-block">
+                      {JSON.stringify(rule.additionalData, null, 2)}
+                    </pre>
                   </div>
                 )}
               </div>
 
-              {(!rule.status || rule.status === 'pending') && (
+              {(!rule.status || rule.status === "pending") && (
                 <div class="rule-actions">
-                  <form method="post" action={`/api/rules/${rule.id}/review`} class="review-form">
-                    <input type="hidden" name="returnUrl" value={title?.toLowerCase().includes('pending') ? '/rules/pending' : '/rules'} />
+                  <form
+                    method="post"
+                    action={`/api/rules/${rule.id}/review`}
+                    class="review-form"
+                  >
+                    <input
+                      type="hidden"
+                      name="returnUrl"
+                      value={
+                        title?.toLowerCase().includes("pending")
+                          ? "/rules/pending"
+                          : "/rules"
+                      }
+                    />
                     <div class="button-group">
-                      <button type="submit" name="action" value="approve" class="btn btn-approve">
+                      <button
+                        type="submit"
+                        name="action"
+                        value="approve"
+                        class="btn btn-approve"
+                      >
                         Approve
                       </button>
-                      <button type="submit" name="action" value="reject" class="btn btn-reject">
+                      <button
+                        type="submit"
+                        name="action"
+                        value="reject"
+                        class="btn btn-reject"
+                      >
                         Reject
                       </button>
                     </div>
@@ -274,4 +315,4 @@ export const RulesList: FC<RulesListProps> = ({ rules, title }) => {
       `}</style>
     </div>
   );
-}; 
+};

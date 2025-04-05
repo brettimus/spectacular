@@ -1,6 +1,6 @@
-import { getLogger, configure } from "@logtape/logtape";
-import { categorizeError } from "./categorize-error";
+import { configure, getLogger } from "@logtape/logtape";
 import { APICallError, NoObjectGeneratedError, ToolExecutionError } from "ai";
+import { categorizeError } from "./categorize-error";
 
 let loggerState: "dormant" | "active" = "dormant";
 

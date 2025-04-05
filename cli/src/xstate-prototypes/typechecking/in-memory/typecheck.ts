@@ -1,10 +1,10 @@
 import * as ts from "typescript";
+import { fromPromise } from "xstate";
 import type {
   ErrorInfo,
   InMemoryFile,
   ValidateTypescriptInMemoryInputs,
 } from "./types";
-import { fromPromise } from "xstate";
 
 /**
  * Validates TypeScript code in-memory using the TypeScript compiler API

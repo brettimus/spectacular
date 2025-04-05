@@ -1,9 +1,9 @@
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import { validateTypeScriptOnDisk } from "../on-disk/typecheck";
 import { validateTypeScriptInMemory } from "./typecheck";
 import type { InMemoryFile } from "./types";
-import * as os from "node:os";
 
 /**
  * Test function that compares the results of the filesystem-based type checker

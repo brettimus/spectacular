@@ -9,7 +9,9 @@ export const fixEvents = sqliteTable(
     sessionId: text("session_id").notNull(),
     type: text("type").notNull(),
     sourceCode: text("source_code").notNull(),
-    sourceCompilerErrors: text("source_compiler_errors", { mode: "json" }).notNull(), // Assuming JSON is stored as TEXT
+    sourceCompilerErrors: text("source_compiler_errors", {
+      mode: "json",
+    }).notNull(), // Assuming JSON is stored as TEXT
     analysis: text("analysis").notNull(),
     fixedCode: text("fixed_code"),
     fixedCompilerErrors: text("fixed_compiler_errors", { mode: "json" }), // Might be null if fix eliminates all errors

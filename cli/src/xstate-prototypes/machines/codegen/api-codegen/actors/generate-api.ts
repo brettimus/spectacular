@@ -1,10 +1,10 @@
-import { fromPromise } from "xstate";
 import {
-  generateApi,
-  type GenerateApiResult,
-  type GenerateApiOptions,
   type FpAiConfig,
+  type GenerateApiOptions,
+  type GenerateApiResult,
+  generateApi,
 } from "@/xstate-prototypes/ai";
+import { fromPromise } from "xstate";
 
 export const generateApiActor = fromPromise<
   GenerateApiResult,

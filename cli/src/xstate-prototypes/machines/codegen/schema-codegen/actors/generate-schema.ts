@@ -1,10 +1,10 @@
-import { fromPromise } from "xstate";
 import {
-  generateSchema,
+  type FpAiConfig,
   type GenerateSchemaOptions,
   type GenerateSchemaResult,
-  type FpAiConfig,
+  generateSchema,
 } from "@/xstate-prototypes/ai";
+import { fromPromise } from "xstate";
 
 export const generateSchemaActor = fromPromise<
   GenerateSchemaResult,

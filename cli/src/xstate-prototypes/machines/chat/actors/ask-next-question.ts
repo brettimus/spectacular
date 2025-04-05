@@ -1,7 +1,7 @@
-import type { Message } from "ai";
-import { fromPromise } from "xstate";
 import { askNextQuestion } from "@/xstate-prototypes/ai";
 import type { FpAiConfig } from "@/xstate-prototypes/ai";
+import type { Message } from "ai";
+import { fromPromise } from "xstate";
 import type { AiTextStreamResult } from "../../streaming/types";
 
 export const askNextQuestionActor = fromPromise<

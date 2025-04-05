@@ -1,9 +1,9 @@
 import {
-  chatMachine,
-  schemaCodegenMachine,
   apiCodegenMachine,
+  chatMachine,
   downloadTemplateActor,
   installDependenciesActor,
+  schemaCodegenMachine,
 } from "@/xstate-prototypes/machines";
 
 import {

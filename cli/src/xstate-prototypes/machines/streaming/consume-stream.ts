@@ -1,8 +1,8 @@
 import { fromPromise } from "xstate";
-import type { AiTextStreamResult, AiResponseMessage } from "./types";
 import type { AnyActorRef } from "xstate";
 import { log } from "../../utils/logging";
 import { createChunkEvent } from "./events";
+import type { AiResponseMessage, AiTextStreamResult } from "./types";
 
 export type ConsumeStreamOutput =
   | { success: true; responseMessages: AiResponseMessage[] }

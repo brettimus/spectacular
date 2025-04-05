@@ -5,9 +5,9 @@
  * https://stately.ai/docs/inspector
  */
 
+import { resolve } from "node:path";
 import { defineConfig } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
-import { resolve } from "node:path";
 import { evaliteTracerPlugin } from "./src/shims/evalite-tracer-plugin";
 
 export default defineConfig(() => {

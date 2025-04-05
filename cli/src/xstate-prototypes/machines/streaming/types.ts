@@ -1,4 +1,4 @@
-import type { streamText, StreamTextResult, ToolSet } from "ai";
+import type { StreamTextResult, ToolSet, streamText } from "ai";
 
 export type AiTextStreamResult<
   TOOLS extends ToolSet = ToolSet,

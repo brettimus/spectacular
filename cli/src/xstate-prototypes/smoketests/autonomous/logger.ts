@@ -1,7 +1,7 @@
 import { writeFileSync } from "node:fs";
 import path from "node:path";
-import type { SnapshotFrom } from "xstate";
 import pico from "picocolors";
+import type { SnapshotFrom } from "xstate";
 
 export const createLogger = (logsDir: string, machineName: string) => {
   let previousState: string | undefined;

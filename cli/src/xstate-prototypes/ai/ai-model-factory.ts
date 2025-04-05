@@ -1,8 +1,8 @@
-import type { LanguageModelV1 } from "ai";
-import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { ollama } from "ollama-ai-provider";
+import { createOpenAI } from "@ai-sdk/openai";
+import type { LanguageModelV1 } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
+import { ollama } from "ollama-ai-provider";
 import type {
   AnthropicModelName,
   FpAiModelFactoryOptions,

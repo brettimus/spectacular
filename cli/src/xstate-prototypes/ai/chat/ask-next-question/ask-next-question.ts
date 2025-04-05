@@ -1,10 +1,10 @@
 import { streamText } from "ai";
 import type { Message } from "ai";
+import { ollama } from "ollama-ai-provider";
 import { aiModelFactory } from "../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../types";
-import { OPENAI_STRATEGY } from "./openai";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
-import { ollama } from "ollama-ai-provider";
+import { OPENAI_STRATEGY } from "./openai";
 
 export type AskNextQuestionOptions = {
   messages: Message[];

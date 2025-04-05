@@ -17,16 +17,25 @@ pnpm dev:xstate:inspect
 ```
 xstate-prototypes/
 │
-├── adapters/         # Adapters for different environments (CLI, Workers, etc.)
+├── adapters/          # Adapters for different environments (CLI, Workers, etc.)
 │
-├── chat/             # Chat-related state machines and utilities
-│   └── actors/       # Actor logic for the chat machine (manages child requests to LLMs, filesystem, etc)
+├── ai/                # AI integration components
+│   ├── chat/          # AI chat-related state machines (ask-next-question, generate-spec, router)
+│   └── codegen/       # AI code generation state machines
+│       ├── api/       # API-related code generation (analyze-errors, fix-api, generate-api)
+│       └── schema/    # Schema-related code generation (analyze-errors, generate-schema, etc.)
 │
-├── codegen/          # Codegen-related state machines and utilities
+├── machines/          # Core state machines
+│   ├── chat/          # Chat machine implementations
+│   ├── codegen/       # Code generation machine implementations
+│   ├── configure-workspace/ # Workspace configuration machines
+│   └── streaming/     # Streaming related machines
 │
-├── streaming/        # Streaming machines for `streamText`
+├── smoketests/        # Tests to verify basic functionality
 │
-└── utils/            # Includes logging (logtape), and higher order functions to add logic to actors
+├── typechecking/      # Type checking utilities
+│
+└── utils/             # Includes logging (logtape), and higher order functions for actors
 ```
 
 ## Notes

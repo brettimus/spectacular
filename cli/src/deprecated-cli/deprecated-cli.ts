@@ -8,9 +8,9 @@ import {
 } from "./commands/api-keys";
 import {
   commandAutogander,
+  commandClearAutogander,
   commandListAutogander,
   commandSubmitFixesToAutogander,
-  commandClearAutogander,
 } from "./commands/autogander-fixes";
 import { commandCreateApi } from "./commands/create-api";
 import { commandCreateSchema } from "./commands/create-schema";

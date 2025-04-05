@@ -1,8 +1,8 @@
-import { setup, assign } from "xstate";
-import { chatMachine } from "./machines/chat/chat";
-import { schemaCodegenMachine } from "./machines/codegen/schema-codegen/schema-codegen";
-import { apiCodegenMachine } from "./machines/codegen/api-codegen/api-codegen";
 import type { Message } from "ai";
+import { assign, setup } from "xstate";
+import { chatMachine } from "./machines/chat/chat";
+import { apiCodegenMachine } from "./machines/codegen/api-codegen/api-codegen";
+import { schemaCodegenMachine } from "./machines/codegen/schema-codegen/schema-codegen";
 
 interface SpectacularMachineInput {
   cwd: string;

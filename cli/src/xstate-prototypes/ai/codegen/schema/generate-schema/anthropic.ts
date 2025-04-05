@@ -1,7 +1,7 @@
 import {
+  getD1AdditionalTips,
   getD1SchemaExample,
   getDrizzleSchemaExamples,
-  getD1AdditionalTips,
 } from "./examples";
 
 export const ANTHROPIC_STRATEGY = {

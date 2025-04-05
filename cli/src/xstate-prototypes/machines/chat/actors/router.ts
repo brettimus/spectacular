@@ -1,10 +1,10 @@
-import { fromPromise } from "xstate";
 import type { Message } from "ai";
+import { fromPromise } from "xstate";
 
 import {
-  routeRequest,
-  type RouterResponse,
   type FpAiConfig,
+  type RouterResponse,
+  routeRequest,
 } from "@/xstate-prototypes/ai";
 
 // Re-exporting these types because they are used by the main machine

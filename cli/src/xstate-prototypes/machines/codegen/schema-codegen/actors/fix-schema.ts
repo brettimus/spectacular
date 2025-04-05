@@ -1,10 +1,10 @@
-import { fromPromise } from "xstate";
 import {
-  fixSchema,
   type FixSchemaOptions,
   type FixSchemaResult,
   type FpAiConfig,
+  fixSchema,
 } from "@/xstate-prototypes/ai";
+import { fromPromise } from "xstate";
 
 /**
  * Fix schema errors using AI

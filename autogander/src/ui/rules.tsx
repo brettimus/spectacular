@@ -1,8 +1,8 @@
 import { and, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
+import { Layout, RulesList } from "../components";
 import * as schema from "../db/schema";
-import { RulesList, Layout } from "../components";
 import type { Bindings } from "../types";
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -19,26 +19,26 @@ app.get("/rules/pending", async (c) => {
       .orderBy(desc(schema.rules.id));
 
     // Transform the data to match the expected type
-    const rules = rulesData.map(rule => ({
+    const rules = rulesData.map((rule) => ({
       ...rule,
-      additionalData: rule.additionalData as Record<string, unknown> | null
+      additionalData: rule.additionalData as Record<string, unknown> | null,
     }));
 
     return c.html(
-      <Layout title="Pending Rules" >
+      <Layout title="Pending Rules">
         <RulesList rules={rules} title="Pending Rules" />
-      </Layout>
+      </Layout>,
     );
   } catch (error) {
     console.error("Error fetching rules:", error);
     return c.html(
-      <Layout title="Error" >
+      <Layout title="Error">
         <div>
           <h1>Error</h1>
           <p>Failed to fetch rules. Please try again later.</p>
           <pre>{error instanceof Error ? error.message : String(error)}</pre>
         </div>
-      </Layout>
+      </Layout>,
     );
   }
 });
@@ -54,26 +54,26 @@ app.get("/rules/approved", async (c) => {
       .orderBy(desc(schema.rules.id));
 
     // Transform the data to match the expected type
-    const rules = rulesData.map(rule => ({
+    const rules = rulesData.map((rule) => ({
       ...rule,
-      additionalData: rule.additionalData as Record<string, unknown> | null
+      additionalData: rule.additionalData as Record<string, unknown> | null,
     }));
 
     return c.html(
-      <Layout title="Approved Rules" >
+      <Layout title="Approved Rules">
         <RulesList rules={rules} title="Approved Rules" />
-      </Layout>
+      </Layout>,
     );
   } catch (error) {
     console.error("Error fetching rules:", error);
     return c.html(
-      <Layout title="Error" >
+      <Layout title="Error">
         <div>
           <h1>Error</h1>
           <p>Failed to fetch rules. Please try again later.</p>
           <pre>{error instanceof Error ? error.message : String(error)}</pre>
         </div>
-      </Layout>
+      </Layout>,
     );
   }
 });
@@ -89,26 +89,26 @@ app.get("/rules/rejected", async (c) => {
       .orderBy(desc(schema.rules.id));
 
     // Transform the data to match the expected type
-    const rules = rulesData.map(rule => ({
+    const rules = rulesData.map((rule) => ({
       ...rule,
-      additionalData: rule.additionalData as Record<string, unknown> | null
+      additionalData: rule.additionalData as Record<string, unknown> | null,
     }));
 
     return c.html(
-      <Layout title="Rejected Rules" >
+      <Layout title="Rejected Rules">
         <RulesList rules={rules} title="Rejected Rules" />
-      </Layout>
+      </Layout>,
     );
   } catch (error) {
     console.error("Error fetching rules:", error);
     return c.html(
-      <Layout title="Error" >
+      <Layout title="Error">
         <div>
           <h1>Error</h1>
           <p>Failed to fetch rules. Please try again later.</p>
           <pre>{error instanceof Error ? error.message : String(error)}</pre>
         </div>
-      </Layout>
+      </Layout>,
     );
   }
 });
@@ -125,26 +125,26 @@ app.get("/rules", async (c) => {
       .orderBy(desc(schema.rules.id)); // Default sort by ID descending for the database query
 
     // Transform the data to match the expected type
-    const rules = rulesData.map(rule => ({
+    const rules = rulesData.map((rule) => ({
       ...rule,
-      additionalData: rule.additionalData as Record<string, unknown> | null
+      additionalData: rule.additionalData as Record<string, unknown> | null,
     }));
 
     return c.html(
-      <Layout title="All Rules" >
+      <Layout title="All Rules">
         <RulesList rules={rules} title="All Rules" />
-      </Layout>
+      </Layout>,
     );
   } catch (error) {
     console.error("Error fetching rules:", error);
     return c.html(
-      <Layout title="Error" >
+      <Layout title="Error">
         <div>
           <h1>Error</h1>
           <p>Failed to fetch rules. Please try again later.</p>
           <pre>{error instanceof Error ? error.message : String(error)}</pre>
         </div>
-      </Layout>
+      </Layout>,
     );
   }
 });
@@ -164,20 +164,20 @@ app.get("/rules/:id", async (c) => {
     const rules = rule ? [rule] : [];
 
     return c.html(
-      <Layout title="Rule Detail" >
+      <Layout title="Rule Detail">
         <RulesList rules={rules} title="Rule Detail" />
-      </Layout>
+      </Layout>,
     );
   } catch (error) {
     console.error("Error fetching rules:", error);
     return c.html(
-      <Layout title="Error" >
+      <Layout title="Error">
         <div>
           <h1>Error</h1>
           <p>Failed to fetch rules. Please try again later.</p>
           <pre>{error instanceof Error ? error.message : String(error)}</pre>
         </div>
-      </Layout>
+      </Layout>,
     );
   }
 });

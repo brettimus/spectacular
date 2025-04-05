@@ -1,10 +1,10 @@
-import { fromPromise } from "xstate";
-import { analyzeErrors } from "@/xstate-prototypes/ai/codegen/schema/analyze-schema-errors";
 import type { FpAiConfig } from "@/xstate-prototypes/ai";
 import type {
   AnalyzeSchemaErrorsOptions,
   AnalyzeSchemaErrorsResult,
 } from "@/xstate-prototypes/ai";
+import { analyzeErrors } from "@/xstate-prototypes/ai/codegen/schema/analyze-schema-errors";
+import { fromPromise } from "xstate";
 
 // Re-export the result type so it can be referenced in the machine
 export type { AnalyzeSchemaErrorsResult };

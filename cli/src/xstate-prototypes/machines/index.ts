@@ -1,11 +1,11 @@
 import { chatMachine } from "./chat";
-import { schemaCodegenMachine } from "./codegen/schema-codegen";
 import { apiCodegenMachine } from "./codegen/api-codegen";
+import { schemaCodegenMachine } from "./codegen/schema-codegen";
 import {
-  downloadTemplateNoopActor,
-  installDependenciesNoopActor,
   downloadTemplateActor,
+  downloadTemplateNoopActor,
   installDependenciesActor,
+  installDependenciesNoopActor,
 } from "./configure-workspace";
 
 export {
