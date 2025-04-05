@@ -21,7 +21,7 @@ const __dirname = dirname(__filename);
 config();
 
 // Configure a dedicated logging directory
-const MAX_ITERATIONS = 20;
+const MAX_ITERATIONS = 2;
 const CENTRAL_LOGS_DIR = path.join(
   process.cwd(),
   "..",
