@@ -24,12 +24,7 @@
     "test": "vitest"
   },
   "exports": "./dist/index.js",
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE",
-    ".gitignore"
-  ],
+  "files": ["dist", "README.md", "LICENSE", ".gitignore"],
   "bin": {
     "spectacular": "dist/deprecated-cli.js",
     "spectacular-machine": "dist/machines/commands/cli-entry.js"

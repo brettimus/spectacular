@@ -7,8 +7,8 @@ export type AnthropicModelName =
 
 export type OllamaModelName = "gemma3:4b" | "qwq:32b";
 
-export type CloudflareModelName = 
-  | "@cf/meta/llama-4-scout-17b-16e-instruct" 
+export type CloudflareModelName =
+  | "@cf/meta/llama-4-scout-17b-16e-instruct"
   | "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
   | "@cf/meta/llama-3.1-8b-instruct-fast"
   | "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b";
@@ -29,18 +29,19 @@ type OllamaModelDetails = {
   modelName: OllamaModelName;
 };
 
+/**
+ * @NOTE - NOT YET IMPLEMENTED IN STATE MACHINES
+ */
 export type CloudflareModelDetails = {
   modelProvider: "cloudflare";
   modelName: CloudflareModelName;
 };
-
 
 export type FpModelDetails =
   | OpenAiModelDetails
   | AnthropicModelDetails
   | OllamaModelDetails
   | CloudflareModelDetails;
-
 
 export type FpModelProvider = FpModelDetails["modelProvider"];
 
