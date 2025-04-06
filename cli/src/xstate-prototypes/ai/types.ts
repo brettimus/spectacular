@@ -7,20 +7,40 @@ export type AnthropicModelName =
 
 export type OllamaModelName = "gemma3:4b" | "qwq:32b";
 
+export type CloudflareModelName = 
+  | "@cf/meta/llama-4-scout-17b-16e-instruct" 
+  | "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+  | "@cf/meta/llama-3.1-8b-instruct-fast"
+  | "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b";
+
+type OpenAiModelDetails = {
+  modelProvider: "openai";
+  modelName: OpenAiModelName;
+  responsesApi?: boolean;
+};
+
+type AnthropicModelDetails = {
+  modelProvider: "anthropic";
+  modelName: AnthropicModelName;
+};
+
+type OllamaModelDetails = {
+  modelProvider: "ollama";
+  modelName: OllamaModelName;
+};
+
+export type CloudflareModelDetails = {
+  modelProvider: "cloudflare";
+  modelName: CloudflareModelName;
+};
+
+
 export type FpModelDetails =
-  | {
-      modelProvider: "openai";
-      modelName: OpenAiModelName;
-      responsesApi?: boolean;
-    }
-  | {
-      modelProvider: "anthropic";
-      modelName: AnthropicModelName;
-    }
-  | {
-      modelProvider: "ollama";
-      modelName: OllamaModelName;
-    };
+  | OpenAiModelDetails
+  | AnthropicModelDetails
+  | OllamaModelDetails
+  | CloudflareModelDetails;
+
 
 export type FpModelProvider = FpModelDetails["modelProvider"];
 

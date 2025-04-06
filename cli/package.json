@@ -24,7 +24,12 @@
     "test": "vitest"
   },
   "exports": "./dist/index.js",
-  "files": ["dist", "README.md", "LICENSE", ".gitignore"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    ".gitignore"
+  ],
   "bin": {
     "spectacular": "dist/deprecated-cli.js",
     "spectacular-machine": "dist/machines/commands/cli-entry.js"
@@ -48,10 +53,12 @@
     "open": "^10.1.0",
     "oslo": "^1.2.1",
     "picocolors": "^1.0.1",
+    "workers-ai-provider": "^0.3.0",
     "xstate": "^5.19.2",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250321.0",
     "@statelyai/inspect": "^0.4.0",
     "@types/node": "^22.2.0",
     "autoevals": "^0.0.124",
