@@ -3,7 +3,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createActor, type AnyActorRef, fromPromise } from "xstate";
-import { chatMachine } from "@/xstate-prototypes/machines/chat/chat";
+import { chatMachine } from "@/xstate-prototypes/machines";
 import type {
   RouterResponse,
   RouterActorInput,
