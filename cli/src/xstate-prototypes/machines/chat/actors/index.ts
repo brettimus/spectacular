@@ -1,9 +1,13 @@
-export { generateSpecActor } from "./generate-spec";
-export type { GeneratedPlan } from "./generate-spec";
+export {
+  generateSpecActor,
+  type GenerateSpecActorInput,
+  type GeneratedPlan,
+} from "./generate-spec";
 export {
   routeRequestActor,
+  type RouterActorInput,
   type RouterResponse,
   type RouterResponseType,
 } from "./router";
-export { saveSpecNoopActor } from "./save-spec-noop";
+export { saveSpecNoopActor, type SaveSpecActorInput } from "./save-spec-noop";
 export { askNextQuestionActor } from "./ask-next-question";

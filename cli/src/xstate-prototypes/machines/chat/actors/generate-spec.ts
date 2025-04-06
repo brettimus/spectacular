@@ -7,12 +7,15 @@ import { fromPromise } from "xstate";
 // and it makes sense to have it in the same file as the actor
 export type { GeneratedPlan };
 
+// Export the input type for the actor to be reused in tests
+export interface GenerateSpecActorInput {
+  aiConfig: FpAiConfig;
+  messages: Message[];
+}
+
 export const generateSpecActor = fromPromise<
   GeneratedPlan,
-  {
-    aiConfig: FpAiConfig;
-    messages: Message[];
-  }
+  GenerateSpecActorInput
 >(async ({ input, signal }) => {
   return generateSpec(input.aiConfig, { messages: input.messages }, signal);
 });
