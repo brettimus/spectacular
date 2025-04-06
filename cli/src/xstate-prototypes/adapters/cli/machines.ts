@@ -1,9 +1,9 @@
 import {
   apiCodegenMachine,
   chatMachine,
+  dbSchemaCodegenMachine,
   downloadTemplateActor,
   installDependenciesActor,
-  dbSchemaCodegenMachine,
 } from "@/xstate-prototypes/machines";
 
 import {

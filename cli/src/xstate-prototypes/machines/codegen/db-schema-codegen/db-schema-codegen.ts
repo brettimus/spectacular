@@ -5,16 +5,16 @@ import {
   type FpModelProvider,
 } from "@/xstate-prototypes/ai";
 import {
-  downloadTemplateNoopActor,
-  installDependenciesNoopActor,
-} from "../../configure-workspace";
-import {
   type ErrorInfo,
   validateTypeScriptNoopActor,
 } from "@/xstate-prototypes/typechecking";
 import { getPackageManager } from "@/xstate-prototypes/utils";
 import { log } from "@/xstate-prototypes/utils/logging";
 import { assign, setup } from "xstate";
+import {
+  downloadTemplateNoopActor,
+  installDependenciesNoopActor,
+} from "../../configure-workspace";
 import {
   type AnalyzeSchemaErrorsResult,
   analyzeErrorsActor,

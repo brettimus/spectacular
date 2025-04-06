@@ -5,8 +5,8 @@ import { config } from "dotenv";
 import pico from "picocolors";
 import {
   type ActorRefFrom,
-  createActor,
   type StateFrom,
+  createActor,
   waitFor,
 } from "xstate";
 import { cliChatMachine } from "./machines";

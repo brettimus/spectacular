@@ -110,17 +110,13 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
       CENTRAL_LOGS_DIR,
       `iter-${iteration}-${path.basename(logsDir)}`,
     );
-    
+
     // Check if symlink target already exists and remove it if it does
     if (fs.existsSync(symlinkTarget)) {
       fs.rmSync(symlinkTarget, { recursive: true, force: true });
     }
-    
-    fs.symlinkSync(
-      logsDir,
-      symlinkTarget,
-      "dir",
-    );
+
+    fs.symlinkSync(logsDir, symlinkTarget, "dir");
 
     logger.info(`Running autoSpectacular for iteration ${iteration}`);
 

@@ -11,6 +11,7 @@ import {
   type AiTextStreamResult,
   aiTextStreamMachine,
 } from "../streaming";
+import type { ChunkEvent } from "../streaming";
 import {
   type RouterResponse,
   askNextQuestionActor,
@@ -18,13 +19,13 @@ import {
   routeRequestActor,
   saveSpecNoopActor,
 } from "./actors";
-import type { ChunkEvent } from "../streaming";
 
 interface ChatMachineInput {
   apiKey: string;
   aiProvider?: FpModelProvider;
   aiGatewayUrl?: string;
   cwd: string;
+  messages?: Message[];
 }
 
 export interface ChatMachineContext {
@@ -128,7 +129,7 @@ const chatMachine = setup({
       aiProvider: input.aiProvider ?? DEFAULT_AI_PROVIDER,
       aiGatewayUrl: input.aiGatewayUrl,
     },
-    messages: [],
+    messages: input.messages ?? [],
     error: null,
     errorHistory: [],
     cwd: input.cwd,
