@@ -32,6 +32,7 @@ const AI_PROVIDER = "openai";
 type ChatCliAdapterState = StateFrom<typeof chatMachine>["value"];
 
 export class ChatCliAdapter {
+  projectDir: string | undefined;
   machine: typeof chatMachine;
   actor: ActorRefFrom<typeof chatMachine>;
 
@@ -58,13 +59,15 @@ export class ChatCliAdapter {
   }
 
   // Start the chat session
-  public async start(): Promise<void> {
+  public async start(callback?: Function): Promise<void> {
     // We have to start by forcing the user to select a project directory
     const projectDir = await promptProjectFolder(process.cwd());
     if (!projectDir) {
       log.error("Could not set up project dir");
       process.exit(1);
     }
+
+    this.projectDir = projectDir;
 
     await actionCreateProjectFolder(projectDir);
 
@@ -78,15 +81,21 @@ export class ChatCliAdapter {
       },
     });
 
+    let shouldChat = true;
+
     // Listen for state changes to provide UI feedback
     // HACK - We only execute the bulk of our logic when the state value changes
     //
     this.actor.subscribe({
       complete: () => {
         console.debug("Finished!", this.actor.getSnapshot().context);
+        shouldChat = false;
+        callback?.(null, this.actor.getSnapshot());
       },
       error(err) {
         console.error("Ended in error state?", err);
+        shouldChat = false;
+        callback?.(err, null);
       },
     });
     this.actor.subscribe((snapshot) => {
@@ -126,7 +135,7 @@ export class ChatCliAdapter {
             }
             const savedPath = snapshot.context.spec?.filename ?? "unknown";
             log.success(`Plan saved to: ${savedPath}`);
-            process.exit(0);
+            // process.exit(0);
             break;
           case "Error":
             if (this.loadingSpinner) {
@@ -163,7 +172,7 @@ export class ChatCliAdapter {
 
     // Main CLI loop
     // TODO - Find a way to exit the loop with `done` ?
-    while (true) {
+    while (shouldChat) {
       if (!userPrompt) {
         userPrompt = await text({
           message: pico.italic("Clarify..."),
@@ -206,6 +215,9 @@ export class ChatCliAdapter {
         this.actor,
         (state) => {
           const isDone = state.matches("Done");
+          if (isDone) {
+            shouldChat = false;
+          }
           const isAwaitingUserInput = state.matches("AwaitingUserInput");
           const shouldContinue = isAwaitingUserInput || isDone;
           return shouldContinue;

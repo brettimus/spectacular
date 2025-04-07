@@ -4,8 +4,12 @@ import { ollama } from "ollama-ai-provider";
 import { fromPromise } from "xstate";
 import type { AiTextStreamResult } from "../../machines/streaming";
 import {
+  AnalyzeTablesOptions,
+  AnalyzeTablesResult,
   FpAiConfig,
   GeneratedPlan,
+  GenerateSchemaOptions,
+  GenerateSchemaResult,
   RouterResponse,
 } from "@/xstate-prototypes/ai";
 import { RouterResponseType } from "@/xstate-prototypes/machines/chat/actors";
@@ -59,5 +63,40 @@ export const generateSpecLocalActor = fromPromise<
   return {
     title: "Hi",
     plan: "# This is a plan\nnvm wait i got lost",
+  };
+});
+
+export const analyzeTablesLocalActor = fromPromise<
+  AnalyzeTablesResult,
+  {
+    aiConfig: FpAiConfig;
+    options: AnalyzeTablesOptions;
+  }
+>(async () => {
+  //
+  await new Promise((r) => setTimeout(r, 3000));
+  return {
+    reasoning: "idk",
+    schemaSpecification: "# a database\n ...wait what was i doing?",
+  };
+});
+
+export const generateSchemaLocalActor = fromPromise<
+  GenerateSchemaResult,
+  {
+    aiConfig: FpAiConfig;
+    options: GenerateSchemaOptions;
+  }
+>(async ({ input: { options } }) => {
+  const model = ollama("gemma3:4b");
+  const response = await generateText({
+    model,
+    system:
+      "You are an inquisitive typescript goose, write a random ass database schema in typescript using Drizzle ORM for D1 (sqlite)",
+    prompt: options.schemaSpecification,
+  });
+  return {
+    explanation: "yolo",
+    dbSchemaTs: response.text,
   };
 });

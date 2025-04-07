@@ -40,19 +40,23 @@ type DbSchemaCodegenMachineContext = {
   schemaSpecification: string;
   relevantRules: SelectedRule[];
   dbSchemaTs: string;
+
+  /** Whatever error stopped teh machine */
+  error: unknown;
+
+  /** TODO - rename - these are typescript errors */
   errors: ErrorInfo[];
   errorAnalysis: AnalyzeSchemaErrorsResult | null;
   fixedSchema: string | null;
   valid: boolean;
   issues: string[];
   suggestions: string[];
-  /** What went wrong with the machine */
-  machineError: null | Error | string;
 };
 
 interface DbSchemaCodegenMachineOutput {
   dbSchemaTs: string;
   valid: boolean;
+  error: unknown;
   issues: string[];
   suggestions: string[];
 }
@@ -78,6 +82,11 @@ export const dbSchemaCodegenMachine = setup({
     fixSchema: fixSchemaActor,
     validateTypeScript: validateTypeScriptNoopActor,
   },
+  actions: {
+    assignError: assign({
+      error: (_, params: unknown) => params,
+    }),
+  },
 }).createMachine({
   id: "db-schema-codegen",
   description: "generate db/schema.ts file",
@@ -90,6 +99,8 @@ export const dbSchemaCodegenMachine = setup({
     },
     spec: input.spec,
 
+    error: null,
+
     fixAttempts: 0,
 
     schemaSpecification: "",
@@ -101,7 +112,6 @@ export const dbSchemaCodegenMachine = setup({
     valid: false,
     issues: [],
     suggestions: [],
-    machineError: null,
   }),
   states: {
     Idle: {
@@ -143,8 +153,9 @@ export const dbSchemaCodegenMachine = setup({
                 });
               }
             },
+            // FIXME
             assign({
-              machineError: ({ event }) => {
+              error: ({ event }) => {
                 const { error } = event;
                 if (error instanceof Error) {
                   return error;
@@ -216,11 +227,18 @@ export const dbSchemaCodegenMachine = setup({
         },
         onError: {
           target: "Failed",
-          actions: ({ event }) => {
-            if (event.error) {
-              log("error", "Failed to generate schema", { error: event.error });
-            }
-          },
+          actions: [
+            ({ event }) => {
+              if (event.error) {
+                log("error", "Failed to generate schema", {
+                  error: event.error,
+                });
+              }
+            },
+            assign({
+              error: ({ event }) => event.error,
+            }),
+          ],
         },
       },
     },
@@ -383,8 +401,7 @@ export const dbSchemaCodegenMachine = setup({
         () =>
           log("error", "Schema generation process failed", { stage: "error" }),
         assign({
-          machineError: ({ context }) =>
-            context.machineError ?? "Failed to generate schema",
+          error: ({ context }) => context.error ?? "Failed to generate schema",
         }),
       ],
     },
@@ -392,7 +409,7 @@ export const dbSchemaCodegenMachine = setup({
 
   output: ({ context }) => ({
     dbSchemaTs: context.fixedSchema || context.dbSchemaTs,
-    error: context.machineError,
+    error: context.error,
     valid: context.valid,
     issues: context.issues,
     suggestions: context.suggestions,

@@ -1,2 +1,2 @@
 export { ChatCliAdapter } from "./cli";
-export { localChatMachine } from "./local";
+export { localChatMachine, localDbSchemaCodegenMachine } from "./local";

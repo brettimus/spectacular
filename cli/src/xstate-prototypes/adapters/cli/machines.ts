@@ -45,8 +45,10 @@ export const createCliSetUpWorkspaceMachine = (
 export const createCliDbSchemaCodegenMachine = (
   projectDir: string,
   packageManager: PackageManager,
+  /** Tricky way for us to inject additional actors if we so please */
+  baseDbSchemaMachine: typeof dbSchemaCodegenMachine = dbSchemaCodegenMachine,
 ) =>
-  dbSchemaCodegenMachine.provide({
+  baseDbSchemaMachine.provide({
     actors: {
       saveSchema: createSaveSchemaToDiskActor(projectDir),
       validateTypeScript: createValidateTypeScriptOnDiskActor(
@@ -59,8 +61,10 @@ export const createCliDbSchemaCodegenMachine = (
 export const createCliApiCodegenMachine = (
   projectDir: string,
   packageManager: PackageManager,
+  /** Tricky way for us to inject additional actors if we so please */
+  baseApiMachine: typeof apiCodegenMachine = apiCodegenMachine,
 ) =>
-  apiCodegenMachine.provide({
+  baseApiMachine.provide({
     actors: {
       saveApiIndex: createSaveApiIndexToDiskActor(projectDir),
       validateTypeScript: createValidateTypeScriptOnDiskActor(

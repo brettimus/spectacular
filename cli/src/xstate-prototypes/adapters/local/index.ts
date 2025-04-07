@@ -1,1 +1,1 @@
-export { localChatMachine } from "./machines";
+export { localChatMachine, localDbSchemaCodegenMachine } from "./machines";

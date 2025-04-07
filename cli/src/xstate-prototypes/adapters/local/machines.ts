@@ -7,7 +7,10 @@ import {
   routeRequestLocalActor,
   askNextQuestionOllamaActor,
   generateSpecLocalActor,
+  analyzeTablesLocalActor,
+  generateSchemaLocalActor,
 } from "./actors";
+import { validateTypeScriptNoopActor } from "@/xstate-prototypes/typechecking";
 
 export const localChatMachine = chatMachine.provide({
   actors: {
@@ -22,8 +25,13 @@ export const localChatMachine = chatMachine.provide({
   },
 });
 
-export const localSchemaCodegenMachine = dbSchemaCodegenMachine.provide({
-  actors: {},
+export const localDbSchemaCodegenMachine = dbSchemaCodegenMachine.provide({
+  actors: {
+    analyzeTables: analyzeTablesLocalActor,
+    generateSchema: generateSchemaLocalActor,
+    // Skip validating typescript, which skips the fix loop
+    validateTypeScript: validateTypeScriptNoopActor,
+  },
 });
 
 export const localApiCodegenMachine = apiCodegenMachine.provide({
