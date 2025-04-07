@@ -1,6 +1,7 @@
 import { fromPromise } from "xstate";
 
-export const saveApiIndexNoopActor = fromPromise<
-  void,
-  { projectDir: string; indexTs: string }
->(async () => {});
+export type SaveApiActorInput = { indexTs: string };
+
+export const saveApiIndexNoopActor = fromPromise<void, SaveApiActorInput>(
+  async () => {},
+);

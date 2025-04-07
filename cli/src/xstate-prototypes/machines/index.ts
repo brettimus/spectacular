@@ -1,20 +1,24 @@
 import { chatMachine, type SaveSpecActorInput } from "./chat";
-import { apiCodegenMachine } from "./codegen/api-codegen";
-import { dbSchemaCodegenMachine } from "./codegen/db-schema-codegen";
 import {
-  downloadTemplateActor,
+  dbSchemaCodegenMachine,
+  type SaveSchemaInput,
+  apiCodegenMachine,
+  type SaveApiActorInput,
+} from "./codegen";
+import {
   downloadTemplateNoopActor,
-  installDependenciesActor,
   installDependenciesNoopActor,
-} from "./configure-workspace";
+  setUpWorkspaceMachine,
+} from "./set-up-workspace";
 
 export {
   chatMachine,
   type SaveSpecActorInput,
   dbSchemaCodegenMachine,
+  type SaveSchemaInput,
   apiCodegenMachine,
+  type SaveApiActorInput,
   downloadTemplateNoopActor,
   installDependenciesNoopActor,
-  downloadTemplateActor,
-  installDependenciesActor,
+  setUpWorkspaceMachine,
 };

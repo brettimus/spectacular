@@ -4,7 +4,7 @@ import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { config } from "dotenv";
 import { createActor } from "xstate";
-import { cliSchemaCodegenMachine } from "../adapters/cli";
+import { createCliDbSchemaCodegenMachine } from "../adapters/cli";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -65,12 +65,12 @@ if (!existsSync(logsDir)) {
   console.log(`Created logs directory: ${logsDir}`);
 }
 
-const actor = createActor(cliSchemaCodegenMachine, {
+const machine = createCliDbSchemaCodegenMachine(projectDir, "npm");
+const actor = createActor(machine, {
   input: {
     apiKey: API_KEY,
     aiProvider: AI_PROVIDER,
     spec,
-    projectDir,
   },
 });
 
@@ -113,5 +113,5 @@ actor.subscribe((snapshot) => {
 
 actor.start();
 
-// Kicks off project setup
-actor.send({ type: "download.template" });
+// Kicks off db schema generation
+actor.send({ type: "analyze.tables", spec });

@@ -68,8 +68,7 @@ const apiGeneratorActor = createActor(apiCodegenMachine, {
     apiKey: AI_CONFIG.apiKey,
     aiProvider: AI_CONFIG.aiProvider,
     spec: specDetails.spec,
-    projectDir,
-    schema: dbSchemaTs,
+    dbSchemaTs,
   },
 });
 

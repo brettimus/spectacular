@@ -6,4 +6,4 @@ export {
   type AnalyzeSchemaErrorsResult,
 } from "./analyze-errors";
 export { fixSchemaActor } from "./fix-schema";
-export { saveSchemaNoopActor } from "./save-schema-noop";
+export { saveSchemaNoopActor, type SaveSchemaInput } from "./save-schema-noop";

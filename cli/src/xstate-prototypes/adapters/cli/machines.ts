@@ -1,30 +1,68 @@
 import {
   apiCodegenMachine,
+  chatMachine,
   dbSchemaCodegenMachine,
-  downloadTemplateActor,
-  installDependenciesActor,
+  setUpWorkspaceMachine,
 } from "@/xstate-prototypes/machines";
-
+import { PackageManager } from "@/xstate-prototypes/utils/package-manager";
 import {
-  saveApiIndexToDiskActor,
-  saveSchemaToDiskActor,
-  validateTypeScriptOnDiskActor,
-} from "./actors";
+  createCliSaveSpecActor,
+  createDownloadTemplateActor,
+  createInstallDependenciesActor,
+  createSaveSchemaToDiskActor,
+  createSaveApiIndexToDiskActor,
+  createValidateTypeScriptOnDiskActor,
+} from "./actor-factories";
 
 // NOTE - We need to provide filesystem actors to do things like save the spec and files to disk
 
-export const cliSchemaCodegenMachine = dbSchemaCodegenMachine.provide({
-  actors: {
-    saveSchema: saveSchemaToDiskActor,
-    validateTypeScript: validateTypeScriptOnDiskActor,
-    downloadTemplate: downloadTemplateActor,
-    installDependencies: installDependenciesActor,
-  },
-});
+export const createCliChatMachine = (projectDir: string) => {
+  return chatMachine.provide({
+    actors: {
+      saveSpec: createCliSaveSpecActor(projectDir),
+    },
+  });
+};
 
-export const cliApiCodegenMachine = apiCodegenMachine.provide({
-  actors: {
-    saveApiIndex: saveApiIndexToDiskActor,
-    validateTypeScript: validateTypeScriptOnDiskActor,
-  },
-});
+export const createCliSetUpWorkspaceMachine = (
+  projectDir: string,
+  packageManager: PackageManager,
+) => {
+  return setUpWorkspaceMachine.provide({
+    actors: {
+      downloadTemplate: createDownloadTemplateActor(projectDir),
+      installDependencies: createInstallDependenciesActor(
+        projectDir,
+        packageManager,
+      ),
+    },
+  });
+};
+
+export const createCliDbSchemaCodegenMachine = (
+  projectDir: string,
+  packageManager: PackageManager,
+) =>
+  dbSchemaCodegenMachine.provide({
+    actors: {
+      saveSchema: createSaveSchemaToDiskActor(projectDir),
+      validateTypeScript: createValidateTypeScriptOnDiskActor(
+        projectDir,
+        packageManager,
+      ),
+    },
+  });
+
+export const createCliApiCodegenMachine = (
+  projectDir: string,
+  packageManager: PackageManager,
+) =>
+  apiCodegenMachine.provide({
+    actors: {
+      saveApiIndex: createSaveApiIndexToDiskActor(projectDir),
+      validateTypeScript: createValidateTypeScriptOnDiskActor(
+        projectDir,
+        packageManager,
+      ),
+    },
+  });

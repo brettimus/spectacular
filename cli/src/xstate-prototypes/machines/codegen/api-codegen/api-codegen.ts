@@ -21,17 +21,15 @@ interface ApiCodegenMachineInput {
   apiKey: string;
   aiProvider?: FpModelProvider;
   aiGatewayUrl?: string;
-  schema?: string;
+  dbSchemaTs?: string;
   spec?: string;
-  projectDir: string;
 }
 
 interface ApiCodegenMachineContext {
   aiConfig: FpAiConfig;
-  schema: string;
+  dbSchemaTs: string;
   spec: string;
   apiCode: string;
-  projectDir: string;
 
   reasoning: string;
   errors: ErrorInfo[];
@@ -77,12 +75,11 @@ export const apiCodegenMachine = setup({
       aiProvider: input.aiProvider ?? DEFAULT_AI_PROVIDER,
       aiGatewayUrl: input.aiGatewayUrl,
     },
-    schema: input.schema || "",
+    dbSchemaTs: input.dbSchemaTs || "",
     spec:
       input.spec ||
       "Create a simple REST API with CRUD operations for all tables in the schema.",
     apiCode: "",
-    projectDir: input.projectDir,
 
     reasoning: "",
     errors: [],
@@ -97,7 +94,7 @@ export const apiCodegenMachine = setup({
         "generate.api": {
           target: "GeneratingApi",
           actions: assign({
-            schema: ({ event }) => event.schema,
+            dbSchemaTs: ({ event }) => event.schema,
             spec: ({ event }) => event.spec,
           }),
         },
@@ -111,7 +108,7 @@ export const apiCodegenMachine = setup({
         input: ({ context }) => ({
           aiConfig: context.aiConfig,
           options: {
-            schema: context.schema,
+            schema: context.dbSchemaTs,
             spec: context.spec,
           },
         }),
@@ -138,7 +135,6 @@ export const apiCodegenMachine = setup({
         id: "saveApiIndex",
         src: "saveApiIndex",
         input: ({ context }) => ({
-          projectDir: context.projectDir,
           indexTs: context.apiCode,
         }),
         onDone: {
@@ -163,9 +159,6 @@ export const apiCodegenMachine = setup({
       invoke: {
         id: "validateTypeScript",
         src: "validateTypeScript",
-        input: ({ context }) => ({
-          projectDir: context.projectDir,
-        }),
         onDone: [
           {
             target: "FixingErrors",
@@ -265,8 +258,7 @@ export const apiCodegenMachine = setup({
         id: "saveFixedApi",
         src: "saveApiIndex",
         input: ({ context }) => ({
-          projectDir: context.projectDir,
-          // TODO - fixme
+          // TODO - fixme - saveApiIndex should just throw its error
           indexTs: context.fixedApiCode || context.apiCode,
         }),
         onDone: {

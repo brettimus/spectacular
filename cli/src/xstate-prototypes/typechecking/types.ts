@@ -1,10 +1,5 @@
 import z from "zod";
 
-export type ValidateTypescriptInputs = {
-  projectDir: string;
-  packageManager?: string;
-};
-
 // Define a Zod schema for the exec error
 export const ExecErrorSchema = z
   .object({

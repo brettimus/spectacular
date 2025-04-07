@@ -1,2 +1,5 @@
-export { apiCodegenMachine } from "./api-codegen";
-export { dbSchemaCodegenMachine } from "./db-schema-codegen";
+export { apiCodegenMachine, type SaveApiActorInput } from "./api-codegen";
+export {
+  dbSchemaCodegenMachine,
+  type SaveSchemaInput,
+} from "./db-schema-codegen";

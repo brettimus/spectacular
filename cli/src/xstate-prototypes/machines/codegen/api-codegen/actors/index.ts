@@ -4,4 +4,7 @@ export {
 } from "./analyze-api-errors";
 export { fixApiErrorsActor } from "./fix-api";
 export { generateApiActor } from "./generate-api";
-export { saveApiIndexNoopActor } from "./save-api-index-noop";
+export {
+  saveApiIndexNoopActor,
+  type SaveApiActorInput,
+} from "./save-api-index-noop";

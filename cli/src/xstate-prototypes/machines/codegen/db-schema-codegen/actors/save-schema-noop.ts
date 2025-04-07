@@ -1,6 +1,7 @@
 import { fromPromise } from "xstate";
 
-export const saveSchemaNoopActor = fromPromise<
-  void,
-  { projectDir: string; schema: string }
->(async () => {});
+export type SaveSchemaInput = { schema: string };
+
+export const saveSchemaNoopActor = fromPromise<void, SaveSchemaInput>(
+  async () => {},
+);

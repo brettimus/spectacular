@@ -1,4 +1,3 @@
-import { fromPromise } from "xstate";
 import type { AiTextStreamResult } from "@/xstate-prototypes/machines/streaming";
 import { stream, isCancel, log, spinner, text } from "@clack/prompts";
 import type { Message } from "ai";
@@ -11,24 +10,28 @@ import {
   waitFor,
 } from "xstate";
 import { chatMachine } from "../../machines";
-import { writeFile } from "node:fs/promises";
-import { SaveSpecActorInput } from "@/xstate-prototypes/machines";
 import {
   actionCreateProjectFolder,
   promptProjectFolder,
 } from "./prompt-project-dir";
+import { createCliChatMachine } from "./machines";
 
 // import path from "node:path";
 
 config();
 
 const API_KEY = process.env.OPENAI_API_KEY;
+// TODO - Look up API key from config dir
+
+if (!API_KEY) {
+  throw new Error("OPENAI_API_KEY is not set");
+}
+
 const AI_PROVIDER = "openai";
 
 type ChatCliAdapterState = StateFrom<typeof chatMachine>["value"];
 
 export class ChatCliAdapter {
-  private projectDir: string;
   private actor: ActorRefFrom<typeof chatMachine>;
 
   private loadingSpinner: ReturnType<typeof spinner> | null = null;
@@ -36,27 +39,17 @@ export class ChatCliAdapter {
   private previousState: ChatCliAdapterState | null = null;
 
   constructor() {
-    // TODO - Look up API key from config dir
-    if (!API_KEY) {
-      throw new Error("OPENAI_API_KEY is not set");
-    }
-
     this.previousState = null;
-
-    this.projectDir = process.cwd();
 
     // NOTE - We need to provide filesystem actors to do things like save the spec and files to disk
 
     // TODO - Try to provide a `processQuestionStream` actor that can
     //        stream the response to the CLI
-    const machine = chatMachine.provide({
-      actors: {
-        saveSpec: fromPromise(this.saveSpecToDisk),
-      },
-    });
-    this.actor = createActor(machine, {
+
+    // Temporary actor - gets reset when we start the cli and ask for the project dir
+    this.actor = createActor(chatMachine, {
       input: {
-        apiKey: API_KEY,
+        apiKey: API_KEY ?? "",
         aiProvider: AI_PROVIDER,
       },
     });
@@ -125,8 +118,13 @@ export class ChatCliAdapter {
 
     await actionCreateProjectFolder(projectDir);
 
-    // IMPORTANT! assign the project directory here so it can be used by actors
-    this.projectDir = projectDir;
+    // Important!
+    this.actor = createActor(createCliChatMachine(projectDir), {
+      input: {
+        apiKey: API_KEY ?? "",
+        aiProvider: AI_PROVIDER,
+      },
+    });
 
     this.actor.start();
     log.info(pico.cyan("🤖 Spectacular AI Chat Session"));
@@ -201,10 +199,6 @@ export class ChatCliAdapter {
     }
   }
 
-  private saveSpecToDisk = async ({ input }: { input: SaveSpecActorInput }) => {
-    await writeFile(this.projectDir, input.content);
-  };
-
   private async streamQuestion(result: AiTextStreamResult) {
     await stream.info(
       (async function* () {
@@ -256,10 +250,4 @@ export class ChatCliAdapter {
   public getMessages(): Message[] {
     return this.actor.getSnapshot().context.messages;
   }
-}
-
-// Usage
-export async function startCliChatSession() {
-  const cli = new ChatCliAdapter();
-  await cli.start();
 }

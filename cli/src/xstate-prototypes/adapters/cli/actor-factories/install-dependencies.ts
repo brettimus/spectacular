@@ -1,21 +1,23 @@
 import { runShell } from "@/xstate-prototypes/utils";
+import { PackageManager } from "@/xstate-prototypes/utils/package-manager";
 import { fromPromise } from "xstate/actors";
 
 export type InstallDependenciesInput = {
   projectDir: string;
-  packageManager?: "npm" | "yarn" | "pnpm" | "bun";
+  packageManager?: PackageManager;
 };
 
-export const installDependenciesActor = fromPromise<
-  void,
-  InstallDependenciesInput
->(async ({ input: { projectDir, packageManager = "npm" } }) => {
-  await installDependencies(projectDir, packageManager);
-});
+export const createInstallDependenciesActor = (
+  projectDir: string,
+  packageManager: PackageManager,
+) =>
+  fromPromise<void, void>(async () => {
+    await installDependencies(projectDir, packageManager);
+  });
 
 export async function installDependencies(
   projectDir: string,
-  packageManager: "npm" | "yarn" | "pnpm" | "bun",
+  packageManager: PackageManager,
 ): Promise<void> {
   if (!projectDir) {
     console.error("Project directory is not defined");
@@ -23,6 +25,7 @@ export async function installDependencies(
   }
 
   const installDir = projectDir;
+
   try {
     await runShell(installDir, [packageManager, "install"]);
     console.log("Dependencies installed successfully");

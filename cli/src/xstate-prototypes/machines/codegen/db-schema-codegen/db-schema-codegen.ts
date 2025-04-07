@@ -8,13 +8,8 @@ import {
   type ErrorInfo,
   validateTypeScriptNoopActor,
 } from "@/xstate-prototypes/typechecking";
-import { getPackageManager } from "@/xstate-prototypes/utils";
 import { log } from "@/xstate-prototypes/utils/logging";
 import { assign, setup } from "xstate";
-import {
-  downloadTemplateNoopActor,
-  installDependenciesNoopActor,
-} from "../../configure-workspace";
 import {
   type AnalyzeSchemaErrorsResult,
   analyzeErrorsActor,
@@ -25,7 +20,7 @@ import {
   saveSchemaNoopActor,
 } from "./actors";
 
-interface DbSchemaCodegenMachineInput {
+type DbSchemaCodegenMachineInput = {
   /** The API key to use for AI calls */
   apiKey: string;
   /** The AI provider to use for AI calls */
@@ -34,14 +29,11 @@ interface DbSchemaCodegenMachineInput {
   aiGatewayUrl?: string;
   /** The spec to use for schema generation */
   spec: string;
-  /** Project root directory - Only relevant if we are writing to a file */
-  projectDir?: string;
-}
+};
 
-interface DbSchemaCodegenMachineContext {
+type DbSchemaCodegenMachineContext = {
   aiConfig: FpAiConfig;
   spec: string;
-  projectDir: string;
 
   fixAttempts: number;
 
@@ -56,7 +48,7 @@ interface DbSchemaCodegenMachineContext {
   suggestions: string[];
   /** What went wrong with the machine */
   machineError: null | Error | string;
-}
+};
 
 interface DbSchemaCodegenMachineOutput {
   dbSchemaTs: string;
@@ -70,7 +62,6 @@ export const dbSchemaCodegenMachine = setup({
     context: {} as DbSchemaCodegenMachineContext,
     input: {} as DbSchemaCodegenMachineInput,
     events: {} as
-      | { type: "download.template" }
       | { type: "analyze.tables"; spec: string }
       | { type: "generate.schema" }
       | { type: "verify.schema" }
@@ -79,8 +70,6 @@ export const dbSchemaCodegenMachine = setup({
     output: {} as DbSchemaCodegenMachineOutput,
   },
   actors: {
-    downloadTemplate: downloadTemplateNoopActor,
-    installDependencies: installDependenciesNoopActor,
     analyzeTables: analyzeTablesActor,
     identifyRules: identifyRulesActor,
     generateSchema: generateSchemaActor,
@@ -100,7 +89,6 @@ export const dbSchemaCodegenMachine = setup({
       aiGatewayUrl: input.aiGatewayUrl,
     },
     spec: input.spec,
-    projectDir: input.projectDir || process.cwd(),
 
     fixAttempts: 0,
 
@@ -123,59 +111,6 @@ export const dbSchemaCodegenMachine = setup({
           actions: assign({
             spec: ({ event }) => event.spec,
           }),
-        },
-        "download.template": {
-          target: "DownloadingTemplate",
-        },
-      },
-    },
-    DownloadingTemplate: {
-      entry: () =>
-        log("info", "Downloading template", { stage: "download-template" }),
-      invoke: {
-        id: "downloadTemplate",
-        src: "downloadTemplate",
-        input: ({ context }) => ({
-          projectDir: context.projectDir,
-        }),
-        onDone: {
-          target: "InstallingDependencies",
-        },
-        onError: {
-          target: "Failed",
-          actions: ({ event }) => {
-            log("error", "Failed to download template", { error: event.error });
-          },
-        },
-      },
-    },
-    InstallingDependencies: {
-      entry: () =>
-        log("info", "Installing dependencies", {
-          stage: "install-dependencies",
-        }),
-      invoke: {
-        id: "installDependencies",
-        src: "installDependencies",
-        input: ({ context }) => ({
-          projectDir: context.projectDir,
-          // TODO - Make this dynamic
-          packageManager: getPackageManager() as
-            | "npm"
-            | "yarn"
-            | "pnpm"
-            | "bun",
-        }),
-        onDone: {
-          target: "AnalyzingTables",
-        },
-        onError: {
-          target: "Failed",
-          actions: ({ event }) => {
-            log("error", "Failed to install dependencies", {
-              error: event.error,
-            });
-          },
         },
       },
     },
@@ -295,7 +230,7 @@ export const dbSchemaCodegenMachine = setup({
         id: "saveSchema",
         src: "saveSchema",
         input: ({ context }) => ({
-          projectDir: context.projectDir,
+          // projectDir: context.projectDir,
           schema: context.dbSchemaTs,
         }),
         onDone: {
@@ -316,9 +251,6 @@ export const dbSchemaCodegenMachine = setup({
       invoke: {
         id: "validateTypeScript",
         src: "validateTypeScript",
-        input: ({ context }) => ({
-          projectDir: context.projectDir,
-        }),
         onDone: [
           {
             target: "AnalyzingErrors",
@@ -424,7 +356,7 @@ export const dbSchemaCodegenMachine = setup({
         id: "saveFixedSchema",
         src: "saveSchema",
         input: ({ context }) => ({
-          projectDir: context.projectDir,
+          // TODO - fixme - should guard against falsy fixedSchema
           schema: context.fixedSchema || context.dbSchemaTs,
         }),
         onDone: {

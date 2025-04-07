@@ -1,10 +1,12 @@
 import { createActor, waitFor } from "xstate";
 import {
-  cliApiCodegenMachine,
-  cliSchemaCodegenMachine,
+  createCliApiCodegenMachine,
+  createCliDbSchemaCodegenMachine,
+  createCliSetUpWorkspaceMachine,
 } from "../../adapters/cli";
 import type { FpModelProvider } from "../../ai";
 import { createLogger } from "./logger";
+import { getPackageManager } from "@/xstate-prototypes/utils";
 
 export interface SpectacularOptions {
   apiKey: string;
@@ -21,21 +23,50 @@ export async function autoSpectacular({
   projectDir,
   logsDir,
 }: SpectacularOptions) {
-  const schemaGeneratorActor = createActor(cliSchemaCodegenMachine, {
-    input: {
-      apiKey,
-      aiProvider,
-      spec,
-      projectDir,
+  const packageManager = getPackageManager();
+
+  // Downloads templates and installs dependencies
+  const setUpWorkspaceActor = createActor(
+    createCliSetUpWorkspaceMachine(projectDir, packageManager),
+  );
+
+  // Generates db/schema.ts
+  const schemaGeneratorActor = createActor(
+    createCliDbSchemaCodegenMachine(projectDir, packageManager),
+    {
+      input: {
+        apiKey,
+        aiProvider,
+        spec,
+      },
     },
+  );
+
+  setUpWorkspaceActor.subscribe(createLogger(logsDir, "setUpWorkspaceActor"));
+
+  // HACK - Create a promise that resolves when the actor completes
+  // TODO - us toPromise
+  const setUpWorkspacePromise = new Promise((resolve, reject) => {
+    setUpWorkspaceActor.subscribe({
+      complete() {
+        resolve(null);
+      },
+      error(err) {
+        reject(err);
+      },
+    });
   });
+
+  setUpWorkspaceActor.start();
 
   schemaGeneratorActor.subscribe(createLogger(logsDir, "schemaCodegenMachine"));
 
   schemaGeneratorActor.start();
 
-  // Kicks off project setup
-  schemaGeneratorActor.send({ type: "download.template" });
+  await setUpWorkspacePromise;
+
+  // Kicks off ai workflow for creating db schema
+  schemaGeneratorActor.send({ type: "analyze.tables", spec });
 
   // HACK - Await final state
   await waitFor(schemaGeneratorActor, (state) => {
@@ -62,15 +93,17 @@ export async function autoSpectacular({
 
   const schemaGenOutput = finalState.output;
 
-  const apiGeneratorActor = createActor(cliApiCodegenMachine, {
-    input: {
-      apiKey,
-      aiProvider,
-      spec,
-      projectDir,
-      schema: schemaGenOutput.dbSchemaTs,
+  const apiGeneratorActor = createActor(
+    createCliApiCodegenMachine(projectDir, packageManager),
+    {
+      input: {
+        apiKey,
+        aiProvider,
+        spec,
+        dbSchemaTs: schemaGenOutput.dbSchemaTs,
+      },
     },
-  });
+  );
 
   apiGeneratorActor.subscribe(createLogger(logsDir, "apiCodegenMachine"));
 

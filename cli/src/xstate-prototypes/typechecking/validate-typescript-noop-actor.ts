@@ -1,5 +1,5 @@
 import { fromPromise } from "xstate";
-import type { ErrorInfo, ValidateTypescriptInputs } from "./types";
+import type { ErrorInfo } from "./types";
 
 /**
  * A noop actor that returns an empty array of errors
@@ -7,7 +7,6 @@ import type { ErrorInfo, ValidateTypescriptInputs } from "./types";
  *
  * It helps set the *types* of any `validateTypescript` actor that gets added with `.provide`
  */
-export const validateTypeScriptNoopActor = fromPromise<
-  ErrorInfo[],
-  ValidateTypescriptInputs
->(() => Promise.resolve([]));
+export const validateTypeScriptNoopActor = fromPromise<ErrorInfo[]>(() =>
+  Promise.resolve([]),
+);

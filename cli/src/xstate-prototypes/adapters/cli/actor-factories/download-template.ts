@@ -1,15 +1,10 @@
 import { downloadTemplate as gigetDownloadTemplate } from "giget";
 import { fromPromise } from "xstate/actors";
 
-export type DownloadTemplateInput = {
-  projectDir: string;
-};
-
-export const downloadTemplateActor = fromPromise<void, DownloadTemplateInput>(
-  async ({ input: { projectDir } }) => {
+export const createDownloadTemplateActor = (projectDir: string) =>
+  fromPromise<void, void>(async () => {
     await downloadTemplate(projectDir);
-  },
-);
+  });
 
 export async function downloadTemplate(projectDir: string) {
   const templateUrl = "github:brettimus/mega-honc";

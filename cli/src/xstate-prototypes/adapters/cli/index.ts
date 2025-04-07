@@ -1,2 +1,11 @@
 export { ChatCliAdapter } from "./chat-cli-adapter";
-export { cliSchemaCodegenMachine, cliApiCodegenMachine } from "./machines";
+export {
+  createCliChatMachine,
+  createCliSetUpWorkspaceMachine,
+  createCliDbSchemaCodegenMachine,
+  createCliApiCodegenMachine,
+} from "./machines";
+export {
+  createDownloadTemplateActor,
+  createInstallDependenciesActor,
+} from "./actor-factories";
