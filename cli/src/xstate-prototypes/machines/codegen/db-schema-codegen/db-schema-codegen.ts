@@ -31,6 +31,12 @@ type DbSchemaCodegenMachineInput = {
   spec: string;
 };
 
+type FixAttempt = {
+  typescriptErrors: ErrorInfo[];
+  typescriptErrorAnalysis: AnalyzeSchemaErrorsResult | null;
+  fixedCode: string | null;
+};
+
 type DbSchemaCodegenMachineContext = {
   aiConfig: FpAiConfig;
   /** The api specification document (spec.md) */
@@ -44,26 +50,21 @@ type DbSchemaCodegenMachineContext = {
   /** The generated db/schema.ts file */
   dbSchemaTs: string;
   /** Counter of how many fixes we have attempted */
-  fixAttempts: number;
-  /**
-   * Typescript errors for the last fix attempt
-   * @TODO - make it ErrorInfo[][], indexed by fixAttempt
-   */
-  typescriptErrors: ErrorInfo[];
-  typescriptErrorAnalysis: AnalyzeSchemaErrorsResult | null;
-  fixedSchema: string | null;
-  valid: boolean;
-  issues: string[];
-  suggestions: string[];
+  fixAttempts: FixAttempt[];
+  /** debug info - all ts errors (unfiltered by schema.ts) */
+  allTypescriptErrors: ErrorInfo[][];
 };
 
 interface DbSchemaCodegenMachineOutput {
   dbSchemaTs: string;
-  valid: boolean;
+  /** Issue while running machine, if Failed */
   error: unknown;
-  /** Remaining Typescript errors */
-  issues: string[];
-  suggestions: string[];
+  /** TODO - Tidy this up */
+  fixAttempts: FixAttempt[];
+  /** Remaining Typescript errors after fix loop */
+  issues: ErrorInfo[];
+  /** Debug info */
+  allTypescriptErrors: ErrorInfo[][];
 }
 
 export const dbSchemaCodegenMachine = setup({
@@ -103,20 +104,13 @@ export const dbSchemaCodegenMachine = setup({
       aiGatewayUrl: input.aiGatewayUrl,
     },
     spec: input.spec,
-
     error: null,
-
-    fixAttempts: 0,
-
+    fixAttempts: [],
+    allTypescriptErrors: [],
     schemaSpecification: "",
     relevantRules: [],
     dbSchemaTs: "",
-    typescriptErrors: [],
-    typescriptErrorAnalysis: null,
-    fixedSchema: null,
-    valid: false,
     issues: [],
-    suggestions: [],
   }),
   states: {
     Idle: {
@@ -285,8 +279,15 @@ export const dbSchemaCodegenMachine = setup({
             },
             actions: [
               assign({
-                typescriptErrors: ({ event }) => {
-                  return event.output;
+                fixAttempts: ({ event, context }) => {
+                  return [
+                    ...context.fixAttempts,
+                    {
+                      typescriptErrors: event.output,
+                      typescriptErrorAnalysis: null,
+                      fixedCode: null,
+                    },
+                  ];
                 },
               }),
             ],
@@ -295,8 +296,11 @@ export const dbSchemaCodegenMachine = setup({
             target: "Success",
             actions: [
               assign({
-                typescriptErrors: ({ event }) => {
-                  return event.output;
+                allTypescriptErrors: ({ context, event }) => {
+                  // HACK - I'm too tired to think if this is buggy or not
+                  const allErrors = [...context.allTypescriptErrors];
+                  allErrors[context.fixAttempts.length] = event.output;
+                  return allErrors;
                 },
               }),
             ],
@@ -311,63 +315,89 @@ export const dbSchemaCodegenMachine = setup({
       invoke: {
         id: "analyzeSchemaErrors",
         src: "analyzeErrors",
-        input: ({ context }) => ({
-          aiConfig: context.aiConfig,
-          options: {
-            schemaSpecification: context.schemaSpecification,
-            schema: context.dbSchemaTs,
-            errors: context.typescriptErrors,
-          },
-        }),
+        input: ({ context }) => {
+          const { aiConfig, fixAttempts } = context;
+          const lastFixAttempt = fixAttempts[fixAttempts.length - 1];
+          return {
+            aiConfig,
+            options: {
+              schemaSpecification: context.schemaSpecification,
+              schema: lastFixAttempt?.fixedCode ?? context.dbSchemaTs,
+              errors:
+                lastFixAttempt?.typescriptErrors ?? "<missing error data>",
+            },
+          };
+        },
         onDone: {
           target: "FixingErrors",
+          // TODO - Fixme - This is messy
           actions: assign({
-            typescriptErrorAnalysis: ({ event }) => event.output || null,
+            fixAttempts: ({ event, context }) => {
+              const { fixAttempts } = context;
+              const lastIndex = fixAttempts.length - 1;
+              const lastFixAttempt = fixAttempts[lastIndex];
+              const newFixAttempts = [...fixAttempts];
+              newFixAttempts[lastIndex] = {
+                ...lastFixAttempt,
+                typescriptErrorAnalysis: event.output || null,
+              };
+              return newFixAttempts;
+            },
           }),
         },
         onError: {
           target: "Failed",
           actions: ({ event }) => {
-            if (event.error) {
-              log("error", "Failed to analyze schema errors", {
-                error: event.error,
-              });
-            }
+            log("error", "Failed to analyze schema errors", {
+              error: event.error,
+            });
           },
         },
       },
     },
     FixingErrors: {
-      entry: [
-        () => log("info", "Fixing schema errors", { stage: "error-fix" }),
-        assign({
-          fixAttempts: ({ context }) => context.fixAttempts + 1,
-        }),
-      ],
+      // entry: [
+      //   () => log("info", "Fixing schema errors", { stage: "error-fix" }),
+      //   assign({
+      //     fixAttempts: ({ context }) => context.fixAttempts + 1,
+      //   }),
+      // ],
       invoke: {
         id: "fixSchemaErrors",
         src: "fixSchema",
-        input: ({ context }) => ({
-          aiConfig: context.aiConfig,
-          options: {
-            fixContent: context.typescriptErrorAnalysis?.text || "",
-            originalSchema: context.dbSchemaTs,
-          },
-        }),
+        input: ({ context }) => {
+          const { aiConfig, fixAttempts } = context;
+          const lastFixAttempt = fixAttempts[fixAttempts.length - 1];
+          return {
+            aiConfig: aiConfig,
+            options: {
+              fixContent: lastFixAttempt.typescriptErrorAnalysis?.text || "",
+              originalSchema: context.dbSchemaTs,
+            },
+          };
+        },
         onDone: {
           target: "SavingFixedSchema",
           actions: assign({
-            fixedSchema: ({ event }) => event.output?.code || null,
+            fixAttempts: ({ context, event }) => {
+              const { fixAttempts } = context;
+              const lastIndex = fixAttempts.length - 1;
+              const lastFixAttempt = fixAttempts[lastIndex];
+              const newFixAttempts = [...fixAttempts];
+              newFixAttempts[lastIndex] = {
+                ...lastFixAttempt,
+                fixedCode: event.output?.code || null,
+              };
+              return newFixAttempts;
+            },
           }),
         },
         onError: {
           target: "Failed",
           actions: ({ event }) => {
-            if (event.error) {
-              log("error", "Failed to fix schema errors", {
-                error: event.error,
-              });
-            }
+            log("error", "Failed to fix schema errors", {
+              error: event.error,
+            });
           },
         },
       },
@@ -378,10 +408,16 @@ export const dbSchemaCodegenMachine = setup({
       invoke: {
         id: "saveFixedSchema",
         src: "saveSchema",
-        input: ({ context }) => ({
-          // TODO - fixme - should guard against falsy fixedSchema
-          schema: context.fixedSchema || context.dbSchemaTs,
-        }),
+        input: ({ context }) => {
+          const { fixAttempts } = context;
+          const lastIndex = fixAttempts.length - 1;
+          const lastFixAttempt = fixAttempts[lastIndex];
+          const code = lastFixAttempt?.fixedCode || context.dbSchemaTs;
+          return {
+            // TODO - fixme - should guard against falsy fixedSchema
+            schema: code,
+          };
+        },
         onDone: {
           target: "Success",
         },
@@ -412,11 +448,18 @@ export const dbSchemaCodegenMachine = setup({
     },
   },
 
-  output: ({ context }) => ({
-    dbSchemaTs: context.fixedSchema || context.dbSchemaTs,
-    error: context.error,
-    valid: context.valid,
-    issues: context.issues,
-    suggestions: context.suggestions,
-  }),
+  output: ({ context }) => {
+    const { fixAttempts } = context;
+    const lastIndex = fixAttempts.length - 1;
+    const lastFixAttempt = fixAttempts[lastIndex];
+    const code = lastFixAttempt?.fixedCode || context.dbSchemaTs;
+
+    return {
+      dbSchemaTs: code,
+      error: context.error,
+      issues: lastFixAttempt?.typescriptErrors,
+      fixAttempts: context.fixAttempts,
+      allTypescriptErrors: context.allTypescriptErrors,
+    };
+  },
 });
