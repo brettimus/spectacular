@@ -212,7 +212,7 @@ const chatMachine = setup({
           messages: context.messages,
         }),
         onDone: {
-          target: "ProcessingAiResponse",
+          target: "StreamingFollowUpQuestion",
           actions: assign({
             streamResponse: ({ event }) => event.output,
           }),
@@ -226,7 +226,7 @@ const chatMachine = setup({
         },
       },
     },
-    ProcessingAiResponse: {
+    StreamingFollowUpQuestion: {
       on: {
         cancel: {
           target: "AwaitingUserInput",
