@@ -16,8 +16,11 @@ import {
 
 // NOTE - We need to provide filesystem actors to do things like save the spec and files to disk
 
-export const createCliChatMachine = (projectDir: string) => {
-  return chatMachine.provide({
+export const createCliChatMachine = (
+  projectDir: string,
+  baseChatMachine: typeof chatMachine = chatMachine,
+) => {
+  return baseChatMachine.provide({
     actors: {
       saveSpec: createCliSaveSpecActor(projectDir),
     },

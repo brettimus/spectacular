@@ -32,14 +32,16 @@ const AI_PROVIDER = "openai";
 type ChatCliAdapterState = StateFrom<typeof chatMachine>["value"];
 
 export class ChatCliAdapter {
-  private actor: ActorRefFrom<typeof chatMachine>;
+  machine: typeof chatMachine;
+  actor: ActorRefFrom<typeof chatMachine>;
 
   private loadingSpinner: ReturnType<typeof spinner> | null = null;
 
   private previousState: ChatCliAdapterState | null = null;
 
-  constructor() {
+  constructor(baseChatMachine = chatMachine) {
     this.previousState = null;
+    this.machine = baseChatMachine;
 
     // NOTE - We need to provide filesystem actors to do things like save the spec and files to disk
 
@@ -47,7 +49,29 @@ export class ChatCliAdapter {
     //        stream the response to the CLI
 
     // Temporary actor - gets reset when we start the cli and ask for the project dir
-    this.actor = createActor(chatMachine, {
+    this.actor = createActor(this.machine, {
+      input: {
+        apiKey: API_KEY ?? "",
+        aiProvider: AI_PROVIDER,
+      },
+    });
+  }
+
+  // Start the chat session
+  public async start(): Promise<void> {
+    // We have to start by forcing the user to select a project directory
+    const projectDir = await promptProjectFolder(process.cwd());
+    if (!projectDir) {
+      log.error("Could not set up project dir");
+      process.exit(1);
+    }
+
+    await actionCreateProjectFolder(projectDir);
+
+    // Important! Assign an actor that's scoped to the project directory
+    // Also, we inject `this.machine` to support local chat
+    const cliMachine = createCliChatMachine(projectDir, this.machine);
+    this.actor = createActor(cliMachine, {
       input: {
         apiKey: API_KEY ?? "",
         aiProvider: AI_PROVIDER,
@@ -56,11 +80,21 @@ export class ChatCliAdapter {
 
     // Listen for state changes to provide UI feedback
     // HACK - We only execute the bulk of our logic when the state value changes
+    //
+    this.actor.subscribe({
+      complete: () => {
+        console.debug("Finished!", this.actor.getSnapshot().context);
+      },
+      error(err) {
+        console.error("Ended in error state?", err);
+      },
+    });
     this.actor.subscribe((snapshot) => {
       const currentState: ChatCliAdapterState = snapshot.value;
 
       if (currentState !== this.previousState) {
-        console.log(pico.dim(`\nState transition to -> ${currentState}\n`));
+        // console.log(pico.dim(`\nState transition to -> ${currentState}\n`));
+
         // Handle different states with appropriate UI feedback
         switch (currentState) {
           case "AwaitingUserInput":
@@ -99,31 +133,15 @@ export class ChatCliAdapter {
               this.stopSpinner("Error!");
             }
             log.error("Whoa! Something went wrong...");
+            console.error(
+              "Error state reached:",
+              JSON.stringify(snapshot.context, null, 2),
+            );
             break;
         }
 
         this.previousState = currentState;
       }
-    });
-  }
-
-  // Start the chat session
-  public async start(): Promise<void> {
-    // We have to start by forcing the user to select a project directory
-    const projectDir = await promptProjectFolder(process.cwd());
-    if (!projectDir) {
-      log.error("Could not set up project dir");
-      process.exit(1);
-    }
-
-    await actionCreateProjectFolder(projectDir);
-
-    // Important!
-    this.actor = createActor(createCliChatMachine(projectDir), {
-      input: {
-        apiKey: API_KEY ?? "",
-        aiProvider: AI_PROVIDER,
-      },
     });
 
     this.actor.start();

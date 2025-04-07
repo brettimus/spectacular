@@ -5,6 +5,7 @@
   "description": "An interactive CLI to iterate on project specifications with AI",
   "scripts": {
     "chat": "tsx src/xstate-prototypes/index.ts",
+    "chat:local": "tsx src/xstate-prototypes/chat-local.ts",
     "auto": "tsx src/xstate-prototypes/smoketests/autonomous/autonomous.smoketest.ts",
     "schemagen": "tsx src/xstate-prototypes/smoketests/schemagen.smoketest.ts",
     "build": "pnpm clean && tsup",
