@@ -1,9 +1,18 @@
 import { fromPromise } from "xstate";
 import type {
+  SaveFollowUpActorInput,
   SaveApiActorInput,
   SaveSchemaInput,
   SaveSpecActorInput,
 } from "@/xstate-prototypes/machines";
+
+export const saveFollowUpMessagesToApiActor = fromPromise<
+  void,
+  SaveFollowUpActorInput
+>(async ({ input }) => {
+  // TODO - Save the spec to the API
+  console.log("[NOT YET IMPLEMENTED] Saving follow up messages", input);
+});
 
 export const saveSpecToApiActor = fromPromise<void, SaveSpecActorInput>(
   async ({ input }) => {

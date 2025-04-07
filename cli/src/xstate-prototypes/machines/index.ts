@@ -1,24 +1,16 @@
-import { chatMachine, type SaveSpecActorInput } from "./chat";
-import {
+export {
+  chatMachine,
+  type SaveSpecActorInput,
+  type SaveFollowUpActorInput,
+} from "./chat";
+export {
   dbSchemaCodegenMachine,
   type SaveSchemaInput,
   apiCodegenMachine,
   type SaveApiActorInput,
 } from "./codegen";
-import {
+export {
   downloadTemplateNoopActor,
   installDependenciesNoopActor,
   setUpWorkspaceMachine,
 } from "./set-up-workspace";
-
-export {
-  chatMachine,
-  type SaveSpecActorInput,
-  dbSchemaCodegenMachine,
-  type SaveSchemaInput,
-  apiCodegenMachine,
-  type SaveApiActorInput,
-  downloadTemplateNoopActor,
-  installDependenciesNoopActor,
-  setUpWorkspaceMachine,
-};

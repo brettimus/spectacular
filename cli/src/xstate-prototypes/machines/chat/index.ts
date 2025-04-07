@@ -3,6 +3,7 @@ export type { ChatMachineContext } from "./chat";
 export type {
   RouterActorInput,
   RouterResponse,
+  SaveFollowUpActorInput,
   SaveSpecActorInput,
   GenerateSpecActorInput,
   GeneratedPlan,

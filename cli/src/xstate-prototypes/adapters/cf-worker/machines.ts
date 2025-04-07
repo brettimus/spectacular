@@ -4,33 +4,31 @@ import {
   dbSchemaCodegenMachine,
 } from "@/xstate-prototypes/machines";
 import {
+  saveFollowUpMessagesToApiActor,
   saveApiIndexToApiActor,
   saveSchemaToApiActor,
   saveSpecToApiActor,
 } from "./actors";
 
-export const cliChatMachine = chatMachine.provide({
+export const cfChatMachine = chatMachine.provide({
   actors: {
     saveSpec: saveSpecToApiActor,
+    saveFollowUp: saveFollowUpMessagesToApiActor,
   },
   actions: {
     handleStreamChunk: (_, _params) => {
       // NOOP - But this is a good place to add logic to handle chunks of text from the streaming response
     },
-    handleFollowUpQuestion: (_, _params) => {
-      // NOOP - But this is a good place to add logic to handle new assistant messages after the streaming response has completed
-      //        BUT, this will NOT fire after a spec is generated. for that, rely on the `saveSpec` actor.
-    },
   },
 });
 
-export const cliSchemaCodegenMachine = dbSchemaCodegenMachine.provide({
+export const cfSchemaCodegenMachine = dbSchemaCodegenMachine.provide({
   actors: {
     saveSchema: saveSchemaToApiActor,
   },
 });
 
-export const cliApiCodegenMachine = apiCodegenMachine.provide({
+export const cfApiCodegenMachine = apiCodegenMachine.provide({
   actors: {
     saveApiIndex: saveApiIndexToApiActor,
   },

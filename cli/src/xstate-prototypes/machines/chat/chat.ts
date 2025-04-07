@@ -15,10 +15,12 @@ import type { ChunkEvent } from "../streaming";
 import {
   type RouterResponse,
   askNextQuestionActor,
+  saveFollowUpNoopActor,
   generateSpecActor,
   routeRequestActor,
   saveSpecNoopActor,
 } from "./actors";
+import { log } from "@/xstate-prototypes/utils/logging";
 
 type SpecDetails = {
   title: string;
@@ -42,6 +44,7 @@ type ChatMachineOutput = {
 export interface ChatMachineContext {
   aiConfig: FpAiConfig;
   messages: Message[];
+  followUpMessages: AiResponseMessage[] | null;
   error: unknown | null;
   errorHistory: unknown[];
   spec: SpecDetails | null;
@@ -64,6 +67,7 @@ const chatMachine = setup({
   actors: {
     routeRequest: routeRequestActor,
     askNextQuestion: askNextQuestionActor,
+    saveFollowUp: saveFollowUpNoopActor,
     generateSpec: generateSpecActor,
     saveSpec: saveSpecNoopActor,
     processQuestionStream: aiTextStreamMachine,
@@ -88,14 +92,6 @@ const chatMachine = setup({
       //         but it can be overridden with `.provide`
       //         It's a way to stream responses
     },
-    handleFollowUpQuestion: (
-      _,
-      _params: { responseMessages: AiResponseMessage[] },
-    ) => {
-      // NOTE - This is a noop by default, but it's a good place
-      //        to add logic to handle new assistant messages
-      //        via `.provide`
-    },
     updateAssistantMessages: assign({
       messages: (
         { context },
@@ -107,6 +103,19 @@ const chatMachine = setup({
         });
       },
       streamResponse: null, // Clear the raw streaming response
+    }),
+    logEmptyFollowUpMessagesWarning: ({ context }) => {
+      if (!context.followUpMessages || !context.followUpMessages?.length) {
+        log("warn", "Follow up messages is empty - nothing will be saved", {
+          followUpMessages: context.followUpMessages,
+        });
+      }
+    },
+    updateFollowUpQuestionMessages: assign({
+      followUpMessages: (_, params: AiResponseMessage[]) => params,
+    }),
+    clearFollowUpMessages: assign({
+      followUpMessages: () => null,
     }),
     recordError: assign({
       error: (_, event: { error: unknown }) => event.error,
@@ -131,6 +140,7 @@ const chatMachine = setup({
       aiGatewayUrl: input.aiGatewayUrl,
     },
     messages: input.messages ?? [],
+    followUpMessages: null,
     error: null,
     errorHistory: [],
     spec: null,
@@ -230,18 +240,6 @@ const chatMachine = setup({
       on: {
         cancel: {
           target: "AwaitingUserInput",
-          // TODO - Flush message somehow?
-          actions: ({ self }) => {
-            const processQuestionStream =
-              self.getSnapshot().children.processQuestionStream;
-            if (processQuestionStream) {
-              const cancelledActorContext =
-                processQuestionStream.getSnapshot().context;
-              console.log("cancelledActorContext", cancelledActorContext);
-            } else {
-              console.log("no processQuestionStream upon cancellation");
-            }
-          },
         },
         "textStream.chunk": {
           actions: {
@@ -261,7 +259,7 @@ const chatMachine = setup({
           parent: self,
         }),
         onDone: {
-          target: "AwaitingUserInput",
+          target: "SavingFollowUpQuestion",
           actions: [
             {
               type: "updateAssistantMessages",
@@ -272,12 +270,8 @@ const chatMachine = setup({
               },
             },
             {
-              type: "handleFollowUpQuestion",
-              params: ({ event }) => {
-                return {
-                  responseMessages: event.output.responseMessages,
-                };
-              },
+              type: "updateFollowUpQuestionMessages",
+              params: ({ event }) => event.output.responseMessages,
             },
           ],
         },
@@ -287,6 +281,37 @@ const chatMachine = setup({
             type: "recordError",
             params: ({ event }) => ({ error: event.error }),
           },
+        },
+      },
+    },
+    SavingFollowUpQuestion: {
+      entry: [
+        {
+          type: "logEmptyFollowUpMessagesWarning",
+        },
+      ],
+      invoke: {
+        id: "saveFollowUp",
+        src: "saveFollowUp",
+        input: ({ context }) => {
+          return {
+            // HACK - Fallback to [], since strong typing is hard for this kind of state
+            followUpMessages: context.followUpMessages ?? [],
+          };
+        },
+        onDone: {
+          target: "AwaitingUserInput",
+          actions: "clearFollowUpMessages",
+        },
+        onError: {
+          target: "Error",
+          actions: [
+            "clearFollowUpMessages",
+            {
+              type: "recordError",
+              params: ({ event }) => ({ error: event.error }),
+            },
+          ],
         },
       },
     },
