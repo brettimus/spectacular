@@ -1,3 +1,4 @@
+import { fromPromise } from "xstate";
 import type { AiTextStreamResult } from "@/xstate-prototypes/machines/streaming";
 import { stream, isCancel, log, spinner, text } from "@clack/prompts";
 import type { Message } from "ai";
@@ -9,17 +10,23 @@ import {
   createActor,
   waitFor,
 } from "xstate";
-import { cliChatMachine } from "./machines";
+import { chatMachine } from "../../machines";
+import { writeFile } from "node:fs/promises";
+import { SaveSpecActorInput } from "@/xstate-prototypes/machines";
+
+// import path from "node:path";
 
 config();
 
 const API_KEY = process.env.OPENAI_API_KEY;
 const AI_PROVIDER = "openai";
 
-type ChatCliAdapterState = StateFrom<typeof cliChatMachine>["value"];
+type ChatCliAdapterState = StateFrom<typeof chatMachine>["value"];
 
 export class ChatCliAdapter {
-  private actor: ActorRefFrom<typeof cliChatMachine>;
+  private projectDir: string;
+  private actor: ActorRefFrom<typeof chatMachine>;
+
   private loadingSpinner: ReturnType<typeof spinner> | null = null;
 
   private previousState: ChatCliAdapterState | null = null;
@@ -31,15 +38,22 @@ export class ChatCliAdapter {
     }
 
     this.previousState = null;
+
+    this.projectDir = process.cwd();
+
     // NOTE - We need to provide filesystem actors to do things like save the spec and files to disk
 
     // TODO - Try to provide a `processQuestionStream` actor that can
     //        stream the response to the CLI
-    this.actor = createActor(cliChatMachine, {
+    const machine = chatMachine.provide({
+      actors: {
+        saveSpec: fromPromise(this.saveSpecToDisk),
+      },
+    });
+    this.actor = createActor(machine, {
       input: {
         apiKey: API_KEY,
         aiProvider: AI_PROVIDER,
-        cwd: process.cwd(),
       },
     });
 
@@ -79,7 +93,8 @@ export class ChatCliAdapter {
             if (this.loadingSpinner) {
               this.stopSpinner("Complete!");
             }
-            log.success(`Plan saved to: ${snapshot.context.specLocation}`);
+            const savedPath = snapshot.context.spec?.filename ?? "unknown";
+            log.success(`Plan saved to: ${savedPath}`);
             process.exit(0);
             break;
           case "Error":
@@ -99,6 +114,9 @@ export class ChatCliAdapter {
   public async start(): Promise<void> {
     this.actor.start();
     log.info(pico.cyan("🤖 Spectacular AI Chat Session"));
+
+    // TODO - Force user to select project directory
+
     log.info(pico.dim("Type your question or idea to get started."));
     log.info("");
 
@@ -168,6 +186,10 @@ export class ChatCliAdapter {
       userPrompt = null;
     }
   }
+
+  private saveSpecToDisk = async ({ input }: { input: SaveSpecActorInput }) => {
+    await writeFile(this.projectDir, input.content);
+  };
 
   private async streamQuestion(result: AiTextStreamResult) {
     await stream.info(

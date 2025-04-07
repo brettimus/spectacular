@@ -5,7 +5,7 @@ import {
   type FpAiConfig,
   type FpModelProvider,
 } from "../../ai";
-import { createUserMessage, pathFromInput } from "../../utils";
+import { createUserMessage } from "../../utils";
 import {
   type AiResponseMessage,
   type AiTextStreamResult,
@@ -20,24 +20,32 @@ import {
   saveSpecNoopActor,
 } from "./actors";
 
-interface ChatMachineInput {
+type SpecDetails = {
+  title: string;
+  filename: "spec.md";
+  content: string;
+};
+
+type ChatMachineInput = {
   apiKey: string;
   aiProvider?: FpModelProvider;
   aiGatewayUrl?: string;
-  cwd: string;
   messages?: Message[];
-}
+};
+
+type ChatMachineOutput = {
+  messages: Message[];
+  errors: unknown[];
+  spec: SpecDetails | null;
+};
 
 export interface ChatMachineContext {
   aiConfig: FpAiConfig;
   messages: Message[];
   error: unknown | null;
   errorHistory: unknown[];
-  cwd: string;
-  spec: string | null;
-  projectDir: string | null;
-  specLocation: string | null;
-  title: string;
+  spec: SpecDetails | null;
+  /** NOTE - This is only used to make it easier to consume the stream in the CLI */
   streamResponse: AiTextStreamResult | null;
 }
 
@@ -45,16 +53,6 @@ type ChatMachineEvent =
   | { type: "user.message"; content: string }
   | { type: "cancel" }
   | ChunkEvent;
-
-interface ChatMachineOutput {
-  messages: Message[];
-  errorHistory: unknown[];
-  cwd: string;
-  spec: string | null;
-  specLocation: string | null;
-  title: string;
-  projectDir: string;
-}
 
 const chatMachine = setup({
   types: {
@@ -88,12 +86,15 @@ const chatMachine = setup({
     handleStreamChunk: (_, _params: { chunk: string }) => {
       // NOTE - `handleStreamChunk` is a noop by default,
       //         but it can be overridden with `.provide`
+      //         It's a way to stream responses
     },
-    handleNewAssistantMessages: (
+    handleFollowUpQuestion: (
       _,
       _params: { responseMessages: AiResponseMessage[] },
     ) => {
-      // NOTE - This is a noop by default, but it's a good place to add logic to handle new assistant messages via `.provide`
+      // NOTE - This is a noop by default, but it's a good place
+      //        to add logic to handle new assistant messages
+      //        via `.provide`
     },
     updateAssistantMessages: assign({
       messages: (
@@ -132,12 +133,8 @@ const chatMachine = setup({
     messages: input.messages ?? [],
     error: null,
     errorHistory: [],
-    cwd: input.cwd,
     spec: null,
-    specLocation: null,
-    title: "spec.md",
     streamResponse: null,
-    projectDir: input.cwd,
   }),
   states: {
     AwaitingUserInput: {
@@ -275,7 +272,7 @@ const chatMachine = setup({
               },
             },
             {
-              type: "handleNewAssistantMessages",
+              type: "handleFollowUpQuestion",
               params: ({ event }) => {
                 return {
                   responseMessages: event.output.responseMessages,
@@ -304,8 +301,12 @@ const chatMachine = setup({
         onDone: {
           actions: [
             assign({
-              spec: ({ event }) => event.output.plan,
-              title: ({ event }) => event.output.title,
+              spec: ({ context, event }) => ({
+                ...context.spec,
+                filename: "spec.md",
+                title: event.output.title,
+                content: event.output.plan,
+              }),
             }),
           ],
           target: "SavingSpec",
@@ -325,19 +326,15 @@ const chatMachine = setup({
         src: "saveSpec",
         input: ({ context }) => {
           return {
-            // HACK - We can't strongly type the `plan` here without adding
-            //        a lot of complexity to the onDone handler of the
-            //        savePlan actor
-            spec: context.spec ?? "",
-            specLocation: pathFromInput(context.title, context.cwd),
+            // We can't strongly type the `spec` here without adding
+            // a lot of complexity to the onDone handler of the `savePlan` actor
+            content: context.spec?.content ?? "",
+            filename: context.spec?.filename ?? "spec.md",
+            title: context.spec?.title ?? "spec.md",
           };
         },
         onDone: {
           target: "Done",
-          actions: assign({
-            specLocation: ({ context }) =>
-              pathFromInput(context.title, context.cwd),
-          }),
         },
         onError: {
           target: "Error",
@@ -374,15 +371,9 @@ const chatMachine = setup({
     },
   },
   output: ({ context }) => ({
-    errorHistory: context.errorHistory,
     spec: context.spec,
-    specLocation: context.specLocation,
     messages: context.messages,
-    cwd: context.cwd,
-    // HACK - Default to emptystring
-    // IMPROVEMENT - If missing necessary data, return a different output type
-    projectDir: context.projectDir ?? "",
-    title: context.title,
+    errors: context.errorHistory,
   }),
 });
 

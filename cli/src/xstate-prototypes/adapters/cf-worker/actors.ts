@@ -1,12 +1,12 @@
 import { fromPromise } from "xstate";
+import type { SaveSpecActorInput } from "@/xstate-prototypes/machines";
 
-export const saveSpecToApiActor = fromPromise<
-  void,
-  { spec: string; specLocation: string }
->(async ({ input }) => {
-  // TODO - Save the spec to the API
-  console.log("[NOT YET IMPLEMENTED] Saving spec to API", input);
-});
+export const saveSpecToApiActor = fromPromise<void, SaveSpecActorInput>(
+  async ({ input }) => {
+    // TODO - Save the spec to the API
+    console.log("[NOT YET IMPLEMENTED] Saving spec to API", input);
+  },
+);
 
 export const saveSchemaToApiActor = fromPromise<
   void,

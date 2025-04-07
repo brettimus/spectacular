@@ -85,7 +85,6 @@ describe("Chat Machine - Generate Spec", () => {
     generateSpecActor = createActor(generateSpecMachine, {
       input: {
         apiKey: "test-api-key",
-        cwd: "/test/dir",
       },
     });
 
@@ -116,7 +115,6 @@ describe("Chat Machine - Generate Spec", () => {
     generateSpecFailActor = createActor(generateSpecFailMachine, {
       input: {
         apiKey: "test-api-key",
-        cwd: "/test/dir",
       },
     });
 

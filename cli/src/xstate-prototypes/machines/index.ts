@@ -1,4 +1,4 @@
-import { chatMachine } from "./chat";
+import { chatMachine, type SaveSpecActorInput } from "./chat";
 import { apiCodegenMachine } from "./codegen/api-codegen";
 import { dbSchemaCodegenMachine } from "./codegen/db-schema-codegen";
 import {
@@ -10,6 +10,7 @@ import {
 
 export {
   chatMachine,
+  type SaveSpecActorInput,
   dbSchemaCodegenMachine,
   apiCodegenMachine,
   downloadTemplateNoopActor,

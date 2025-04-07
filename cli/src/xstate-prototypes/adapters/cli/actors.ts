@@ -14,13 +14,6 @@ export const validateTypeScriptOnDiskActor = fromPromise<
   validateTypeScriptOnDisk(input.projectDir, input.packageManager, signal),
 );
 
-export const saveSpecToDiskActor = fromPromise<
-  void,
-  { spec: string; specLocation: string }
->(async ({ input }) => {
-  await writeFile(input.specLocation, input.spec);
-});
-
 export const saveSchemaToDiskActor = fromPromise<
   void,
   { projectDir: string; schema: string }

@@ -4,11 +4,15 @@ import { fromPromise } from "xstate";
 //        you will use `.provide({ actors: { saveSpec: saveSpecSomewhereActor } })`
 //        to override this adapter.
 
-// Export the input type for the actor to be reused in tests
-export interface SaveSpecActorInput {
-  spec: string;
-  specLocation: string;
-}
+export type SaveSpecActorInput = {
+  /**
+   * I'm actually not certain the filename is relevant as an input,
+   * or if that detail should be left to the actor implementation
+   */
+  filename: string;
+  title: string;
+  content: string;
+};
 
 export const saveSpecNoopActor = fromPromise<void, SaveSpecActorInput>(
   async () => {},
