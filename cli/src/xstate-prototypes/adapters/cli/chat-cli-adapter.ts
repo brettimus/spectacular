@@ -13,6 +13,10 @@ import {
 import { chatMachine } from "../../machines";
 import { writeFile } from "node:fs/promises";
 import { SaveSpecActorInput } from "@/xstate-prototypes/machines";
+import {
+  actionCreateProjectFolder,
+  promptProjectFolder,
+} from "./prompt-project-dir";
 
 // import path from "node:path";
 
@@ -112,10 +116,20 @@ export class ChatCliAdapter {
 
   // Start the chat session
   public async start(): Promise<void> {
+    // We have to start by forcing the user to select a project directory
+    const projectDir = await promptProjectFolder(process.cwd());
+    if (!projectDir) {
+      log.error("Could not set up project dir");
+      process.exit(1);
+    }
+
+    await actionCreateProjectFolder(projectDir);
+
+    // IMPORTANT! assign the project directory here so it can be used by actors
+    this.projectDir = projectDir;
+
     this.actor.start();
     log.info(pico.cyan("🤖 Spectacular AI Chat Session"));
-
-    // TODO - Force user to select project directory
 
     log.info(pico.dim("Type your question or idea to get started."));
     log.info("");
