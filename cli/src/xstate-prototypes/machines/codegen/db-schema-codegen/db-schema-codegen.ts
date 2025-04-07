@@ -259,12 +259,6 @@ export const dbSchemaCodegenMachine = setup({
       },
     },
     CheckingTypescript: {
-      entry: () =>
-        log(
-          "info",
-          "Schema verification failed. Waiting for errors to analyze",
-          { stage: "error-wait" },
-        ),
       invoke: {
         id: "validateTypeScript",
         src: "validateTypeScript",
@@ -292,6 +286,7 @@ export const dbSchemaCodegenMachine = setup({
               }),
             ],
           },
+          // TODO - Fixme - this doesn't work, but it's because we need a different state flow and data structure for this
           {
             target: "Success",
             actions: [

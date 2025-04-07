@@ -150,12 +150,6 @@ export const apiCodegenMachine = setup({
     },
 
     CheckingTypescript: {
-      entry: () =>
-        log(
-          "info",
-          "Schema verification failed. Waiting for errors to analyze",
-          { stage: "error-wait" },
-        ),
       invoke: {
         id: "validateTypeScript",
         src: "validateTypeScript",
