@@ -3,7 +3,7 @@ import type { Message } from "ai";
 import { ollama } from "ollama-ai-provider";
 import { fromPromise } from "xstate";
 import type { AiTextStreamResult } from "../../machines/streaming";
-import {
+import type {
   AnalyzeTablesOptions,
   AnalyzeTablesResult,
   FpAiConfig,
@@ -12,7 +12,7 @@ import {
   GenerateSchemaResult,
   RouterResponse,
 } from "@/xstate-prototypes/ai";
-import { RouterResponseType } from "@/xstate-prototypes/machines/chat/actors";
+import type { RouterResponseType } from "@/xstate-prototypes/machines/chat/actors";
 
 export const routeRequestLocalActor = fromPromise<
   RouterResponse,

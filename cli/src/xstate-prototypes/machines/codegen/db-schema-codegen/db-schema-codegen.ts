@@ -27,26 +27,30 @@ type DbSchemaCodegenMachineInput = {
   aiProvider?: FpModelProvider;
   /** The AI gateway URL to use for AI calls */
   aiGatewayUrl?: string;
-  /** The spec to use for schema generation */
+  /** The spec content to use for schema generation */
   spec: string;
 };
 
 type DbSchemaCodegenMachineContext = {
   aiConfig: FpAiConfig;
+  /** The api specification document (spec.md) */
   spec: string;
-
-  fixAttempts: number;
-
-  schemaSpecification: string;
-  relevantRules: SelectedRule[];
-  dbSchemaTs: string;
-
   /** Whatever error stopped teh machine */
   error: unknown;
-
-  /** TODO - rename - these are typescript errors */
-  errors: ErrorInfo[];
-  errorAnalysis: AnalyzeSchemaErrorsResult | null;
+  /** The natural language description of the schema */
+  schemaSpecification: string;
+  /** Rules selected from a knowledge base (not yet implemented) */
+  relevantRules: SelectedRule[];
+  /** The generated db/schema.ts file */
+  dbSchemaTs: string;
+  /** Counter of how many fixes we have attempted */
+  fixAttempts: number;
+  /**
+   * Typescript errors for the last fix attempt
+   * @TODO - make it ErrorInfo[][], indexed by fixAttempt
+   */
+  typescriptErrors: ErrorInfo[];
+  typescriptErrorAnalysis: AnalyzeSchemaErrorsResult | null;
   fixedSchema: string | null;
   valid: boolean;
   issues: string[];
@@ -57,6 +61,7 @@ interface DbSchemaCodegenMachineOutput {
   dbSchemaTs: string;
   valid: boolean;
   error: unknown;
+  /** Remaining Typescript errors */
   issues: string[];
   suggestions: string[];
 }
@@ -106,8 +111,8 @@ export const dbSchemaCodegenMachine = setup({
     schemaSpecification: "",
     relevantRules: [],
     dbSchemaTs: "",
-    errors: [],
-    errorAnalysis: null,
+    typescriptErrors: [],
+    typescriptErrorAnalysis: null,
     fixedSchema: null,
     valid: false,
     issues: [],
@@ -280,7 +285,7 @@ export const dbSchemaCodegenMachine = setup({
             },
             actions: [
               assign({
-                errors: ({ event }) => {
+                typescriptErrors: ({ event }) => {
                   return event.output;
                 },
               }),
@@ -290,7 +295,7 @@ export const dbSchemaCodegenMachine = setup({
             target: "Success",
             actions: [
               assign({
-                errors: ({ event }) => {
+                typescriptErrors: ({ event }) => {
                   return event.output;
                 },
               }),
@@ -311,13 +316,13 @@ export const dbSchemaCodegenMachine = setup({
           options: {
             schemaSpecification: context.schemaSpecification,
             schema: context.dbSchemaTs,
-            errors: context.errors,
+            errors: context.typescriptErrors,
           },
         }),
         onDone: {
           target: "FixingErrors",
           actions: assign({
-            errorAnalysis: ({ event }) => event.output || null,
+            typescriptErrorAnalysis: ({ event }) => event.output || null,
           }),
         },
         onError: {
@@ -345,7 +350,7 @@ export const dbSchemaCodegenMachine = setup({
         input: ({ context }) => ({
           aiConfig: context.aiConfig,
           options: {
-            fixContent: context.errorAnalysis?.text || "",
+            fixContent: context.typescriptErrorAnalysis?.text || "",
             originalSchema: context.dbSchemaTs,
           },
         }),

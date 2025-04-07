@@ -1,5 +1,5 @@
 import { fromPromise } from "xstate";
-import { AiResponseMessage } from "../../streaming";
+import type { AiResponseMessage } from "../../streaming";
 
 export type SaveFollowUpActorInput = {
   followUpMessages: AiResponseMessage[];
