@@ -69,7 +69,7 @@ export class ChatCliAdapter {
           case "Routing":
             this.startSpinner("Thinking...");
             break;
-          case "FollowingUp":
+          case "InitializingFollowUpQuestion":
             this.updateSpinner("Preparing follow-up question...");
             break;
           case "ProcessingAiResponse":

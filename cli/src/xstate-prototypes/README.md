@@ -68,7 +68,7 @@ Docs: https://stately.ai/docs/inspector
 
 **One of the main benefits of xstate is the ability to visually document and inspect the state of the machine, but this is kinda hacky to do when you're not running machines in the browser.**
 
-I've added a workaround by spinning up a simple vite app that runs the current `ChatMachine` with node polyfills. That said, arriving at this solution was _a pain_, and was odd because there is an adapter that's supposed to work over WebSockets, but it's undocumented and didn't work for me I don't like that we can't just... send events over WebSockets, and instead have to shim the machine for the browser to get the inspector to work. 
+I've added a workaround by spinning up a simple vite app that runs the current `ChatMachine` with node polyfills. That said, arriving at this solution was _a pain_, and was odd because there is an adapter that's supposed to work over WebSockets, but it's undocumented and didn't work for me I don't like that we can't just... send events over WebSockets, and instead have to shim the machine for the browser to get the inspector to work.
 
 The fact that we _must_ run the machine in the browser is a bit of a pain, and might make it difficult to support a target like Cloudflare Workers without using an adapter pattern on top of core machine logic.
 
@@ -82,16 +82,16 @@ Regarding the inspector that fires WebSocket events, which you can forward to St
 
 ## Logging
 
-Tried looking into Pino, but it isn't supported in Cloudflare Workers out of the box so nixed that. I liked log layer as a general solution so we could swap out the transport layer easily, but they don't have support for.... logtape! 
+Tried looking into Pino, but it isn't supported in Cloudflare Workers out of the box so nixed that. I liked log layer as a general solution so we could swap out the transport layer easily, but they don't have support for.... logtape!
 
 Went with logtape since we're using it in Cloudflare Workers already.
 
 ## Naming conventions
 
 ### State Names
-Using PascalCase (capitalized state names) is considered good practice for XState state machines. 
+Using PascalCase (capitalized state names) is considered good practice for XState state machines.
 
-The official ESLint plugin for XState supports this convention, though XState itself doesn't enforce any particular format. 
+The official ESLint plugin for XState supports this convention, though XState itself doesn't enforce any particular format.
 
 While camelCase is used in some official XState documentation, PascalCase helps visually distinguish states in our code.
 
@@ -117,7 +117,7 @@ When `invoke`ing an actor, it's perfectly fine to use the same name for the `id`
 The `src` just needs to uniquely identify the actor within the state machine. The `name` should be unique for all spawned actors and invoked services.
 
 ```ts
-    FollowingUp: {
+    InitializingFollowUpQuestion: {
       invoke: {
         id: "askNextQuestion",
         src: "askNextQuestion",

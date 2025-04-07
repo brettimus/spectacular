@@ -174,7 +174,7 @@ const chatMachine = setup({
             //
             // NOTE - This does not give a type error even if you remove the corresponding state
             // TODO - Look up if we can cause type errors for targeting not-defined states!
-            target: "FollowingUp",
+            target: "InitializingFollowUpQuestion",
             guard: {
               type: "shouldAskFollowUp",
               params: ({ event }) => event.output,
@@ -198,7 +198,7 @@ const chatMachine = setup({
         },
       },
     },
-    FollowingUp: {
+    InitializingFollowUpQuestion: {
       on: {
         cancel: {
           target: "AwaitingUserInput",
