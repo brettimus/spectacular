@@ -93,7 +93,7 @@ describe("Chat Machine - Generate Spec", () => {
 
     // Send a message to trigger the routing
     generateSpecActor.send({
-      type: "user.message",
+      type: "user.message.added",
       content: "Create a spec for my project",
     });
 
@@ -123,7 +123,7 @@ describe("Chat Machine - Generate Spec", () => {
 
     // Send a message to trigger the routing
     generateSpecFailActor.send({
-      type: "user.message",
+      type: "user.message.added",
       content: "Create a spec for my project",
     });
 
