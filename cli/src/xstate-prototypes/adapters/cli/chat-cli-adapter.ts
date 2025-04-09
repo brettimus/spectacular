@@ -59,7 +59,8 @@ export class ChatCliAdapter {
   }
 
   // Start the chat session
-  public async start(callback?: Function): Promise<void> {
+  // biome-ignore lint/complexity/noBannedTypes: prototyping!! get off my back!!!!
+    public async start(callback?: Function): Promise<void> {
     // We have to start by forcing the user to select a project directory
     const projectDir = await promptProjectFolder(process.cwd());
     if (!projectDir) {
@@ -129,7 +130,7 @@ export class ChatCliAdapter {
           case "SavingSpec":
             this.updateSpinner("Saving plan to disk...");
             break;
-          case "Done":
+          case "Done": {
             if (this.loadingSpinner) {
               this.stopSpinner("Complete!");
             }
@@ -137,6 +138,7 @@ export class ChatCliAdapter {
             log.success(`Plan saved to: ${savedPath}`);
             // process.exit(0);
             break;
+          }
           case "Error":
             if (this.loadingSpinner) {
               this.stopSpinner("Error!");
@@ -192,7 +194,7 @@ export class ChatCliAdapter {
 
       // Send prompt to state machine
       this.actor.send({
-        type: "user.message",
+        type: "user.message.added",
         content: userPrompt as string,
       });
 

@@ -1,4 +1,4 @@
-import { type Message, appendResponseMessages } from "ai";
+import { type Message as AiMessage, appendResponseMessages } from "ai";
 import { assign, setup } from "xstate";
 import {
   DEFAULT_AI_PROVIDER,
@@ -32,30 +32,32 @@ type ChatMachineInput = {
   apiKey: string;
   aiProvider?: FpModelProvider;
   aiGatewayUrl?: string;
-  messages?: Message[];
+  messages?: AiMessage[];
   agentMessageId?: string;
 };
 
 type ChatMachineOutput = {
-  messages: Message[];
+  messages: AiMessage[];
   errors: unknown[];
   spec: SpecDetails | null;
 };
 
 export interface ChatMachineContext {
   aiConfig: FpAiConfig;
-  messages: Message[];
+  messages: AiMessage[];
   followUpMessages: AiResponseMessage[] | null;
   error: unknown | null;
   errorHistory: unknown[];
   spec: SpecDetails | null;
+  /** A unique identifier for the agent's response message - think of this as a way to trace response progress updates */
   agentMessageId: string | null;
   /** NOTE - This is only used to make it easier to consume the stream in the CLI */
   streamResponse: AiTextStreamResult | null;
 }
 
 type ChatMachineEvent =
-  | { type: "user.message"; content: string }
+  | { type: "user.message.added"; content: string }
+  | { type: "messages.replaced"; messages: AiMessage[] }
   | { type: "cancel" }
   | ChunkEvent;
 
@@ -88,6 +90,9 @@ const chatMachine = setup({
         ...context.messages,
         createUserMessage(params.content),
       ],
+    }),
+    replaceMessages: assign({
+      messages: (_, params: { messages: AiMessage[] }) => params.messages,
     }),
     handleStreamChunk: (_, _params: { chunk: string }) => {
       // NOTE - `handleStreamChunk` is a noop by default,
@@ -152,7 +157,7 @@ const chatMachine = setup({
   states: {
     AwaitingUserInput: {
       on: {
-        "user.message": {
+        "user.message.added": {
           description: "The user sends a message to the chat agent",
           target: "Routing",
           actions: [
@@ -163,6 +168,14 @@ const chatMachine = setup({
                   content: event.content,
                 };
               },
+            },
+          ],
+        },
+        "messages.replaced": {
+          actions: [
+            {
+              type: "replaceMessages",
+              params: ({ event }) => ({ messages: event.messages }),
             },
           ],
         },
@@ -378,7 +391,7 @@ const chatMachine = setup({
     },
     Error: {
       on: {
-        "user.message": {
+        "user.message.added": {
           target: "Routing",
           actions: [
             // Flush error state
@@ -392,6 +405,19 @@ const chatMachine = setup({
                   content: event.content,
                 };
               },
+            },
+          ],
+        },
+        "messages.replaced": {
+          target: "Routing",
+          actions: [
+            // Flush error state
+            {
+              type: "resetError",
+            },
+            {
+              type: "replaceMessages",
+              params: ({ event }) => ({ messages: event.messages }),
             },
           ],
         },
