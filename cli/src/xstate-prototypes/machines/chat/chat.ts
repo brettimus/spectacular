@@ -33,6 +33,7 @@ type ChatMachineInput = {
   aiProvider?: FpModelProvider;
   aiGatewayUrl?: string;
   messages?: Message[];
+  agentMessageId?: string;
 };
 
 type ChatMachineOutput = {
@@ -48,6 +49,7 @@ export interface ChatMachineContext {
   error: unknown | null;
   errorHistory: unknown[];
   spec: SpecDetails | null;
+  agentMessageId: string | null;
   /** NOTE - This is only used to make it easier to consume the stream in the CLI */
   streamResponse: AiTextStreamResult | null;
 }
@@ -140,6 +142,7 @@ const chatMachine = setup({
       aiGatewayUrl: input.aiGatewayUrl,
     },
     messages: input.messages ?? [],
+    agentMessageId: input.agentMessageId ?? null,
     followUpMessages: null,
     error: null,
     errorHistory: [],
