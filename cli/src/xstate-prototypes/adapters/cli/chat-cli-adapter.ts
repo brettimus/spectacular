@@ -60,7 +60,7 @@ export class ChatCliAdapter {
 
   // Start the chat session
   // biome-ignore lint/complexity/noBannedTypes: prototyping!! get off my back!!!!
-    public async start(callback?: Function): Promise<void> {
+  public async start(callback?: Function): Promise<void> {
     // We have to start by forcing the user to select a project directory
     const projectDir = await promptProjectFolder(process.cwd());
     if (!projectDir) {
