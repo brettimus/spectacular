@@ -97,7 +97,7 @@ const chatMachine = setup({
     updateTraceId: assign({
       traceId: (_, params: { traceId?: string }) => params.traceId ?? null,
     }),
-    handleStreamChunk: (_, _params: { chunk: string }) => {
+    handleStreamChunk: (_, _params: { chunk: string; traceId?: string }) => {
       // NOTE - `handleStreamChunk` is a noop by default,
       //         but it can be overridden with `.provide`
       //         It's a way to stream responses
@@ -321,6 +321,7 @@ const chatMachine = setup({
         src: "saveFollowUp",
         input: ({ context }) => {
           return {
+            traceId: context.traceId ?? undefined,
             // HACK - Fallback to [], since strong typing is hard for this kind of state
             followUpMessages: context.followUpMessages ?? [],
           };
@@ -377,6 +378,7 @@ const chatMachine = setup({
         src: "saveSpec",
         input: ({ context }) => {
           return {
+            traceId: context.traceId ?? undefined,
             // We can't strongly type the `spec` here without adding
             // a lot of complexity to the onDone handler of the `savePlan` actor
             content: context.spec?.content ?? "",
