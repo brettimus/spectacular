@@ -97,6 +97,9 @@ const chatMachine = setup({
     updateTraceId: assign({
       traceId: (_, params: { traceId?: string }) => params.traceId ?? null,
     }),
+    clearTraceId: assign({
+      traceId: () => null,
+    }),
     handleStreamChunk: (_, _params: { chunk: string; traceId?: string }) => {
       // NOTE - `handleStreamChunk` is a noop by default,
       //         but it can be overridden with `.provide`
@@ -270,7 +273,10 @@ const chatMachine = setup({
         "textStream.chunk": {
           actions: {
             type: "handleStreamChunk",
-            params: ({ event }) => ({ chunk: event.content }),
+            params: ({ event, context }) => ({
+              chunk: event.content,
+              traceId: context.traceId ?? undefined,
+            }),
           },
         },
       },
@@ -328,7 +334,7 @@ const chatMachine = setup({
         },
         onDone: {
           target: "AwaitingUserInput",
-          actions: "clearFollowUpMessages",
+          actions: ["clearFollowUpMessages", "clearTraceId"],
         },
         onError: {
           target: "Error",
