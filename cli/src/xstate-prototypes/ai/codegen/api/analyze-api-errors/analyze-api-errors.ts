@@ -1,5 +1,5 @@
-import type { ErrorInfo } from "@/xstate-prototypes/typechecking/types";
-import { log } from "@/xstate-prototypes/utils/logging/logger";
+import type { ErrorInfo } from "../../../../typechecking";
+import { log } from "../../../../utils/logging";
 import { generateText } from "ai";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";

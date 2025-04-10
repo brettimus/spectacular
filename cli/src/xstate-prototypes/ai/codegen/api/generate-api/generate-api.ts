@@ -1,10 +1,10 @@
-import { log } from "@/xstate-prototypes/utils/logging/logger";
 import { generateObject } from "ai";
 import { z } from "zod";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 import { OPENAI_STRATEGY } from "./openai";
+import { log } from "../../../../utils/logging";
 
 export type GenerateApiResult = z.infer<typeof GenerateApiSchema>;
 

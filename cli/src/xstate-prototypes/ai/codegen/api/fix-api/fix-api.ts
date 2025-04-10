@@ -1,9 +1,9 @@
-import { log } from "@/xstate-prototypes/utils/logging/logger";
 import { generateText } from "ai";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 import { OPENAI_STRATEGY } from "./openai";
+import { log } from "../../../../utils/logging";
 
 export type FixApiErrorsResult = {
   code: string;
