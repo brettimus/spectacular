@@ -3,7 +3,7 @@ import {
   type GenerateSchemaOptions,
   type GenerateSchemaResult,
   generateSchema,
-} from "@/xstate-prototypes/ai";
+} from "../../../../ai";
 import { fromPromise } from "xstate";
 
 export const generateSchemaActor = fromPromise<

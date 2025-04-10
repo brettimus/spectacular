@@ -1,14 +1,14 @@
 // This should be a version of the chat machine that assets the spec generation actor is called
 // when the router says it is time to generate the spec
 
-import { chatMachine } from "@/xstate-prototypes/machines";
+import { chatMachine } from "../../machines";
 import type {
   GenerateSpecActorInput,
   GeneratedPlan,
   RouterActorInput,
   RouterResponse,
   SaveSpecActorInput,
-} from "@/xstate-prototypes/machines/chat";
+} from "../../machines/chat";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type AnyActorRef, createActor, fromPromise } from "xstate";
 

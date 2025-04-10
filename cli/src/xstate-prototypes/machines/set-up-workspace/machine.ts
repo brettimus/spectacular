@@ -1,5 +1,4 @@
-// import { getPackageManager } from "@/xstate-prototypes/utils";
-import { log } from "@/xstate-prototypes/utils/logging";
+import { log } from "../../utils/logging";
 import { assign, setup } from "xstate";
 import {
   downloadTemplateNoopActor,

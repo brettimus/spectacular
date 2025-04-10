@@ -3,8 +3,8 @@ import {
   chatMachine,
   dbSchemaCodegenMachine,
   setUpWorkspaceMachine,
-} from "@/xstate-prototypes/machines";
-import type { PackageManager } from "@/xstate-prototypes/utils/package-manager";
+} from "../../machines";
+import type { PackageManager } from "../../utils/package-manager";
 import {
   createCliSaveSpecActor,
   createDownloadTemplateActor,

@@ -3,7 +3,7 @@ import {
   type FixSchemaResult,
   type FpAiConfig,
   fixSchema,
-} from "@/xstate-prototypes/ai";
+} from "../../../../ai";
 import { fromPromise } from "xstate";
 
 /**

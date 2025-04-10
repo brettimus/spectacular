@@ -2,12 +2,12 @@ import {
   DEFAULT_AI_PROVIDER,
   type FpAiConfig,
   type FpModelProvider,
-} from "@/xstate-prototypes/ai";
+} from "../../../ai";
 import {
   type ErrorInfo,
   validateTypeScriptNoopActor,
-} from "@/xstate-prototypes/typechecking";
-import { log } from "@/xstate-prototypes/utils/logging/logger";
+} from "../../../typechecking";
+import { log } from "../../../utils/logging/logger";
 import { assign, setup } from "xstate";
 import {
   type AnalyzeApiErrorsResult,

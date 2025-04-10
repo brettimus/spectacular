@@ -1,5 +1,5 @@
-import { runShell } from "@/xstate-prototypes/utils";
-import type { PackageManager } from "@/xstate-prototypes/utils/package-manager";
+import { runShell } from "../../../utils";
+import type { PackageManager } from "../../../utils/package-manager";
 import { fromPromise } from "xstate/actors";
 
 export type InstallDependenciesInput = {

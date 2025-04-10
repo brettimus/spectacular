@@ -3,7 +3,7 @@ import {
   type GenerateApiOptions,
   type GenerateApiResult,
   generateApi,
-} from "@/xstate-prototypes/ai";
+} from "../../../../ai";
 import { fromPromise } from "xstate";
 
 export const generateApiActor = fromPromise<

@@ -1,14 +1,14 @@
-import type { SelectedRule } from "@/xstate-prototypes/ai";
+import type { SelectedRule } from "../../../ai";
 import {
   DEFAULT_AI_PROVIDER,
   type FpAiConfig,
   type FpModelProvider,
-} from "@/xstate-prototypes/ai";
+} from "../../../ai";
 import {
   type ErrorInfo,
   validateTypeScriptNoopActor,
-} from "@/xstate-prototypes/typechecking";
-import { log } from "@/xstate-prototypes/utils/logging";
+} from "../../../typechecking";
+import { log } from "../../../utils/logging";
 import { assign, setup } from "xstate";
 import {
   type AnalyzeSchemaErrorsResult,

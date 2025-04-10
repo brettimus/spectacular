@@ -2,7 +2,7 @@ import {
   type FixApiErrorsResult,
   type FpAiConfig,
   fixApiErrors,
-} from "@/xstate-prototypes/ai";
+} from "../../../../ai";
 import { fromPromise } from "xstate";
 
 export const fixApiErrorsActor = fromPromise<

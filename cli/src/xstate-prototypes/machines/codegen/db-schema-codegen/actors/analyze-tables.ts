@@ -3,7 +3,7 @@ import {
   type AnalyzeTablesResult,
   type FpAiConfig,
   analyzeTables,
-} from "@/xstate-prototypes/ai";
+} from "../../../../ai";
 import { fromPromise } from "xstate";
 
 /**
