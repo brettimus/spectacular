@@ -58,7 +58,7 @@ export interface ChatMachineContext {
 type ChatMachineEvent =
   | { type: "user.message.added"; content: string; traceId?: string }
   | { type: "user.reply.requested"; messages: AiMessage[]; traceId?: string }
-  | { type: "cancel" }
+  | { type: "user.cancel" }
   | ChunkEvent;
 
 const chatMachine = setup({
@@ -193,7 +193,7 @@ const chatMachine = setup({
     },
     Routing: {
       on: {
-        cancel: {
+        "user.cancel": {
           target: "AwaitingUserInput",
         },
       },
@@ -236,7 +236,7 @@ const chatMachine = setup({
     },
     InitializingFollowUpQuestion: {
       on: {
-        cancel: {
+        "user.cancel": {
           target: "AwaitingUserInput",
         },
       },
@@ -264,7 +264,7 @@ const chatMachine = setup({
     },
     StreamingFollowUpQuestion: {
       on: {
-        cancel: {
+        "user.cancel": {
           target: "AwaitingUserInput",
         },
         "textStream.chunk": {

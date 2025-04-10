@@ -9,5 +9,5 @@ export const createChunkEvent = (content: string): ChunkEvent => ({
 });
 
 export type CancelEvent = {
-  type: "cancel";
+  type: "user.cancel";
 };

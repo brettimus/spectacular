@@ -47,7 +47,9 @@ export const aiTextStreamMachine = setup({
 }).createMachine({
   id: "streamProcessor",
   description: "A state machine to consume a stream of text from the AI SDK.",
+
   initial: "Processing",
+
   context: ({ input }) => ({
     chunks: [],
     error: null,

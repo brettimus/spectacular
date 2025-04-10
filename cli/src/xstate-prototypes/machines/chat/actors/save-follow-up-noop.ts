@@ -1,9 +1,10 @@
 import { fromPromise } from "xstate";
 import type { AiResponseMessage } from "../../streaming";
+import type { WithTrace } from "../../types";
 
-export type SaveFollowUpActorInput = {
+export type SaveFollowUpActorInput = WithTrace<{
   followUpMessages: AiResponseMessage[];
-};
+}>;
 
 /**
  *  NOTE - This actor is a no-op because it is expected that if you need persistence,
