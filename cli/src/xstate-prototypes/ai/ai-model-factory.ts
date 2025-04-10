@@ -1,18 +1,18 @@
-import type { LanguageModelV1 } from "ai";
-import type { Ai } from "@cloudflare/workers-types";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAI } from "@ai-sdk/openai";
-import { createWorkersAI } from "workers-ai-provider";
-import { ollama } from "ollama-ai-provider";
+import type { Ai } from "@cloudflare/workers-types";
+import type { LanguageModelV1 } from "ai";
 import { traceAISDKModel } from "evalite/ai-sdk";
+import { ollama } from "ollama-ai-provider";
+import { createWorkersAI } from "workers-ai-provider";
 
 import type {
   AnthropicModelName,
+  CloudflareModelDetails,
+  CloudflareModelName,
   FpAiModelFactoryOptions,
   OllamaModelName,
   OpenAiModelName,
-  CloudflareModelName,
-  CloudflareModelDetails,
 } from "./types";
 
 // Create new type for Cloudflare options

@@ -1,10 +1,10 @@
-import { createActor, type AnyActorRef, fromPromise } from "xstate";
+import { type AnyActorRef, createActor, fromPromise } from "xstate";
+import type { ConsumeStreamOutput } from "../../machines/streaming/consume-stream";
+import { createChunkEvent } from "../../machines/streaming/events";
 import type {
   AiResponseMessage,
   AiTextStreamResult,
 } from "../../machines/streaming/types";
-import { createChunkEvent } from "../../machines/streaming/events";
-import type { ConsumeStreamOutput } from "../../machines/streaming/consume-stream";
 
 /**
  * Defines the interface for a mock AI stream response

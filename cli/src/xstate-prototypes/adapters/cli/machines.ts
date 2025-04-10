@@ -4,13 +4,13 @@ import {
   dbSchemaCodegenMachine,
   setUpWorkspaceMachine,
 } from "@/xstate-prototypes/machines";
-import { PackageManager } from "@/xstate-prototypes/utils/package-manager";
+import type { PackageManager } from "@/xstate-prototypes/utils/package-manager";
 import {
   createCliSaveSpecActor,
   createDownloadTemplateActor,
   createInstallDependenciesActor,
-  createSaveSchemaToDiskActor,
   createSaveApiIndexToDiskActor,
+  createSaveSchemaToDiskActor,
   createValidateTypeScriptOnDiskActor,
 } from "./actor-factories";
 

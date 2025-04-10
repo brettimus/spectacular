@@ -1,10 +1,10 @@
-import { fromPromise } from "xstate";
 import type {
-  SaveFollowUpActorInput,
   SaveApiActorInput,
+  SaveFollowUpActorInput,
   SaveSchemaInput,
   SaveSpecActorInput,
 } from "@/xstate-prototypes/machines";
+import { fromPromise } from "xstate";
 
 export const saveFollowUpMessagesToApiActor = fromPromise<
   void,

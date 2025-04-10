@@ -3,14 +3,14 @@ import {
   chatMachine,
   dbSchemaCodegenMachine,
 } from "@/xstate-prototypes/machines";
-import {
-  routeRequestLocalActor,
-  askNextQuestionOllamaActor,
-  generateSpecLocalActor,
-  analyzeTablesLocalActor,
-  generateSchemaLocalActor,
-} from "./actors";
 import { validateTypeScriptNoopActor } from "@/xstate-prototypes/typechecking";
+import {
+  analyzeTablesLocalActor,
+  askNextQuestionOllamaActor,
+  generateSchemaLocalActor,
+  generateSpecLocalActor,
+  routeRequestLocalActor,
+} from "./actors";
 
 export const localChatMachine = chatMachine.provide({
   actors: {

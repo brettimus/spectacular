@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
+import type { SaveSchemaInput } from "@/xstate-prototypes/machines";
 import { fromPromise } from "xstate";
-import { SaveSchemaInput } from "@/xstate-prototypes/machines";
 
 export const createSaveSchemaToDiskActor = (projectDir: string) =>
   fromPromise<void, SaveSchemaInput>(async ({ input: { schema } }) => {

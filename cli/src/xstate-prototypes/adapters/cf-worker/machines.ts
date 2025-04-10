@@ -4,8 +4,8 @@ import {
   dbSchemaCodegenMachine,
 } from "@/xstate-prototypes/machines";
 import {
-  saveFollowUpMessagesToApiActor,
   saveApiIndexToApiActor,
+  saveFollowUpMessagesToApiActor,
   saveSchemaToApiActor,
   saveSpecToApiActor,
 } from "./actors";

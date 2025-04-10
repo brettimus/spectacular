@@ -10,11 +10,11 @@ import {
   waitFor,
 } from "xstate";
 import { chatMachine } from "../../machines";
+import { createCliChatMachine } from "./machines";
 import {
   actionCreateProjectFolder,
   promptProjectFolder,
 } from "./prompt-project-dir";
-import { createCliChatMachine } from "./machines";
 
 // import path from "node:path";
 

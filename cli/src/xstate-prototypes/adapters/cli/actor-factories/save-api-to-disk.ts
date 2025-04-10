@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
+import type { SaveApiActorInput } from "@/xstate-prototypes/machines";
 import { fromPromise } from "xstate";
-import { SaveApiActorInput } from "@/xstate-prototypes/machines";
 
 export const createSaveApiIndexToDiskActor = (projectDir: string) =>
   fromPromise<void, SaveApiActorInput>(async ({ input: { indexTs } }) => {

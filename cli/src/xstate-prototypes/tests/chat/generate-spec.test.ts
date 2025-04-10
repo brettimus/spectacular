@@ -1,16 +1,16 @@
 // This should be a version of the chat machine that assets the spec generation actor is called
 // when the router says it is time to generate the spec
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createActor, type AnyActorRef, fromPromise } from "xstate";
 import { chatMachine } from "@/xstate-prototypes/machines";
 import type {
-  RouterResponse,
-  RouterActorInput,
-  SaveSpecActorInput,
   GenerateSpecActorInput,
   GeneratedPlan,
+  RouterActorInput,
+  RouterResponse,
+  SaveSpecActorInput,
 } from "@/xstate-prototypes/machines/chat";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { type AnyActorRef, createActor, fromPromise } from "xstate";
 
 // Router actor that always routes to generating implementation plan
 const mockRouterToGenerateSpecActor = fromPromise<

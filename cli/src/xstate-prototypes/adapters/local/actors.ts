@@ -1,18 +1,18 @@
+import type {
+  AnalyzeTablesOptions,
+  AnalyzeTablesResult,
+  FpAiConfig,
+  GenerateSchemaOptions,
+  GenerateSchemaResult,
+  GeneratedPlan,
+  RouterResponse,
+} from "@/xstate-prototypes/ai";
+import type { RouterResponseType } from "@/xstate-prototypes/machines/chat/actors";
 import { generateText, streamText } from "ai";
 import type { Message } from "ai";
 import { ollama } from "ollama-ai-provider";
 import { fromPromise } from "xstate";
 import type { AiTextStreamResult } from "../../machines/streaming";
-import type {
-  AnalyzeTablesOptions,
-  AnalyzeTablesResult,
-  FpAiConfig,
-  GeneratedPlan,
-  GenerateSchemaOptions,
-  GenerateSchemaResult,
-  RouterResponse,
-} from "@/xstate-prototypes/ai";
-import type { RouterResponseType } from "@/xstate-prototypes/machines/chat/actors";
 
 export const routeRequestLocalActor = fromPromise<
   RouterResponse,

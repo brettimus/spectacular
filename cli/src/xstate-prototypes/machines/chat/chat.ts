@@ -1,3 +1,4 @@
+import { log } from "@/xstate-prototypes/utils/logging";
 import { type Message as AiMessage, appendResponseMessages } from "ai";
 import { assign, setup } from "xstate";
 import {
@@ -15,12 +16,11 @@ import type { ChunkEvent } from "../streaming";
 import {
   type RouterResponse,
   askNextQuestionActor,
-  saveFollowUpNoopActor,
   generateSpecActor,
   routeRequestActor,
+  saveFollowUpNoopActor,
   saveSpecNoopActor,
 } from "./actors";
-import { log } from "@/xstate-prototypes/utils/logging";
 
 type SpecDetails = {
   title: string;
@@ -33,13 +33,13 @@ type ChatMachineInput = {
   aiProvider?: FpModelProvider;
   aiGatewayUrl?: string;
   messages?: AiMessage[];
-  agentMessageId?: string;
 };
 
 type ChatMachineOutput = {
   messages: AiMessage[];
   errors: unknown[];
   spec: SpecDetails | null;
+  traceId: string | null;
 };
 
 export interface ChatMachineContext {
@@ -50,14 +50,14 @@ export interface ChatMachineContext {
   errorHistory: unknown[];
   spec: SpecDetails | null;
   /** A unique identifier for the agent's response message - think of this as a way to trace response progress updates */
-  agentMessageId: string | null;
+  traceId: string | null;
   /** NOTE - This is only used to make it easier to consume the stream in the CLI */
   streamResponse: AiTextStreamResult | null;
 }
 
 type ChatMachineEvent =
-  | { type: "user.message.added"; content: string }
-  | { type: "messages.replaced"; messages: AiMessage[] }
+  | { type: "user.message.added"; content: string; traceId?: string }
+  | { type: "user.reply.requested"; messages: AiMessage[]; traceId?: string }
   | { type: "cancel" }
   | ChunkEvent;
 
@@ -93,6 +93,9 @@ const chatMachine = setup({
     }),
     replaceMessages: assign({
       messages: (_, params: { messages: AiMessage[] }) => params.messages,
+    }),
+    updateTraceId: assign({
+      traceId: (_, params: { traceId?: string }) => params.traceId ?? null,
     }),
     handleStreamChunk: (_, _params: { chunk: string }) => {
       // NOTE - `handleStreamChunk` is a noop by default,
@@ -147,7 +150,7 @@ const chatMachine = setup({
       aiGatewayUrl: input.aiGatewayUrl,
     },
     messages: input.messages ?? [],
-    agentMessageId: input.agentMessageId ?? null,
+    traceId: null,
     followUpMessages: null,
     error: null,
     errorHistory: [],
@@ -171,11 +174,18 @@ const chatMachine = setup({
             },
           ],
         },
-        "messages.replaced": {
+        "user.reply.requested": {
+          description:
+            "The user has requested a reply, sending the entire chat history as context",
+          target: "Routing",
           actions: [
             {
               type: "replaceMessages",
               params: ({ event }) => ({ messages: event.messages }),
+            },
+            {
+              type: "updateTraceId",
+              params: ({ event }) => ({ traceId: event.traceId }),
             },
           ],
         },
@@ -408,7 +418,7 @@ const chatMachine = setup({
             },
           ],
         },
-        "messages.replaced": {
+        "user.reply.requested": {
           target: "Routing",
           actions: [
             // Flush error state
@@ -419,6 +429,10 @@ const chatMachine = setup({
               type: "replaceMessages",
               params: ({ event }) => ({ messages: event.messages }),
             },
+            {
+              type: "updateTraceId",
+              params: ({ event }) => ({ traceId: event.traceId }),
+            },
           ],
         },
       },
@@ -428,6 +442,7 @@ const chatMachine = setup({
     spec: context.spec,
     messages: context.messages,
     errors: context.errorHistory,
+    traceId: context.traceId,
   }),
 });
 

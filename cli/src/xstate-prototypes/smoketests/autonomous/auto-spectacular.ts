@@ -1,3 +1,4 @@
+import { getPackageManager } from "@/xstate-prototypes/utils";
 import { createActor, waitFor } from "xstate";
 import {
   createCliApiCodegenMachine,
@@ -6,7 +7,6 @@ import {
 } from "../../adapters/cli";
 import type { FpModelProvider } from "../../ai";
 import { createLogger } from "./logger";
-import { getPackageManager } from "@/xstate-prototypes/utils";
 
 export interface SpectacularOptions {
   apiKey: string;

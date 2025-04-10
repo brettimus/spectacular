@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createActor, type AnyActorRef } from "xstate";
+import { type AnyActorRef, createActor } from "xstate";
 import {
-  consumeStreamActor,
   type ConsumeStreamOutput,
+  consumeStreamActor,
 } from "../../machines/streaming/consume-stream";
+import type { AiTextStreamResult } from "../../machines/streaming/types";
 import {
+  type MockStreamResponse,
   createMockParentActor,
   createMockStreamResponse,
-  type MockStreamResponse,
 } from "./helpers";
-import type { AiTextStreamResult } from "../../machines/streaming/types";
 
 // Create a controlled error stream for testing
 function createErrorStream() {

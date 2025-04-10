@@ -38,6 +38,7 @@ cli.start(async (err: unknown) => {
     },
   });
 
+  // biome-ignore lint/suspicious/noExplicitAny: prototyping
   let lastState: any;
 
   dbSchemaActor.subscribe({

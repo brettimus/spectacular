@@ -1,52 +1,44 @@
 import { existsSync, mkdirSync } from "node:fs";
+import path from "node:path";
 import { text } from "@clack/prompts";
 import pico from "picocolors";
-import path from "node:path";
 
 const DEFAULT_PROJECT_FOLDER = "./spectacular-honc";
 
 export async function promptProjectFolder(cwd: string): Promise<string | null> {
-  try {
-    const placeholder = getPlaceholder();
-    const result = await text({
-      message: "Where should we create your spec? (./relative-path)",
-      placeholder,
-      defaultValue: placeholder,
-      validate: (value) => validateProjectFolder(value, cwd),
-    });
+  const placeholder = getPlaceholder();
+  const result = await text({
+    message: "Where should we create your spec? (./relative-path)",
+    placeholder,
+    defaultValue: placeholder,
+    validate: (value) => validateProjectFolder(value, cwd),
+  });
 
-    let projectPath: string | null = null;
+  let projectPath: string | null = null;
 
-    if (typeof result === "string") {
-      if (result === "") {
-        projectPath = placeholder;
-      } else {
-        projectPath = pathFromInput(result, cwd);
-      }
+  if (typeof result === "string") {
+    if (result === "") {
+      projectPath = placeholder;
+    } else {
+      projectPath = pathFromInput(result, cwd);
     }
-
-    return projectPath;
-  } catch (error) {
-    throw error;
   }
+
+  return projectPath;
 }
 
 export async function actionCreateProjectFolder(projectPath: string) {
-  try {
-    if (!projectPath) {
-      throw new Error("Project path is required");
-    }
-
-    // Create the project folder
-    mkdirSync(projectPath, { recursive: true });
-
-    // Change working directory
-    process.chdir(projectPath);
-
-    return;
-  } catch (error) {
-    throw error;
+  if (!projectPath) {
+    throw new Error("Project path is required");
   }
+
+  // Create the project folder
+  mkdirSync(projectPath, { recursive: true });
+
+  // Change working directory
+  process.chdir(projectPath);
+
+  return;
 }
 
 function validateProjectFolder(projectName: string, cwd: string) {

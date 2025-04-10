@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createActor, type AnyActorRef } from "xstate";
+import { type AnyActorRef, createActor } from "xstate";
 import { aiTextStreamMachine } from "../../machines/streaming/ai-text-stream-machine";
 import type { AiTextStreamResult } from "../../machines/streaming/types";
 import {
+  type MockStreamResponse,
+  createMockConsumeStreamFailureActor,
+  createMockConsumeStreamSuccessActor,
   createMockParentActor,
   createMockStreamResponse,
-  createMockConsumeStreamSuccessActor,
-  createMockConsumeStreamFailureActor,
-  type MockStreamResponse,
 } from "./helpers";
 
 describe("AI Text Stream Machine", () => {
