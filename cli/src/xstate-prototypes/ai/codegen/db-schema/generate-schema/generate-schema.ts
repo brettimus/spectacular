@@ -1,4 +1,4 @@
-import { log } from "@/xstate-prototypes/utils/logging/logger";
+import { log } from "../../../../utils/logging/logger";
 import { generateObject } from "ai";
 import { z } from "zod";
 import { aiModelFactory } from "../../../ai-model-factory";

@@ -1,11 +1,10 @@
-import { log } from "@/xstate-prototypes/utils/logging/logger";
 import { generateObject } from "ai";
 import { z } from "zod";
-
-import { aiModelFactory } from "../../../ai-model-factory";
-import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 import { OPENAI_STRATEGY } from "./openai";
+import { aiModelFactory } from "../../../ai-model-factory";
+import type { FpAiConfig, FpModelProvider } from "../../../types";
+import { log } from "../../../../utils/logging";
 
 // Schema definition for the output object
 const AnalyzeTablesOutputSchema = z.object({

@@ -1,4 +1,4 @@
-import { log } from "@/xstate-prototypes/utils/logging/logger";
+import { log } from "../../../../utils/logging/logger";
 import { generateText } from "ai";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
