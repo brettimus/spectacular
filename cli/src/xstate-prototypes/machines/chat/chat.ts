@@ -1,4 +1,3 @@
-import { log } from "@/xstate-prototypes/utils/logging";
 import { type Message as AiMessage, appendResponseMessages } from "ai";
 import { assign, setup } from "xstate";
 import {
@@ -7,6 +6,7 @@ import {
   type FpModelProvider,
 } from "../../ai";
 import { createUserMessage } from "../../utils";
+import { log } from "../../utils/logging";
 import {
   type AiResponseMessage,
   type AiTextStreamResult,
