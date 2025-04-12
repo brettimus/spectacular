@@ -10,7 +10,7 @@ import type {
   SaveSpecActorInput,
 } from "../../machines/chat";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { type AnyActorRef, createActor, fromPromise } from "xstate";
+import { type AnyActorRef, createActor, fromPromise, waitFor } from "xstate";
 
 // Router actor that always routes to generating implementation plan
 const mockRouterToGenerateSpecActor = fromPromise<
@@ -97,17 +97,11 @@ describe("Chat Machine - Generate Spec", () => {
       content: "Create a spec for my project",
     });
 
-    // Wait for the machine to reach the Done state (use a helper to avoid race conditions)
-    return new Promise<void>((resolve) => {
-      const subscription = generateSpecActor.subscribe((snapshot) => {
-        if (snapshot.matches("Done")) {
-          expect(snapshot.context.spec).toBeTruthy();
-          expect(snapshot.context.title).toBe("Test Plan");
-          subscription.unsubscribe();
-          resolve();
-        }
-      });
-    });
+    await waitFor(generateSpecActor, (state) => state.matches("Done"));
+
+    const snapshot = generateSpecActor.getSnapshot();
+    expect(snapshot.context.spec).toBeTruthy();
+    expect(snapshot.context.spec?.title).toBe("Test Plan");
   });
 
   it("should handle errors when generate spec fails", async () => {
