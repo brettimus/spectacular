@@ -12,6 +12,8 @@ export default defineConfig({
   optimizeDeps: {
     disabled: false,
   },
+  // Configure custom file handling
+  assetsInclude: ["**/*.md"],
   build: {
     rollupOptions: {
       input: {
@@ -24,6 +26,10 @@ export default defineConfig({
         schemagen: resolve(
           __dirname,
           "src/xstate-prototypes/smoketests/schemagen.smoketest.ts",
+        ),
+        "knowledge-test": resolve(
+          __dirname,
+          "src/xstate-prototypes/knowledge-test.ts",
         ),
       },
       output: {
