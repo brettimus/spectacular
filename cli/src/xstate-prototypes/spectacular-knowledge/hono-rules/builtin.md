@@ -1,5 +1,3 @@
-# Drizzle SQLite Rules
-
 ## Builtin
 
 ### Importing and Using Language Detector in Hono

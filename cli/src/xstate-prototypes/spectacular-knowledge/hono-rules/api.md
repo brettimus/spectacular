@@ -1,5 +1,3 @@
-# Drizzle SQLite Rules
-
 ## Api
 
 ### Handling Multiple Methods, Paths and Path Parameters in Hono

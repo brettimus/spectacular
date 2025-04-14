@@ -1,5 +1,3 @@
-# Drizzle SQLite Rules
-
 ## Starting a Local Server
 
 Once the package installation is complete, the following commands can be used to start a local server.

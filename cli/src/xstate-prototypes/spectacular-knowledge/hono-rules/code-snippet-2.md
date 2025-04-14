@@ -1,5 +1,3 @@
-# Drizzle SQLite Rules
-
 ## Code Snippet 2:
 
 ```

@@ -6,10 +6,10 @@ const KNOWLEDGE_BASE_DIR = path.resolve(
 );
 
 // Create the drizzle schema rules
-splitMarkdownByH2(
-  "drizzle-docs-2025-04-01_23-37-24-345.md",
-  "drizzle-schema-rules",
-);
+// splitMarkdownByH2(
+//   "drizzle-docs-2025-04-01_23-37-24-345.md",
+//   "drizzle-schema-rules",
+// );
 
 splitMarkdownByH2("hono-rules-2025-04-02_23-55-02-673.md", "hono-rules");
 
@@ -48,7 +48,7 @@ async function splitMarkdownByH2(inputFileName, outputDirName) {
 
         // Start a new section
         currentTitle = line.replace("## ", "").trim();
-        currentSection = `# Drizzle SQLite Rules\n\n${line}\n`;
+        currentSection = `${line}\n`;
       } else {
         // Add the line to the current section
         currentSection += `${line}\n`;

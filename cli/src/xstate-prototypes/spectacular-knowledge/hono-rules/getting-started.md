@@ -1,5 +1,3 @@
-# Drizzle SQLite Rules
-
 ## Getting-started
 
 ### Creating a Basic Hono Application

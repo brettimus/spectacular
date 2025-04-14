@@ -1,5 +1,3 @@
-# Drizzle SQLite Rules
-
 ## Concepts
 
 ### Configuring the Default Router in Hono

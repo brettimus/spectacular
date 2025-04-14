@@ -52,9 +52,9 @@ async function countFileTokens(filePath, models = ["gpt-3.5-turbo", "gpt-4"]) {
   } catch (error) {
     console.error(`Error processing ${filePath}:`, error);
     const emptyTokenCounts = {};
-    models.forEach((model) => {
+    for (const model of models) {
       emptyTokenCounts[model] = 0;
-    });
+    }
 
     return {
       filename: path.basename(filePath),

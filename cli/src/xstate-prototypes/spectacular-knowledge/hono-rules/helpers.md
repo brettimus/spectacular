@@ -1,5 +1,3 @@
-# Drizzle SQLite Rules
-
 ## Helpers
 
 ### Defining Routes and Generating Static Site Content in Hono

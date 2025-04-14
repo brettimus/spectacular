@@ -1,5 +1,3 @@
-# Drizzle SQLite Rules
-
 ## Guides
 
 ### Avoid Creating 'Ruby on Rails-like Controllers' in Hono
