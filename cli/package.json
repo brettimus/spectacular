@@ -10,7 +10,6 @@
     "schemagen": "vite-node --config vite.cli.config.ts --watch src/xstate-prototypes/smoketests/schemagen.smoketest.ts",
     "test:md-import": "vite-node --config vite.cli.config.ts src/xstate-prototypes/knowledge-test.ts",
     "build": "vite build --config vite.cli.config.ts",
-    "rules:create": "node scripts/create-knowledge-base.mjs",
     "rules:tokens:count": "node scripts/count-tokens.mjs",
     "dev:xstate:inspect": "vite --config vite.ui.config.ts",
     "eval:dev": "evalite watch",
