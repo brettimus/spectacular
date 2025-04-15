@@ -1,0 +1,49 @@
+{
+  "rulesFiles": [
+    {
+      "reasoning": "Explain how to use the `sql` operator for complex or unsupported queries, ensuring type safety and parameterization.",
+      "filename": "sql-operator-basic.md",
+      "rule": "## Use `sql` for Complex or Unsupported Queries\n\nWhen Drizzle ORM's query builder doesn't support a specific SQL feature, use the `sql` template literal to write raw SQL. This ensures table and column names are escaped and dynamic parameters are safely parameterized.\n\n```typescript\nimport { sql } from 'drizzle-orm';\n\nconst id = 69;\nawait db.execute(sql`SELECT * FROM ${usersTable} WHERE ${usersTable.id} = ${id}`);\n```\n"
+    },
+    {
+      "reasoning": "Show how to specify return types for raw SQL expressions to maintain type safety.",
+      "filename": "sql-operator-return-type.md",
+      "rule": "## Specify Return Types with `sql<T>`\n\nWhen using `sql` in a `select` statement, specify the expected return type for type safety.\n\n```typescript\nconst response: { lowerName: string }[] = await db.select({\n  lowerName: sql<string>`LOWER(${usersTable.name})`\n}).from(usersTable);\n```\n"
+    },
+    {
+      "reasoning": "Explain how to map database values to specific types at runtime using `.mapWith()`.",
+      "filename": "sql-operator-mapwith.md",
+      "rule": "## Map Database Values with `.mapWith()`\n\nUse `.mapWith()` to transform database values at runtime and ensure correct typing.\n\n```typescript\nconst count = sql<number>`COUNT(*)`.mapWith(Number);\n```\n"
+    },
+    {
+      "reasoning": "Demonstrate how to alias columns in SQL expressions for clarity or output formatting.",
+      "filename": "sql-operator-alias.md",
+      "rule": "## Alias Columns with `.as()`\n\nAssign aliases to columns using `.as()` to clarify output or match expected formats.\n\n```typescript\nconst aliasedName = sql`LOWER(${usersTable.name})`.as('lower_name');\n```\n"
+    },
+    {
+      "reasoning": "Warn about and explain the use of unescaped SQL for advanced cases, highlighting security risks.",
+      "filename": "sql-operator-raw.md",
+      "rule": "## Use `sql.raw()` for Unescaped SQL\n\nUse `sql.raw()` to include unescaped SQL. Be cautious, as this bypasses parameterization and escaping, increasing SQL injection risk.\n\n```typescript\nsql.raw(`SELECT * FROM users WHERE id = 12`);\n```\n"
+    },
+    {
+      "reasoning": "Show how to build dynamic SQL queries by joining multiple SQL chunks.",
+      "filename": "sql-operator-dynamic-join.md",
+      "rule": "## Construct Dynamic Queries with `sql.join()`\n\nAggregate SQL chunks dynamically using `sql.join()` for flexible query construction.\n\n```typescript\nconst conditions = [];\nfor (let i = 0; i < 5; i++) {\n  conditions.push(sql`id = ${i}`);\n}\nconst whereClause = sql.join(conditions, sql` OR `);\nconst finalSql = sql`SELECT * FROM users WHERE `.append(whereClause);\n```\n"
+    },
+    {
+      "reasoning": "Explain how to start with an empty SQL statement and build it up conditionally.",
+      "filename": "sql-operator-empty.md",
+      "rule": "## Initialize Empty SQL Statements with `sql.empty()`\n\nStart with an empty SQL object and append parts as needed for conditional query building.\n\n```typescript\nconst query = sql.empty();\nquery.append(sql`SELECT * FROM users`);\nquery.append(sql` WHERE id = ${id}`);\n```\n"
+    },
+    {
+      "reasoning": "Describe how to convert a constructed SQL object into a query string and parameters for execution.",
+      "filename": "sql-operator-to-query.md",
+      "rule": "## Convert `sql` to Query String and Parameters\n\nUse the appropriate dialect to convert a `sql` object to a query string and parameters for execution.\n\n```typescript\nimport { PgDialect } from 'drizzle-orm/pg-core';\n\nconst pgDialect = new PgDialect();\nconst { sql: queryString, params } = pgDialect.sqlToQuery(sql`SELECT * FROM ${usersTable} WHERE ${usersTable.id} = ${id}`);\n```\n"
+    },
+    {
+      "reasoning": "Show how to use the `sql` operator in various SQL clauses for advanced filtering and expressions.",
+      "filename": "sql-operator-in-clauses.md",
+      "rule": "## Use `sql` in Various Query Clauses\n\nIncorporate `sql` into `WHERE`, `ORDER BY`, `HAVING`, and `GROUP BY` clauses for advanced expressions.\n\n```typescript\nawait db.select().from(usersTable).where(sql`${usersTable.id} = ${id}`);\n```\n"
+    }
+  ]
+}

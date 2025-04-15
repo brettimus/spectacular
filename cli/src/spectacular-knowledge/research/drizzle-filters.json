@@ -1,0 +1,49 @@
+{
+  "rulesFiles": [
+    {
+      "reasoning": "Equality and inequality are the most basic filters for SQL queries. These operators are used to match or exclude specific values in a column.",
+      "filename": "eq-ne.md",
+      "rule": "## Equality and Inequality Operators\n\n### eq (Equal To)\nFilter records where a column equals a specific value.\n\n```typescript\nimport { eq } from \"drizzle-orm\";\n\ndb.select().from(table).where(eq(table.column, 5));\n// SELECT * FROM table WHERE table.column = 5\n```\n\n### ne (Not Equal To)\nFilter records where a column does not equal a specific value.\n\n```typescript\nimport { ne } from \"drizzle-orm\";\n\ndb.select().from(table).where(ne(table.column, 5));\n// SELECT * FROM table WHERE table.column <> 5\n```\n"
+    },
+    {
+      "reasoning": "Comparison operators allow you to filter records based on greater than, less than, or their inclusive variants. These are essential for range queries.",
+      "filename": "comparison.md",
+      "rule": "## Comparison Operators\n\n### gt (Greater Than)\nFilter records where a column is greater than a value.\n\n```typescript\nimport { gt } from \"drizzle-orm\";\n\ndb.select().from(table).where(gt(table.column, 5));\n// SELECT * FROM table WHERE table.column > 5\n```\n\n### gte (Greater Than or Equal To)\nFilter records where a column is greater than or equal to a value.\n\n```typescript\nimport { gte } from \"drizzle-orm\";\n\ndb.select().from(table).where(gte(table.column, 5));\n// SELECT * FROM table WHERE table.column >= 5\n```\n\n### lt (Less Than)\nFilter records where a column is less than a value.\n\n```typescript\nimport { lt } from \"drizzle-orm\";\n\ndb.select().from(table).where(lt(table.column, 5));\n// SELECT * FROM table WHERE table.column < 5\n```\n\n### lte (Less Than or Equal To)\nFilter records where a column is less than or equal to a value.\n\n```typescript\nimport { lte } from \"drizzle-orm\";\n\ndb.select().from(table).where(lte(table.column, 5));\n// SELECT * FROM table WHERE table.column <= 5\n```\n"
+    },
+    {
+      "reasoning": "Null checks are common in SQL to filter for missing or present values. Drizzle provides explicit helpers for these.",
+      "filename": "null-checks.md",
+      "rule": "## Null Checks\n\n### isNull\nFilter records where a column is NULL.\n\n```typescript\nimport { isNull } from \"drizzle-orm\";\n\ndb.select().from(table).where(isNull(table.column));\n// SELECT * FROM table WHERE table.column IS NULL\n```\n\n### isNotNull\nFilter records where a column is NOT NULL.\n\n```typescript\nimport { isNotNull } from \"drizzle-orm\";\n\ndb.select().from(table).where(isNotNull(table.column));\n// SELECT * FROM table WHERE table.column IS NOT NULL\n```\n"
+    },
+    {
+      "reasoning": "Inclusion operators are used to check if a value exists within a set of values, which is common for filtering by multiple possible matches.",
+      "filename": "inclusion.md",
+      "rule": "## Inclusion Operators\n\n### inArray\nFilter records where a column's value is in a specified array.\n\n```typescript\nimport { inArray } from \"drizzle-orm\";\n\ndb.select().from(table).where(inArray(table.column, [1, 2, 3, 4]));\n// SELECT * FROM table WHERE table.column IN (1, 2, 3, 4)\n```\n\n### notInArray\nFilter records where a column's value is NOT in a specified array.\n\n```typescript\nimport { notInArray } from \"drizzle-orm\";\n\ndb.select().from(table).where(notInArray(table.column, [1, 2, 3, 4]));\n// SELECT * FROM table WHERE table.column NOT IN (1, 2, 3, 4)\n```\n"
+    },
+    {
+      "reasoning": "Range operators are useful for filtering values within or outside a specific interval. These are common for date or numeric ranges.",
+      "filename": "range.md",
+      "rule": "## Range Operators\n\n### between\nFilter records where a column's value is between two values (inclusive).\n\n```typescript\nimport { between } from \"drizzle-orm\";\n\ndb.select().from(table).where(between(table.column, 2, 7));\n// SELECT * FROM table WHERE table.column BETWEEN 2 AND 7\n```\n\n### notBetween\nFilter records where a column's value is NOT between two values.\n\n```typescript\nimport { notBetween } from \"drizzle-orm\";\n\ndb.select().from(table).where(notBetween(table.column, 2, 7));\n// SELECT * FROM table WHERE table.column NOT BETWEEN 2 AND 7\n```\n"
+    },
+    {
+      "reasoning": "Pattern matching is essential for searching text fields. Drizzle supports both case-sensitive and case-insensitive matching.",
+      "filename": "pattern-matching.md",
+      "rule": "## Pattern Matching Operators\n\n### like\nFilter records where a column matches a pattern (case-sensitive).\n\n```typescript\nimport { like } from \"drizzle-orm\";\n\ndb.select().from(table).where(like(table.column, \"%pattern%\"));\n// SELECT * FROM table WHERE table.column LIKE '%pattern%'\n```\n\n### ilike\nFilter records where a column matches a pattern (case-insensitive).\n\n```typescript\nimport { ilike } from \"drizzle-orm\";\n\ndb.select().from(table).where(ilike(table.column, \"%pattern%\"));\n// SELECT * FROM table WHERE table.column ILIKE '%pattern%'\n```\n"
+    },
+    {
+      "reasoning": "Logical operators allow combining multiple conditions for more complex queries. These are foundational for advanced filtering.",
+      "filename": "logical.md",
+      "rule": "## Logical Operators\n\n### and\nCombine multiple conditions; all must be true.\n\n```typescript\nimport { and, gt, lt } from \"drizzle-orm\";\n\ndb.select().from(table).where(and(gt(table.column, 5), lt(table.column, 10)));\n// SELECT * FROM table WHERE (table.column > 5 AND table.column < 10)\n```\n\n### or\nCombine multiple conditions; at least one must be true.\n\n```typescript\nimport { or, eq, isNull } from \"drizzle-orm\";\n\ndb.select().from(table).where(or(eq(table.column, 5), isNull(table.column)));\n// SELECT * FROM table WHERE (table.column = 5 OR table.column IS NULL)\n```\n\n### not\nNegate a condition.\n\n```typescript\nimport { not, eq } from \"drizzle-orm\";\n\ndb.select().from(table).where(not(eq(table.column, 5)));\n// SELECT * FROM table WHERE NOT (table.column = 5)\n```\n"
+    },
+    {
+      "reasoning": "Existence checks are used to filter based on the presence or absence of related records, often with subqueries.",
+      "filename": "existence.md",
+      "rule": "## Existence Checks\n\n### exists\nFilter records where a subquery returns results.\n\n```typescript\nimport { exists } from \"drizzle-orm\";\n\nconst subquery = db.select().from(table2);\ndb.select().from(table).where(exists(subquery));\n// SELECT * FROM table WHERE EXISTS (SELECT * FROM table2)\n```\n\n### notExists\nFilter records where a subquery returns no results.\n\n```typescript\nimport { notExists } from \"drizzle-orm\";\n\nconst subquery = db.select().from(table2);\ndb.select().from(table).where(notExists(subquery));\n// SELECT * FROM table WHERE NOT EXISTS (SELECT * FROM table2)\n```\n"
+    },
+    {
+      "reasoning": "Combining multiple operators is common for advanced filtering. This example shows how to use several operators together for precise queries.",
+      "filename": "combining-operators.md",
+      "rule": "## Combining Multiple Operators\n\nYou can combine multiple operators for advanced filtering. For example, to find records where a column is between 10 and 20, not equal to 15, and not null:\n\n```typescript\nimport { and, between, ne, isNotNull } from \"drizzle-orm\";\n\ndb.select().from(table).where(\n  and(\n    between(table.column, 10, 20),\n    ne(table.column, 15),\n    isNotNull(table.column)\n  )\n);\n// SELECT * FROM table WHERE (table.column BETWEEN 10 AND 20 AND table.column <> 15 AND table.column IS NOT NULL)\n```\n"
+    }
+  ]
+}
