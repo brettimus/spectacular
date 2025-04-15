@@ -1,0 +1,39 @@
+{
+  "rulesFiles": [
+    {
+      "reasoning": "Explains how to delete all rows from a table using Drizzle ORM.",
+      "filename": "delete-all.md",
+      "rule": "## Deleting All Rows in a Table\n\nTo delete all rows from a table, call `.delete()` without any conditions:\n\n```typescript\nawait db.delete(users);\n```\n\nThis removes all records from the `users` table."
+    },
+    {
+      "reasoning": "Shows how to delete rows that match specific conditions using `.where()`.",
+      "filename": "delete-where.md",
+      "rule": "## Deleting Rows with Specific Conditions\n\nUse `.where()` to filter which rows to delete:\n\n```typescript\nawait db.delete(users).where(eq(users.name, 'Dan'));\n```\n\nThis deletes all users whose `name` is 'Dan'."
+    },
+    {
+      "reasoning": "Describes how to limit the number of rows deleted using `.limit()`.",
+      "filename": "delete-limit.md",
+      "rule": "## Limiting the Number of Deleted Rows\n\nUse `.limit()` to restrict how many rows are deleted:\n\n```typescript\nawait db.delete(users).where(eq(users.name, 'Dan')).limit(2);\n```\n\nThis deletes at most two users named 'Dan'."
+    },
+    {
+      "reasoning": "Explains how to order rows for deletion, including multiple columns and sort directions.",
+      "filename": "delete-orderby.md",
+      "rule": "## Ordering Rows in Delete Operations\n\nUse `.orderBy()` to specify the order of deletion:\n\n```typescript\nimport { asc, desc } from 'drizzle-orm';\n\nawait db.delete(users).where(eq(users.name, 'Dan')).orderBy(users.name);\nawait db.delete(users).where(eq(users.name, 'Dan')).orderBy(desc(users.name));\n```\n\nOrder by multiple columns:\n\n```typescript\nawait db.delete(users).where(eq(users.name, 'Dan')).orderBy(users.name, users.age);\nawait db.delete(users).where(eq(users.name, 'Dan')).orderBy(asc(users.name), desc(users.age));\n```\n"
+    },
+    {
+      "reasoning": "Shows how to return deleted rows or specific columns after a delete operation.",
+      "filename": "delete-returning.md",
+      "rule": "## Returning Deleted Rows\n\nUse `.returning()` to get deleted rows (SQLite/PostgreSQL):\n\n```typescript\nconst deletedUsers = await db.delete(users)\n  .where(eq(users.name, 'Dan'))\n  .returning();\n```\n\nReturn specific columns:\n\n```typescript\nconst deletedUserIds = await db.delete(users)\n  .where(eq(users.name, 'Dan'))\n  .returning({ deletedId: users.id });\n```\n"
+    },
+    {
+      "reasoning": "Covers using the WITH clause (CTE) for more complex delete queries.",
+      "filename": "delete-with-cte.md",
+      "rule": "## Using WITH Clause (CTE) in Delete\n\nDefine a CTE with `$with` and use it in a delete:\n\n```typescript\nconst averageAmount = db.$with('average_amount').as(\n  db.select({ value: sql`avg(${orders.amount})`.as('value') }).from(orders)\n);\n\nconst result = await db.with(averageAmount)\n  .delete(orders)\n  .where(gt(orders.amount, sql`(select * from ${averageAmount})`))\n  .returning({ id: orders.id });\n```\n"
+    },
+    {
+      "reasoning": "Explains how to delete all data from all tables in the database programmatically.",
+      "filename": "delete-all-tables.md",
+      "rule": "## Deleting All Data from All Tables\n\nTo clear all tables, retrieve table names and execute a delete on each:\n\n```typescript\nimport { sql } from 'drizzle-orm';\n\nconst clearDb = async () => {\n  const query = sql`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';`;\n  const tables = await db.execute(query);\n\n  for (let table of tables) {\n    const deleteQuery = sql.raw(`DELETE FROM ${table.table_name};`);\n    await db.execute(deleteQuery);\n  }\n};\n```\n"
+    }
+  ]
+}

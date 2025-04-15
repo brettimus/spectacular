@@ -1,0 +1,29 @@
+{
+  "rulesFiles": [
+    {
+      "reasoning": "Selecting all rows from a table is the most basic operation. Drizzle ORM uses .select().from(table) for this, and always lists columns explicitly for type safety and field order consistency.",
+      "filename": "select-all.md",
+      "rule": "## Select All Rows from a Table\n\nTo select all rows from a table:\n\n```typescript\nconst result = await db.select().from(schema.users);\n```\n\nThis retrieves all columns from the `users` table. Drizzle ORM lists columns explicitly instead of using `SELECT *`."
+    },
+    {
+      "reasoning": "Applying conditional filters is a core part of querying. Drizzle ORM provides operators like eq, gt, lt, etc., to use inside .where().",
+      "filename": "conditional-filters.md",
+      "rule": "## Apply Conditional Filters\n\nUse operators such as `eq`, `gt`, `lt`, etc., inside `.where()` to filter results:\n\n```typescript\nimport { eq, gt } from 'drizzle-orm';\n\nconst result = await db\n  .select()\n  .from(schema.users)\n  .where(eq(schema.users.name, 'John'))\n  .where(gt(schema.users.age, 25));\n```\n\n> Note: Multiple `.where()` calls are only allowed in dynamic mode."
+    },
+    {
+      "reasoning": "Combining multiple conditions is common. Drizzle ORM provides logical operators like and() and or() to combine filters, and allows for conditional inclusion of filters.",
+      "filename": "logical-operators.md",
+      "rule": "## Combine Filters with Logical Operators\n\nUse `and()` and `or()` to combine multiple conditions:\n\n```typescript\nimport { and, ilike, inArray, gt } from 'drizzle-orm';\n\nconst searchPosts = async (term, categories = [], views = 0) => {\n  await db\n    .select()\n    .from(schema.posts)\n    .where(\n      and(\n        term ? ilike(schema.posts.title, `%${term}%`) : undefined,\n        categories.length > 0 ? inArray(schema.posts.category, categories) : undefined,\n        views > 100 ? gt(schema.posts.views, views) : undefined\n      )\n    );\n};\n```\n\nConditions are only applied if their parameters are provided."
+    },
+    {
+      "reasoning": "Dynamic query building is useful when query structure depends on runtime conditions. Drizzle ORM supports this with .$dynamic().",
+      "filename": "dynamic-queries.md",
+      "rule": "## Dynamic Query Building\n\nUse `.$dynamic()` to build queries incrementally based on runtime conditions:\n\n```typescript\nconst query = db.select().from(schema.users).$dynamic();\n\nif (someCondition) {\n  query.where(eq(schema.users.status, 'active'));\n}\nif (anotherCondition) {\n  query.limit(10);\n}\n\nconst result = await query;\n```\n\nThis allows flexible query construction."
+    },
+    {
+      "reasoning": "Selecting specific columns or excluding sensitive columns is a best practice. Drizzle ORM allows passing an object to .select() for inclusion, and getTableColumns() for exclusion.",
+      "filename": "include-exclude-columns.md",
+      "rule": "## Include or Exclude Columns\n\n### Include Specific Columns\n\nPass an object to `.select()` to specify columns:\n\n```typescript\nconst result = await db.select({ name: schema.users.name, age: schema.users.age }).from(schema.users);\n```\n\n### Exclude Columns\n\nUse `getTableColumns()` to get all columns, then exclude as needed:\n\n```typescript\nimport { getTableColumns } from 'drizzle-orm';\n\nconst { password, ...columns } = getTableColumns(schema.users);\nconst result = await db.select(columns).from(schema.users);\n```\n\nThis selects all columns except `password`."
+    }
+  ]
+}

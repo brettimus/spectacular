@@ -1,0 +1,54 @@
+{
+  "rulesFiles": [
+    {
+      "reasoning": "Covers the basic and most common way to insert a single row into a table using Drizzle ORM. This is foundational for any API that needs to create new records.",
+      "filename": "insert-single-row.md",
+      "rule": "## Insert a Single Row\n\nUse `.insert()` with `.values()` to insert one row into a table.\n\n```typescript\nawait db.insert(schema.users).values({ name: 'Andrew' });\n```\n\nThis inserts a new user with the name 'Andrew' into the `users` table."
+    },
+    {
+      "reasoning": "Ensures type safety when inserting data by inferring the insert type from the table schema. This is important for TypeScript users to avoid runtime errors.",
+      "filename": "insert-type-inference.md",
+      "rule": "## Infer Insert Type for a Table\n\nUse `typeof table.$inferInsert` to get the correct type for inserts.\n\n```typescript\ntype NewUser = typeof schema.users.$inferInsert;\n\nconst insertUser = async (user: NewUser) => {\n  return db.insert(schema.users).values(user);\n}\n\nconst newUser: NewUser = { name: \"Alef\" };\nawait insertUser(newUser);\n```\n\nThis approach ensures type safety when inserting new rows."
+    },
+    {
+      "reasoning": "Shows how to insert a row and immediately get the inserted row back, which is useful for APIs that need to return the created resource.",
+      "filename": "insert-returning.md",
+      "rule": "## Insert with Returning Clause\n\nUse `.returning()` to get the inserted row(s) after an insert (supported in SQLite and PostgreSQL).\n\n```typescript\nconst result = await db.insert(schema.users).values({ name: \"Dan\" }).returning();\n```\n\nReturns the inserted row."
+    },
+    {
+      "reasoning": "Allows returning only specific columns after an insert, which is useful for privacy or efficiency.",
+      "filename": "insert-returning-specific-columns.md",
+      "rule": "## Insert and Return Specific Columns\n\nPass an object to `.returning()` to specify which columns to return.\n\n```typescript\nconst result = await db.insert(schema.users).values({ name: \"Partial Dan\" }).returning({ insertedId: schema.users.id });\n```\n\nReturns only the `id` of the inserted user."
+    },
+    {
+      "reasoning": "Explains how to insert multiple rows at once, which is more efficient than inserting one at a time.",
+      "filename": "insert-multiple-rows.md",
+      "rule": "## Insert Multiple Rows\n\nPass an array of objects to `.values()` to insert multiple rows in a single operation.\n\n```typescript\nawait db.insert(schema.users).values([{ name: 'Andrew' }, { name: 'Dan' }]);\n```\n\nThis inserts multiple users at once."
+    },
+    {
+      "reasoning": "Shows how to handle conflicts by doing nothing, which is useful for idempotent operations.",
+      "filename": "insert-on-conflict-do-nothing.md",
+      "rule": "## Insert with Conflict Handling: Do Nothing\n\nUse `.onConflictDoNothing()` to skip inserts that would cause a conflict.\n\n```typescript\nawait db.insert(schema.users)\n  .values({ id: 1, name: 'John' })\n  .onConflictDoNothing();\n```\n\nThis cancels the insert if a conflict occurs."
+    },
+    {
+      "reasoning": "Shows how to handle conflicts by updating the existing row, which is useful for upserts.",
+      "filename": "insert-on-conflict-do-update.md",
+      "rule": "## Insert with Conflict Handling: Update Row\n\nUse `.onConflictDoUpdate()` to update the row if a conflict occurs.\n\n```typescript\nawait db.insert(schema.users)\n  .values({ id: 1, name: 'Dan' })\n  .onConflictDoUpdate({ target: schema.users.id, set: { name: 'John' } });\n```\n\nThis updates the `name` to 'John' if a conflict on `id` occurs."
+    },
+    {
+      "reasoning": "Provides advanced control over conflict handling by specifying conditions for when to update or skip.",
+      "filename": "insert-on-conflict-conditions.md",
+      "rule": "## Insert with Conflict Handling: Conditional Update\n\nUse `targetWhere` and `setWhere` for granular conflict resolution.\n\n```typescript\nimport { sql } from 'drizzle-orm';\n\nawait db.insert(schema.employees)\n  .values({ employeeId: 123, name: 'John Doe' })\n  .onConflictDoUpdate({\n    target: schema.employees.employeeId,\n    targetWhere: sql`name <> 'John Doe'`,\n    set: { name: sql`excluded.name` }\n  });\n\nawait db.insert(schema.employees)\n  .values({ employeeId: 123, name: 'John Doe' })\n  .onConflictDoUpdate({\n    target: schema.employees.employeeId,\n    set: { name: 'John Doe' },\n    setWhere: sql`name <> 'John Doe'`\n  });\n```\n\nThese clauses allow for more granular control over conflict resolution."
+    },
+    {
+      "reasoning": "Explains how to use the `WITH` clause for complex insert operations, which is useful for advanced SQL workflows.",
+      "filename": "insert-with-cte.md",
+      "rule": "## Insert Using WITH Clause (CTE)\n\nUse `.with()` to define common table expressions for complex inserts.\n\n```typescript\nconst userCount = db.$with('user_count').as(\n  db.select({ value: sql`count(*)`.as('value') }).from(schema.users)\n);\n\nconst result = await db.with(userCount)\n  .insert(schema.users)\n  .values([\n    { username: 'user1', admin: sql`((select * from ${userCount}) = 0)` }\n  ])\n  .returning({\n    admin: schema.users.admin\n  });\n```\n\nThis helps manage complex insert operations."
+    },
+    {
+      "reasoning": "Shows how to insert data from a select query, which is useful for data migrations or copying data between tables.",
+      "filename": "insert-from-select.md",
+      "rule": "## Insert from a Select Query\n\nUse `.select()` inside `.insert()` to insert rows from another query.\n\n```typescript\nconst insertedEmployees = await db\n  .insert(schema.employees)\n  .select(\n    db.select({ name: schema.users.name }).from(schema.users).where(eq(schema.users.role, 'employee'))\n  )\n  .returning({\n    id: schema.employees.id,\n    name: schema.employees.name\n  });\n```\n\nThis inserts rows into `employees` based on a selection from `users`."
+    }
+  ]
+}

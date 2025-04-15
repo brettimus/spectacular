@@ -1,0 +1,39 @@
+{
+  "rulesFiles": [
+    {
+      "reasoning": "Covers the basic update operation, including setting fields, handling undefined/null, and using raw SQL expressions.",
+      "filename": "update-basic.md",
+      "rule": "## Basic Update Operation\n\nUpdate records in a table using `.update()`, `.set()`, and `.where()`.\n\n```typescript\nawait db.update(users)\n  .set({ name: 'Mr. Dan' })\n  .where(eq(users.name, 'Dan'));\n```\n\n- Values of `undefined` in `.set()` are ignored. To set a column to `null`, pass `null` explicitly:\n\n```typescript\nawait db.update(users)\n  .set({ middleName: null })\n  .where(eq(users.name, 'Dan'));\n```\n\n- Use raw SQL expressions in `.set()` with the `sql` tagged template:\n\n```typescript\nawait db.update(users)\n  .set({ updatedAt: sql`CURRENT_TIMESTAMP` })\n  .where(eq(users.name, 'Dan'));\n```\n"
+    },
+    {
+      "reasoning": "Explains how to limit the number of rows affected by an update.",
+      "filename": "update-limit.md",
+      "rule": "## Limiting Updated Rows\n\nUse `.limit()` to restrict the number of rows updated:\n\n```typescript\nawait db.update(users)\n  .set({ verified: true })\n  .limit(2);\n```\n\nThis updates at most two users."
+    },
+    {
+      "reasoning": "Shows how to order rows for update operations, including multiple columns.",
+      "filename": "update-orderby.md",
+      "rule": "## Ordering Rows in Update Operations\n\nUse `.orderBy()` to specify the order of updates:\n\n```typescript\nimport { asc, desc } from 'drizzle-orm';\n\nawait db.update(users)\n  .set({ verified: true })\n  .orderBy(asc(users.name));\n```\n\nOrder by multiple columns:\n\n```typescript\nawait db.update(users)\n  .set({ verified: true })\n  .orderBy(asc(users.name), desc(users.age));\n```\n"
+    },
+    {
+      "reasoning": "Describes how to return updated rows or specific columns after an update.",
+      "filename": "update-returning.md",
+      "rule": "## Returning Updated Rows\n\nUse `.returning()` to get updated rows (SQLite/PostgreSQL):\n\n```typescript\nconst updatedUsers = await db.update(users)\n  .set({ name: 'Mr. Dan' })\n  .where(eq(users.name, 'Dan'))\n  .returning();\n```\n\nReturn specific columns:\n\n```typescript\nconst updatedUserIds = await db.update(users)\n  .set({ name: 'Mr. Dan' })\n  .where(eq(users.name, 'Dan'))\n  .returning({ updatedId: users.id });\n```\n"
+    },
+    {
+      "reasoning": "Covers using WITH/CTE for more complex update scenarios.",
+      "filename": "update-with-cte.md",
+      "rule": "## Using WITH Clause (CTE) in Update\n\nDefine a CTE with `$with` and use it in an update:\n\n```typescript\nconst averagePrice = db.$with('average_price').as(\n  db.select({ value: sql`avg(${products.price})`.as('value') }).from(products)\n);\n\nconst result = await db.with(averagePrice)\n  .update(products)\n  .set({ cheap: true })\n  .where(lt(products.price, sql`(select * from ${averagePrice})`))\n  .returning({ id: products.id });\n```\n"
+    },
+    {
+      "reasoning": "Explains how to update using data from another table, including table aliasing and returning columns from both tables.",
+      "filename": "update-from-another-table.md",
+      "rule": "## Updating with Data from Another Table\n\nUse `.from()` to update using another table:\n\n```typescript\nawait db.update(users)\n  .set({ cityId: cities.id })\n  .from(cities)\n  .where(and(eq(cities.name, 'Seattle'), eq(users.name, 'John')));\n```\n\nAlias tables for clarity:\n\n```typescript\nconst c = alias(cities, 'c');\nawait db.update(users)\n  .set({ cityId: c.id })\n  .from(c);\n```\n\nReturn columns from both tables (PostgreSQL):\n\n```typescript\nconst updatedUsers = await db.update(users)\n  .set({ cityId: cities.id })\n  .from(cities)\n  .returning({ id: users.id, cityName: cities.name });\n```\n"
+    },
+    {
+      "reasoning": "Shows how to batch update multiple rows with different values using CASE statements.",
+      "filename": "update-batch-case.md",
+      "rule": "## Batch Updating Multiple Rows with Different Values\n\nUse a CASE statement in `.set()` for batch updates:\n\n```typescript\nimport { SQL, inArray, sql } from 'drizzle-orm';\n\nconst inputs = [\n  { id: 1, city: 'New York' },\n  { id: 2, city: 'Los Angeles' },\n  { id: 3, city: 'Chicago' },\n];\n\nif (inputs.length === 0) return;\n\nconst sqlChunks: SQL[] = [sql`(case`];\nconst ids: number[] = [];\n\nfor (const input of inputs) {\n  sqlChunks.push(sql`when ${users.id} = ${input.id} then ${input.city}`);\n  ids.push(input.id);\n}\n\nsqlChunks.push(sql`end)`);\n\nconst finalSql: SQL = sql.join(sqlChunks, sql.raw(' '));\n\nawait db.update(users).set({ city: finalSql }).where(inArray(users.id, ids));\n```\n"
+    }
+  ]
+}
