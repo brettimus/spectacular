@@ -1,4 +1,3 @@
-// Helper functions for providing examples
 export function getD1SchemaExample() {
   return `
 import { sql } from "drizzle-orm";
@@ -39,6 +38,9 @@ export const postsRelations = relations(posts, ({ one }) => ({
 `;
 }
 
+/**
+ * @deprecated - Use the markdown rule files instead
+ */
 export function getDrizzleSchemaExamples() {
   return `
 Here are some examples of how to use the Drizzle ORM to define tables:
@@ -86,6 +88,10 @@ Here are some examples of how to use the Drizzle ORM to define tables:
 ${getDrizzleRelationsExample()}
 `;
 }
+
+/**
+ * @deprecated - Use the markdown rule files instead
+ */
 
 function getDrizzleRelationsExample() {
   return `
@@ -201,6 +207,9 @@ function getDrizzleRelationsExample() {
 </example>`;
 }
 
+/**
+ * @deprecated - Use the markdown rule files instead
+ */
 export function getD1AdditionalTips() {
   return `
 If you need the \`sql\` function, you must import it from \`drizzle-orm\`,

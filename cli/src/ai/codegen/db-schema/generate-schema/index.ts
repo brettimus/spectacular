@@ -7,4 +7,4 @@ export {
   getD1SchemaExample,
   getDrizzleSchemaExamples,
   getD1AdditionalTips,
-} from "./examples";
+} from "./examples--deprecated";

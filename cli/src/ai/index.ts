@@ -35,8 +35,3 @@ export {
   fixApiErrors,
   type FixApiErrorsResult,
 } from "./codegen/api";
-
-// TODO - Implement rule identification
-//
-export type { SelectedRule } from "./codegen/types";
-export { identifyRules } from "./codegen/db-schema";

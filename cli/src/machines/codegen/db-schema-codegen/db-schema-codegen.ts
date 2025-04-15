@@ -1,4 +1,3 @@
-import type { SelectedRule } from "../../../ai";
 import {
   DEFAULT_AI_PROVIDER,
   type FpAiConfig,
@@ -16,7 +15,6 @@ import {
   analyzeTablesActor,
   fixSchemaActor,
   generateSchemaActor,
-  identifyRulesActor,
   saveSchemaNoopActor,
 } from "./actors";
 
@@ -45,8 +43,6 @@ type DbSchemaCodegenMachineContext = {
   error: unknown;
   /** The natural language description of the schema */
   schemaSpecification: string;
-  /** Rules selected from a knowledge base (not yet implemented) */
-  relevantRules: SelectedRule[];
   /** The generated db/schema.ts file */
   dbSchemaTs: string;
   /** Counter of how many fixes we have attempted */
@@ -81,7 +77,6 @@ export const dbSchemaCodegenMachine = setup({
   },
   actors: {
     analyzeTables: analyzeTablesActor,
-    identifyRules: identifyRulesActor,
     generateSchema: generateSchemaActor,
     saveSchema: saveSchemaNoopActor,
     analyzeErrors: analyzeErrorsActor,
@@ -108,7 +103,6 @@ export const dbSchemaCodegenMachine = setup({
     fixAttempts: [],
     allTypescriptErrors: [],
     schemaSpecification: "",
-    relevantRules: [],
     dbSchemaTs: "",
     issues: [],
   }),
@@ -136,7 +130,7 @@ export const dbSchemaCodegenMachine = setup({
           },
         }),
         onDone: {
-          target: "IdentifyingRules",
+          target: "GeneratingSchema",
           actions: assign({
             schemaSpecification: ({ event }) =>
               event.output?.schemaSpecification || "",
@@ -166,43 +160,6 @@ export const dbSchemaCodegenMachine = setup({
         },
       },
     },
-    IdentifyingRules: {
-      entry: () =>
-        log("info", "Identifying relevant rules", {
-          stage: "rule-identification",
-        }),
-      invoke: {
-        id: "identifyRules",
-        src: "identifyRules",
-        input: ({ context }) => ({
-          aiConfig: context.aiConfig,
-          schemaSpecification: context.schemaSpecification,
-          /**
-           * NOTE - This `noop` flag skips rule selection from a knowledge base
-           *        since we don't have a knowledge base yet.
-           */
-          noop: true,
-        }),
-        onDone: {
-          target: "GeneratingSchema",
-          actions: assign({
-            relevantRules: ({ event }) => event.output?.relevantRules || [],
-          }),
-        },
-        onError: {
-          target: "GeneratingSchema",
-          actions: ({ event }) => {
-            if (event.error) {
-              log(
-                "error",
-                "Failed to identify rules, continuing without rules",
-                { error: event.error },
-              );
-            }
-          },
-        },
-      },
-    },
     GeneratingSchema: {
       entry: () =>
         log("info", "Generating database schema", {
@@ -215,7 +172,6 @@ export const dbSchemaCodegenMachine = setup({
           aiConfig: context.aiConfig,
           options: {
             schemaSpecification: context.schemaSpecification,
-            relevantRules: context.relevantRules,
           },
         }),
         onDone: {

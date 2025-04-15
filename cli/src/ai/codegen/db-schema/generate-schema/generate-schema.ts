@@ -3,13 +3,11 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
-import type { SelectedRule } from "../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 import { OPENAI_STRATEGY } from "./openai";
 
 export type GenerateSchemaOptions = {
   schemaSpecification: string;
-  relevantRules: SelectedRule[];
 };
 
 export type GenerateSchemaResult = {
@@ -32,7 +30,6 @@ export async function generateSchema(
 
     log("debug", "Generating schema", {
       specLength: options.schemaSpecification.length,
-      rulesCount: options.relevantRules.length,
     });
 
     const result = await generateObject({
@@ -56,7 +53,7 @@ export async function generateSchema(
 ${options.schemaSpecification}
 ************
 [Additional context]:
-${JSON.stringify(options.relevantRules, null, 2)}
+
 ************
 [END DATA]
 

@@ -1,8 +1,10 @@
 import {
   getD1AdditionalTips,
   getD1SchemaExample,
-  getDrizzleSchemaExamples,
-} from "./examples";
+} from "./examples--deprecated";
+import {
+  drizzleSchemaRules
+} from "../../../../spectacular-knowledge/rules";
 
 export const OPENAI_STRATEGY = {
   modelName: "gpt-4o",
@@ -21,13 +23,14 @@ Here is a simple Drizzle database schema example for D1:
 
 ${getD1SchemaExample()}
 
-Here are some additional code references:
+******
 
-${getDrizzleSchemaExamples()}
+Here is the library documentation for Drizzle ORM, as it may be relevant to the schema generation:
+[BEGIN DRIZZLE LIBRARY DOCUMENTATION]
+${drizzleSchemaRules.map((rule) => rule.content).join("\n\n")}
+[END DRIZZLE LIBRARY DOCUMENTATION]
 
-[IMPORTANT]
-
-${getD1AdditionalTips()}
+******
 
 [ADDITIONAL INSTRUCTIONS]
 - Make sure all dependencies were properly imported
