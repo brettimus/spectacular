@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpModelProvider } from "@/ai";
 import { configure, getLogger } from "@logtape/logtape";
 import { config } from "dotenv";
 import { getAiConfig } from "./ai-config";

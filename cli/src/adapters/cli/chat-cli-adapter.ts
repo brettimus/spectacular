@@ -1,4 +1,4 @@
-import type { AiTextStreamResult } from "@/xstate-prototypes/machines/streaming";
+import type { AiTextStreamResult } from "@/machines/streaming";
 import { stream, isCancel, log, spinner, text } from "@clack/prompts";
 import type { Message } from "ai";
 import { config } from "dotenv";

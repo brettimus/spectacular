@@ -2,8 +2,8 @@ import {
   apiCodegenMachine,
   chatMachine,
   dbSchemaCodegenMachine,
-} from "@/xstate-prototypes/machines";
-import { validateTypeScriptNoopActor } from "@/xstate-prototypes/typechecking";
+} from "@/machines";
+import { validateTypeScriptNoopActor } from "@/typechecking";
 import {
   analyzeTablesLocalActor,
   askNextQuestionOllamaActor,

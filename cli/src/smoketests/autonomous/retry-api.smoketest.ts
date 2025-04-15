@@ -1,9 +1,9 @@
 import { readFileSync } from "node:fs";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
-import { apiCodegenMachine } from "@/xstate-prototypes/machines/codegen/api-codegen/api-codegen";
-import { initializeLogger } from "@/xstate-prototypes/utils/logging/logger";
+import type { FpModelProvider } from "@/ai";
+import { apiCodegenMachine } from "@/machines/codegen/api-codegen/api-codegen";
+import { initializeLogger } from "@/utils/logging/logger";
 import { config } from "dotenv";
 import { createActor } from "xstate";
 import { getAiConfig } from "./ai-config";

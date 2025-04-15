@@ -1,4 +1,4 @@
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
+import type { FpModelProvider } from "@/ai";
 
 export function getAiConfig(aiProvider: FpModelProvider): {
   apiKey: string;

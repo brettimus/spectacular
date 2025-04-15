@@ -3,7 +3,7 @@ import type {
   SaveFollowUpActorInput,
   SaveSchemaInput,
   SaveSpecActorInput,
-} from "@/xstate-prototypes/machines";
+} from "@/machines";
 import { fromPromise } from "xstate";
 
 export const saveFollowUpMessagesToApiActor = fromPromise<

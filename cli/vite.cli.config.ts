@@ -17,19 +17,15 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        chat: resolve(__dirname, "src/xstate-prototypes/index.ts"),
-        "chat-local": resolve(__dirname, "src/xstate-prototypes/chat-local.ts"),
+        chat: resolve(__dirname, "src/index.ts"),
+        "chat-local": resolve(__dirname, "src/chat-local.ts"),
         auto: resolve(
           __dirname,
-          "src/xstate-prototypes/smoketests/autonomous/autonomous.smoketest.ts",
+          "src/smoketests/autonomous/autonomous.smoketest.ts",
         ),
         schemagen: resolve(
           __dirname,
-          "src/xstate-prototypes/smoketests/schemagen.smoketest.ts",
-        ),
-        "knowledge-test": resolve(
-          __dirname,
-          "src/xstate-prototypes/knowledge-test.ts",
+          "src/smoketests/schemagen.smoketest.ts",
         ),
       },
       output: {

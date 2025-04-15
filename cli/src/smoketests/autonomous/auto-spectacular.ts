@@ -1,4 +1,4 @@
-import { getPackageManager } from "@/xstate-prototypes/utils";
+import { getPackageManager } from "@/utils";
 import { createActor, waitFor } from "xstate";
 import {
   createCliApiCodegenMachine,

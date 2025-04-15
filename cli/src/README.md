@@ -1,6 +1,4 @@
-# xstate-prototypes
-
-This is a collection of prototypes / findings for using xstate to model an agential codegen workflow as a state machine.
+# WIP - state machine backed CLI
 
 ## Commands
 
@@ -15,9 +13,9 @@ pnpm dev:xstate:inspect
 ## Folder Structure
 
 ```
-xstate-prototypes/
+src/
 │
-├── adapters/          # Adapters for different environments (CLI, Workers, etc.)
+├── adapters/          # Adapters for different environments (like the CLI)
 │
 ├── ai/                # AI integration components
 │   ├── chat/          # AI chat-related state machines (ask-next-question, generate-spec, router)
@@ -28,7 +26,7 @@ xstate-prototypes/
 ├── machines/          # Core state machines
 │   ├── chat/          # Chat machine implementations
 │   ├── codegen/       # Code generation machine implementations
-│   ├── configure-workspace/ # Workspace configuration machines
+│   ├── configure-workspace/ # Workspace configuration machine (downloads template, etc.)
 │   └── streaming/     # Streaming related machines
 │
 ├── smoketests/        # Tests to verify basic functionality
@@ -40,7 +38,7 @@ xstate-prototypes/
 
 ## Notes
 
-### Initial Impressions
+### Initial Impressions of using xstate
 
 **There is a trade-off**
 
@@ -64,7 +62,7 @@ xstate-prototypes/
 
 Docs: https://stately.ai/docs/inspector
 
-> For our implementation, see the folder: [`../../inspector-ui`](../../inspector-ui)
+> For our implementation, see the folder: [`../inspector-ui`](../inspector-ui)
 
 **One of the main benefits of xstate is the ability to visually document and inspect the state of the machine, but this is kinda hacky to do when you're not running machines in the browser.**
 

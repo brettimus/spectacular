@@ -6,8 +6,8 @@ import type {
   GenerateSchemaResult,
   GeneratedPlan,
   RouterResponse,
-} from "@/xstate-prototypes/ai";
-import type { RouterResponseType } from "@/xstate-prototypes/machines/chat/actors";
+} from "@/ai";
+import type { RouterResponseType } from "@/machines/chat/actors";
 import { generateText, streamText } from "ai";
 import type { Message } from "ai";
 import { ollama } from "ollama-ai-provider";

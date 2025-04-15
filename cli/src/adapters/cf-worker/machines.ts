@@ -2,7 +2,7 @@ import {
   apiCodegenMachine,
   chatMachine,
   dbSchemaCodegenMachine,
-} from "@/xstate-prototypes/machines";
+} from "@/machines";
 import {
   saveApiIndexToApiActor,
   saveFollowUpMessagesToApiActor,

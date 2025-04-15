@@ -1,13 +1,12 @@
 import { createBrowserInspector } from "@statelyai/inspect";
 import { createActor } from "xstate";
-import { chatMachine } from "../src/xstate-prototypes/chat/chat";
+import { chatMachine } from "../src/machines";
 
 const inspector = createBrowserInspector();
 
 const actor = createActor(chatMachine, {
   input: {
-    cwd: "/tmp",
-    apiKey: "123",
+    apiKey: "abc123",
   },
   inspect: inspector.inspect,
 });

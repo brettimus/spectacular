@@ -48,31 +48,6 @@ NOTE:
 - Specs are created via an LLM call, instead of via chat.
   - See: `create-spec.ts`
 
-## Folder Structure
-
-```
-xstate-prototypes/
-│
-├── adapters/          # Adapters for different environments (CLI, Workers, etc.)
-│
-├── ai/                # AI integration components
-│   ├── chat/          # AI chat-related state machines (ask-next-question, generate-spec, router)
-│   └── codegen/       # AI code generation state machines
-│       ├── api/       # API-related code generation 
-│       └── schema/    # DB Schema-related code generation
-│
-├── machines/          # Core state machines
-│   ├── chat/          # Chat machine implementations
-│   ├── codegen/       # Code generation machine implementations
-│   ├── configure-workspace/ # Workspace configuration machines
-│   └── streaming/     # Streaming related machines
-│
-├── smoketests/        # Tests to verify basic functionality
-│
-├── typechecking/      # Type checking utilities
-│
-└── utils/             # Includes logging (logtape), and higher order functions for actors
-```
 ## Notes
 
 ### Initial Impressions

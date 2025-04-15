@@ -1,8 +1,8 @@
 import {
   type ErrorInfo,
   validateTypeScriptOnDisk,
-} from "@/xstate-prototypes/typechecking";
-import type { PackageManager } from "@/xstate-prototypes/utils/package-manager";
+} from "@/typechecking";
+import type { PackageManager } from "@/utils/package-manager";
 import { fromPromise } from "xstate";
 
 export const createValidateTypeScriptOnDiskActor = (

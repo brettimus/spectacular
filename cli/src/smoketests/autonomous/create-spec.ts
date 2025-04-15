@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { FpModelProvider } from "@/xstate-prototypes/ai";
-import { aiModelFactory } from "@/xstate-prototypes/ai";
+import type { FpModelProvider } from "@/ai";
+import { aiModelFactory } from "@/ai";
 import { generateObject } from "ai";
 import { z } from "zod";
 

@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { SaveSpecActorInput } from "@/xstate-prototypes/machines";
+import type { SaveSpecActorInput } from "@/machines";
 import { fromPromise } from "xstate";
 
 export const createCliSaveSpecActor = (projectDir: string) =>

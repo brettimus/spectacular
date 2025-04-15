@@ -5,7 +5,7 @@ import path from "node:path";
 import { encoding_for_model as encodingForModel } from "tiktoken";
 
 const KNOWLEDGE_BASE_DIR = path.resolve(
-  path.join("src", "xstate-prototypes", "spectacular-knowledge"),
+  path.join("src", "spectacular-knowledge"),
 );
 
 const RULES_DIR = path.resolve(

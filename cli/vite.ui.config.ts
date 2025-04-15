@@ -28,8 +28,8 @@ export default defineConfig(() => {
     ],
     server: {
       fs: {
-        // Allow serving files from the project root and the "xstate-prototypes" folder
-        allow: [resolve(__dirname, "xstate-prototypes"), resolve(__dirname)],
+        // Allow serving files from the project root folder
+        allow: [resolve(__dirname)],
       },
     },
     resolve: {
