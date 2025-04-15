@@ -8,6 +8,10 @@ const KNOWLEDGE_BASE_DIR = path.resolve(
   path.join("src", "xstate-prototypes", "spectacular-knowledge"),
 );
 
+const RULES_DIR = path.resolve(
+  path.join(KNOWLEDGE_BASE_DIR, "rules"),
+);
+
 /**
  * Count tokens using OpenAI's tiktoken library
  * @param {string} text - Text to count tokens for
@@ -25,6 +29,25 @@ function countTokens(text, model = "gpt-4") {
   }
 }
 
+/**
+ * Recursively get all files in a directory
+ * @param {string} dirPath - Directory to scan
+ * @returns {Promise<string[]>} - Array of file paths
+ */
+async function getAllFiles(dirPath) {
+  const entries = await fs.readdir(dirPath, { withFileTypes: true });
+  const files = await Promise.all(
+    entries.map(async (entry) => {
+      const fullPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        return getAllFiles(fullPath);
+      }
+      return fullPath;
+    }),
+  );
+  return files.flat();
+}
+
 async function countFileTokens(filePath, models = ["gpt-3.5-turbo", "gpt-4"]) {
   try {
     const content = await fs.readFile(filePath, "utf8");
@@ -36,7 +59,7 @@ async function countFileTokens(filePath, models = ["gpt-3.5-turbo", "gpt-4"]) {
     }
 
     // Print file info
-    console.log(`\nFile: ${path.basename(filePath)}`);
+    console.log(`\nFile: ${filePath}`);
     console.log(`Size: ${(content.length / 1024).toFixed(2)} KB`);
 
     // Print token counts for each model
@@ -45,7 +68,7 @@ async function countFileTokens(filePath, models = ["gpt-3.5-turbo", "gpt-4"]) {
     }
 
     return {
-      filename: path.basename(filePath),
+      filename: filePath,
       bytes: content.length,
       tokenCounts,
     };
@@ -57,7 +80,7 @@ async function countFileTokens(filePath, models = ["gpt-3.5-turbo", "gpt-4"]) {
     }
 
     return {
-      filename: path.basename(filePath),
+      filename: filePath,
       bytes: 0,
       tokenCounts: emptyTokenCounts,
     };
@@ -79,36 +102,82 @@ async function main() {
       return;
     }
 
-    // Default files to analyze (same as create-knowledge-base.mjs)
-    const filesToAnalyze = [
-      path.join(KNOWLEDGE_BASE_DIR, "drizzle-docs-2025-04-01_23-37-24-345.md"),
-      path.join(KNOWLEDGE_BASE_DIR, "hono-rules-2025-04-02_23-55-02-673.md"),
+    // Get rule directories
+    const rulesEntries = await fs.readdir(RULES_DIR, { withFileTypes: true });
+    const ruleDirs = [
+      RULES_DIR, // Include root rules dir
+      ...rulesEntries
+        .filter(entry => entry.isDirectory())
+        .map(dir => path.join(RULES_DIR, dir.name))
     ];
 
-    // Track total tokens
-    const totalCounts = {};
+    // Track global totals
+    const globalTotalCounts = {};
     for (const model of models) {
-      totalCounts[model] = 0;
+      globalTotalCounts[model] = 0;
     }
-    let totalBytes = 0;
+    let globalTotalBytes = 0;
 
-    // Process each file
-    for (const file of filesToAnalyze) {
-      const result = await countFileTokens(file, models);
+    // Process each rule directory
+    for (const ruleDir of ruleDirs) {
+      console.log(`\n\n=== Processing ${path.basename(ruleDir)} ===`);
+      
+      // Get all files in this directory
+      let filesToAnalyze;
+      try {
+        filesToAnalyze = await getAllFiles(ruleDir);
+      } catch (error) {
+        console.error(`Error getting files from ${ruleDir}:`, error);
+        continue;
+      }
+      
+      // Skip if no files found
+      if (filesToAnalyze.length === 0) {
+        console.log(`No files found in ${ruleDir}`);
+        continue;
+      }
 
-      // Accumulate totals
-      totalBytes += result.bytes;
+      // Track directory totals
+      const dirTotalCounts = {};
       for (const model of models) {
-        totalCounts[model] += result.tokenCounts[model];
+        dirTotalCounts[model] = 0;
+      }
+      let dirTotalBytes = 0;
+
+      // Process each file
+      for (const file of filesToAnalyze) {
+        const result = await countFileTokens(file, models);
+
+        // Accumulate directory totals
+        dirTotalBytes += result.bytes;
+        for (const model of models) {
+          dirTotalCounts[model] += result.tokenCounts[model];
+        }
+        
+        // Accumulate global totals
+        globalTotalBytes += result.bytes;
+        for (const model of models) {
+          globalTotalCounts[model] += result.tokenCounts[model];
+        }
+      }
+
+      // Print directory totals
+      console.log(`\n=== ${path.basename(ruleDir)} TOTALS ===`);
+      console.log(`Files analyzed: ${filesToAnalyze.length}`);
+      console.log(`Total size: ${(dirTotalBytes / 1024).toFixed(2)} KB`);
+      for (const model of models) {
+        console.log(
+          `Total ${model} tokens: ${dirTotalCounts[model].toLocaleString()}`,
+        );
       }
     }
 
-    // Print totals
-    console.log("\n=== TOTALS ===");
-    console.log(`Total size: ${(totalBytes / 1024).toFixed(2)} KB`);
+    // Print global totals
+    console.log("\n\n=== GLOBAL TOTALS ===");
+    console.log(`Total size: ${(globalTotalBytes / 1024).toFixed(2)} KB`);
     for (const model of models) {
       console.log(
-        `Total ${model} tokens: ${totalCounts[model].toLocaleString()}`,
+        `Total ${model} tokens: ${globalTotalCounts[model].toLocaleString()}`,
       );
     }
   } catch (error) {
