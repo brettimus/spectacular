@@ -7,6 +7,7 @@ Hono provides methods for handling different types of request data and returning
 - Get query parameters: `c.req.query('search')`
 - Parse JSON body: `await c.req.json()`
 - Get form data: `await c.req.formData()`
+- Get multipart form data: `await c.req.parseBody()`
 - Access headers: `c.req.header('content-type')`
 
 ### Response Helpers
@@ -42,5 +43,12 @@ app.get('/download', (c) => {
     'Content-Type': 'application/octet-stream',
     'Content-Disposition': 'attachment; filename="file.txt"'
   })
+})
+
+// Multipart form data
+app.post('/upload', async (c) => {
+  const body = await c.req.parseBody()
+  const file = body['file'] // File | string
+  console.log(file) 
 })
 ``` 
