@@ -5,6 +5,7 @@ import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 import { OPENAI_STRATEGY } from "./openai";
 import { log } from "../../../../utils/logging";
+import { drizzleQueryRules, honoRules } from "../../../../spectacular-knowledge/rules";
 
 export type GenerateApiResult = z.infer<typeof GenerateApiSchema>;
 
@@ -44,11 +45,12 @@ app.post("/api/user", async (c) => {
   const db = drizzle(c.env.DB);
   const { name, email } = await c.req.json();
 
-  await db.insert(schema.users).values({
+  const [newUser] = await db.insert(schema.users).values({
     name: name,
     email: email,
-  });
-  return c.text(\`user: \${name} inserted\`);
+  }).returning();
+
+  return c.json({ user: newUser });
 });
 
 export default app;
@@ -78,15 +80,15 @@ export async function generateApi(
       spec ||
       "Create a simple REST API with CRUD operations for all tables in the schema.";
 
-    const drizzleOrmExamples = getDrizzleOrmExamples();
-    const commonHonoMistakes = getCommonHonoMistakes();
+    const drizzleOrmExamples = drizzleQueryRules.map((rule) => `<drizzle_query_rule id="${rule.id}">\n${rule.content}\n</drizzle_query_rule>`).join("\n\n");
+    const honoApiRules = honoRules.map((rule) => `<hono_api_rule id="${rule.id}">\n${rule.content}\n</hono_api_rule>`).join("\n\n");
     const templateExample = TEMPLATE_EXAMPLE;
 
     const SYSTEM_PROMPT = getSystemPrompt(
       dbSchema,
       templateExample,
       drizzleOrmExamples,
-      commonHonoMistakes,
+      honoApiRules,
     );
 
     log("debug", "Generating API with reasoning", { apiPlan, dbSchema });
@@ -158,42 +160,4 @@ function fromModelProvider(
     default:
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
-}
-
-function getDrizzleOrmExamples() {
-  return `
-// Example of inserting a new record:
-await db.insert(schema.users).values({
-  name: "John Doe",
-  email: "john@example.com",
-});
-
-// Example of selecting records:
-const users = await db.select().from(schema.users);
-
-// Example of selecting with a filter:
-const user = await db.select()
-  .from(schema.users)
-  .where(eq(schema.users.id, userId));
-
-// Example of updating a record:
-await db.update(schema.users)
-  .set({ name: "Jane Doe" })
-  .where(eq(schema.users.id, userId));
-
-// Example of deleting a record:
-await db.delete(schema.users)
-  .where(eq(schema.users.id, userId));
-`;
-}
-
-function getCommonHonoMistakes() {
-  return `
-1. Don't use process.env, use c.env to access environment variables inside request handlers
-2. Don't forget to add async/await for database operations
-3. Don't include results of D1 queries with the .changed property, D1 queries don't have that
-4. Remember to parse request bodies with await c.req.json()
-5. Use proper error handling with try/catch blocks for database operations
-6. Remember to return the response from each route handler
-`;
 }

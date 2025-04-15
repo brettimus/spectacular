@@ -9,7 +9,7 @@ function getSystemPrompt(
   dbSchema: string,
   templateExample: string,
   drizzleOrmExamples: string,
-  commonHonoMistakes: string,
+  honoApiRules: string,
 ) {
   return `
 You are a friendly, expert full-stack typescript engineer and an API building assistant for apps that use Hono,
@@ -32,7 +32,7 @@ and a plan for the API routes for my api.
 Design a simple CRUD api for key resources in the app.
 Expose a REST api for creating, reading, updating, and deleting resources.
 
-For streaming or realtime apis, add a TODO comment with a link to the following documentation:
+For streaming or realtime apis, write as much as you can, then add a TODO comment with a link to the following documentation:
 
 Streaming:
 - https://hono.dev/docs/helpers/streaming#streaming-helper
@@ -58,10 +58,9 @@ ${drizzleOrmExamples}
 
 ===
 
-There are some common mistakes you make when writing Hono apis on Cloudflare Workers.
-Avoid these mistakes:
+Here is some documentation for Hono:
 
-${commonHonoMistakes}
+${honoApiRules}
 
 ===
 
