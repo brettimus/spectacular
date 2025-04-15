@@ -1,0 +1,49 @@
+{
+  "rulesFiles": [
+    {
+      "reasoning": "Inner joins are the most common type of join and are used to retrieve records that have matching values in both tables. This rule explains how to use Drizzle ORM's innerJoin method for SQLite.",
+      "filename": "join-inner.md",
+      "rule": "## Inner Join\n\nUse `.innerJoin()` to retrieve records with matching values in both tables.\n\n```typescript\nimport { eq } from 'drizzle-orm';\n\nconst result = await db.select().from(users).innerJoin(pets, eq(users.id, pets.ownerId));\n```\n\nThis generates SQL similar to:\n\n```sql\nSELECT ... FROM \"users\" INNER JOIN \"pets\" ON \"users\".\"id\" = \"pets\".\"owner_id\"\n```\n"
+    },
+    {
+      "reasoning": "Left joins are used to retrieve all records from the left table and the matched records from the right table. This rule explains how to use Drizzle ORM's leftJoin method for SQLite.",
+      "filename": "join-left.md",
+      "rule": "## Left Join\n\nUse `.leftJoin()` to retrieve all records from the left table and matched records from the right table.\n\n```typescript\nconst result = await db.select().from(users).leftJoin(pets, eq(users.id, pets.ownerId));\n```\n\nThis generates SQL similar to:\n\n```sql\nSELECT ... FROM \"users\" LEFT JOIN \"pets\" ON \"users\".\"id\" = \"pets\".\"owner_id\"\n```\n"
+    },
+    {
+      "reasoning": "Right joins are less common in SQLite but can be used to retrieve all records from the right table and matched records from the left table. This rule explains how to use Drizzle ORM's rightJoin method.",
+      "filename": "join-right.md",
+      "rule": "## Right Join\n\nUse `.rightJoin()` to retrieve all records from the right table and matched records from the left table.\n\n```typescript\nconst result = await db.select().from(users).rightJoin(pets, eq(users.id, pets.ownerId));\n```\n\nThis generates SQL similar to:\n\n```sql\nSELECT ... FROM \"users\" RIGHT JOIN \"pets\" ON \"users\".\"id\" = \"pets\".\"owner_id\"\n```\n"
+    },
+    {
+      "reasoning": "Full joins retrieve all records when there is a match in either left or right table. This rule explains how to use Drizzle ORM's fullJoin method.",
+      "filename": "join-full.md",
+      "rule": "## Full Join\n\nUse `.fullJoin()` to retrieve all records when there is a match in either left or right table.\n\n```typescript\nconst result = await db.select().from(users).fullJoin(pets, eq(users.id, pets.ownerId));\n```\n\nThis generates SQL similar to:\n\n```sql\nSELECT ... FROM \"users\" FULL JOIN \"pets\" ON \"users\".\"id\" = \"pets\".\"owner_id\"\n```\n"
+    },
+    {
+      "reasoning": "Selecting only specific fields from joined tables is a common requirement for API responses. This rule explains how to perform partial selects and flatten the result structure.",
+      "filename": "join-partial-select.md",
+      "rule": "## Partial Selects in Joins\n\nTo select specific fields or flatten the response structure, pass an object to `.select()`:\n\n```typescript\nconst result = await db.select({\n  userId: users.id,\n  petId: pets.id,\n}).from(users).leftJoin(pets, eq(users.id, pets.ownerId));\n```\n\nThis generates SQL similar to:\n\n```sql\nSELECT \"users\".\"id\", \"pets\".\"id\" FROM \"users\" LEFT JOIN \"pets\" ON \"users\".\"id\" = \"pets\".\"owner_id\"\n```\n"
+    },
+    {
+      "reasoning": "Self-joins and table aliases are necessary when joining a table to itself. This rule explains how to use aliasedTable for self-joins in Drizzle ORM.",
+      "filename": "join-alias-self.md",
+      "rule": "## Aliases and Self-Joins\n\nUse `aliasedTable` to create an alias for a table when performing self-joins:\n\n```typescript\nimport { aliasedTable } from 'drizzle-orm/sqlite-core';\n\nconst parent = aliasedTable(users, 'parent');\n\nconst result = await db\n  .select()\n  .from(users)\n  .leftJoin(parent, eq(parent.id, users.parentId));\n```\n\nThis generates SQL similar to:\n\n```sql\nSELECT ... FROM \"users\" LEFT JOIN \"users\" AS \"parent\" ON \"parent\".\"id\" = \"users\".\"parent_id\"\n```\n"
+    },
+    {
+      "reasoning": "Aggregating join results is useful for mapping one-to-many relationships into a grouped structure. This rule explains how to aggregate join results using JavaScript after querying.",
+      "filename": "join-aggregate.md",
+      "rule": "## Aggregating Join Results\n\nTo aggregate results (e.g., mapping many-to-one relationships):\n\n```typescript\ntype User = typeof users.$inferSelect;\ntype Pet = typeof pets.$inferSelect;\n\nconst rows = await db.select({\n  user: users,\n  pet: pets,\n}).from(users).leftJoin(pets, eq(users.id, pets.ownerId)).all();\n\nconst result = rows.reduce<Record<number, { user: User; pets: Pet[] }>>(\n  (acc, row) => {\n    const user = row.user;\n    const pet = row.pet;\n\n    if (!acc[user.id]) {\n      acc[user.id] = { user, pets: [] };\n    }\n\n    if (pet) {\n      acc[user.id].pets.push(pet);\n    }\n\n    return acc;\n  },\n  {}\n);\n```\n"
+    },
+    {
+      "reasoning": "Many-to-one relationships are common in relational databases. This rule explains how to define and query a many-to-one relationship using Drizzle ORM.",
+      "filename": "join-many-to-one.md",
+      "rule": "## Many-to-One Relationship\n\nDefine and query a many-to-one relationship:\n\n```typescript\nimport { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';\n\nconst cities = sqliteTable('cities', {\n  id: integer('id').primaryKey(),\n  name: text('name'),\n});\n\nconst users = sqliteTable('users', {\n  id: integer('id').primaryKey(),\n  name: text('name'),\n  cityId: integer('city_id').references(() => cities.id),\n});\n\nconst result = await db.select().from(cities).leftJoin(users, eq(cities.id, users.cityId)).all();\n```\n"
+    },
+    {
+      "reasoning": "Many-to-many relationships require a join table. This rule explains how to define and query a many-to-many relationship using Drizzle ORM.",
+      "filename": "join-many-to-many.md",
+      "rule": "## Many-to-Many Relationship\n\nDefine and query a many-to-many relationship:\n\n```typescript\nconst users = sqliteTable('users', {\n  id: integer('id').primaryKey(),\n  name: text('name'),\n});\n\nconst chatGroups = sqliteTable('chat_groups', {\n  id: integer('id').primaryKey(),\n  name: text('name'),\n});\n\nconst usersToChatGroups = sqliteTable('usersToChatGroups', {\n  userId: integer('user_id').notNull().references(() => users.id),\n  groupId: integer('group_id').notNull().references(() => chatGroups.id),\n});\n\n// Querying user group with id 1 and all the participants (users)\nconst result = await db.select()\n  .from(usersToChatGroups)\n  .leftJoin(users, eq(usersToChatGroups.userId, users.id))\n  .leftJoin(chatGroups, eq(usersToChatGroups.groupId, chatGroups.id))\n  .where(eq(chatGroups.id, 1))\n  .all();\n```\n"
+    }
+  ]
+}
