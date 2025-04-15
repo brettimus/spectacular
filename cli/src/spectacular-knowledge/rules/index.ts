@@ -25,6 +25,19 @@ import handlingRequestsAndResponses from "./hono-rules/handling-requests-and-res
 import accessingEnvironmentVariables from "./hono-rules/accessing-environment-variables-in-cloudflare-workers.md?raw";
 import routeGrouping from "./hono-rules/route-grouping-in-hono.md?raw";
 import pathParameters from "./hono-rules/path-parameters-in-hono.md?raw";
+import multipartFormDataBodies from "./hono-rules/multipart-form-data-bodies.md?raw";
+
+// Drizzle Query Rules
+import accessingJsonColumns from "./drizzle-query-rules/accessing-json-columns-in-drizzle-orm.md?raw";
+import basicCrudOperations from "./drizzle-query-rules/basic-crud-operations-with-drizzle-orm-and-sqlite.md?raw";
+import updatingRecords from "./drizzle-query-rules/updating-records-with-drizzle-orm.md?raw";
+import filteringWithComparisonOperators from "./drizzle-query-rules/filtering-with-comparison-operators-in-drizzle-orm.md?raw";
+import deletingRecords from "./drizzle-query-rules/deleting-records-with-drizzle-orm.md?raw";
+import buildingQueriesWithMultipleFilters from "./drizzle-query-rules/building-queries-with-multiple-filters-in-drizzle-orm.md?raw";
+import handlingErrorsInDrizzleOrm from "./drizzle-query-rules/handling-errors-in-drizzle-orm-with-hono.md?raw";
+import filteringWithEqualityOperators from "./drizzle-query-rules/filtering-with-equality-operators-in-drizzle-orm.md?raw";
+import orderingQueryResults from "./drizzle-query-rules/ordering-query-results-with-drizzle-orm.md?raw";
+import countingRecords from "./drizzle-query-rules/counting-records-with-drizzle-orm.md?raw";
 
 // Export individual rules with intuitive names
 export {
@@ -54,6 +67,18 @@ export {
   accessingEnvironmentVariables,
   routeGrouping,
   pathParameters,
+  multipartFormDataBodies,
+  // Drizzle Query Rules
+  accessingJsonColumns,
+  basicCrudOperations,
+  updatingRecords,
+  filteringWithComparisonOperators,
+  deletingRecords,
+  buildingQueriesWithMultipleFilters,
+  handlingErrorsInDrizzleOrm,
+  filteringWithEqualityOperators,
+  orderingQueryResults,
+  countingRecords,
 };
 
 // Export an array of all rules
@@ -157,7 +182,54 @@ export const honoRules = [
     id: "pathParameters",
     content: pathParameters,
   },
+  {
+    id: "multipartFormDataBodies",
+    content: multipartFormDataBodies,
+  },
+];
+
+export const drizzleQueryRules = [
+  {
+    id: "accessingJsonColumns",
+    content: accessingJsonColumns,
+  },
+  {
+    id: "basicCrudOperations",
+    content: basicCrudOperations,
+  },
+  {
+    id: "updatingRecords",
+    content: updatingRecords,
+  },
+  {
+    id: "filteringWithComparisonOperators",
+    content: filteringWithComparisonOperators,
+  },
+  {
+    id: "deletingRecords",
+    content: deletingRecords,
+  },
+  {
+    id: "buildingQueriesWithMultipleFilters",
+    content: buildingQueriesWithMultipleFilters,
+  },
+  {
+    id: "handlingErrorsInDrizzleOrm",
+    content: handlingErrorsInDrizzleOrm,
+  },
+  {
+    id: "filteringWithEqualityOperators",
+    content: filteringWithEqualityOperators,
+  },
+  {
+    id: "orderingQueryResults",
+    content: orderingQueryResults,
+  },
+  {
+    id: "countingRecords",
+    content: countingRecords,
+  },
 ];
 
 // Combined array of all rules
-export const allRules = [...drizzleSchemaRules, ...honoRules];
+export const allRules = [...drizzleSchemaRules, ...honoRules, ...drizzleQueryRules];
