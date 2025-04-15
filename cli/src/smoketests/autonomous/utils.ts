@@ -9,12 +9,12 @@ export function verifyCurrentDir({
   cliProjectRoot: string;
   __dirname: string;
 }) {
-  if (cliProjectRoot !== path.join(__dirname, "..", "..", "..", "..")) {
+  if (cliProjectRoot !== path.join(__dirname, "..", "..", "..")) {
     console.log("cliProjectRoot", cliProjectRoot);
     console.log("__dirname", __dirname);
     console.log(
-      "path.join(__dirname, '..', '..', '..', '..')",
-      path.join(__dirname, "..", "..", "..", ".."),
+      "path.join(__dirname, '..', '..', '..')",
+      path.join(__dirname, "..", "..", ".."),
     );
     throw new Error("Something is unexpected about the cwd");
   }
