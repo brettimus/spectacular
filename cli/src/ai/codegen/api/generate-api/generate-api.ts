@@ -5,7 +5,10 @@ import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
 import { OPENAI_STRATEGY } from "./openai";
 import { log } from "../../../../utils/logging";
-import { drizzleQueryRules, honoRules } from "../../../../spectacular-knowledge/rules";
+import {
+  drizzleQueryRules,
+  honoRules,
+} from "../../../../spectacular-knowledge/rules";
 
 export type GenerateApiResult = z.infer<typeof GenerateApiSchema>;
 
@@ -80,8 +83,18 @@ export async function generateApi(
       spec ||
       "Create a simple REST API with CRUD operations for all tables in the schema.";
 
-    const drizzleOrmExamples = drizzleQueryRules.map((rule) => `<drizzle_query_rule id="${rule.id}">\n${rule.content}\n</drizzle_query_rule>`).join("\n\n");
-    const honoApiRules = honoRules.map((rule) => `<hono_api_rule id="${rule.id}">\n${rule.content}\n</hono_api_rule>`).join("\n\n");
+    const drizzleOrmExamples = drizzleQueryRules
+      .map(
+        (rule) =>
+          `<drizzle_query_rule id="${rule.id}">\n${rule.content}\n</drizzle_query_rule>`,
+      )
+      .join("\n\n");
+    const honoApiRules = honoRules
+      .map(
+        (rule) =>
+          `<hono_api_rule id="${rule.id}">\n${rule.content}\n</hono_api_rule>`,
+      )
+      .join("\n\n");
     const templateExample = TEMPLATE_EXAMPLE;
 
     const SYSTEM_PROMPT = getSystemPrompt(

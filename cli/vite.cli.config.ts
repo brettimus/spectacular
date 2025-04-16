@@ -23,10 +23,7 @@ export default defineConfig({
           __dirname,
           "src/smoketests/autonomous/autonomous.smoketest.ts",
         ),
-        schemagen: resolve(
-          __dirname,
-          "src/smoketests/schemagen.smoketest.ts",
-        ),
+        schemagen: resolve(__dirname, "src/smoketests/schemagen.smoketest.ts"),
       },
       output: {
         entryFileNames: "[name].js",

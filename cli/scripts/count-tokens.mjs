@@ -8,9 +8,7 @@ const KNOWLEDGE_BASE_DIR = path.resolve(
   path.join("src", "spectacular-knowledge"),
 );
 
-const RULES_DIR = path.resolve(
-  path.join(KNOWLEDGE_BASE_DIR, "rules"),
-);
+const RULES_DIR = path.resolve(path.join(KNOWLEDGE_BASE_DIR, "rules"));
 
 /**
  * Count tokens using OpenAI's tiktoken library
@@ -107,8 +105,8 @@ async function main() {
     const ruleDirs = [
       RULES_DIR, // Include root rules dir
       ...rulesEntries
-        .filter(entry => entry.isDirectory())
-        .map(dir => path.join(RULES_DIR, dir.name))
+        .filter((entry) => entry.isDirectory())
+        .map((dir) => path.join(RULES_DIR, dir.name)),
     ];
 
     // Track global totals
@@ -121,7 +119,7 @@ async function main() {
     // Process each rule directory
     for (const ruleDir of ruleDirs) {
       console.log(`\n\n=== Processing ${path.basename(ruleDir)} ===`);
-      
+
       // Get all files in this directory
       let filesToAnalyze;
       try {
@@ -130,7 +128,7 @@ async function main() {
         console.error(`Error getting files from ${ruleDir}:`, error);
         continue;
       }
-      
+
       // Skip if no files found
       if (filesToAnalyze.length === 0) {
         console.log(`No files found in ${ruleDir}`);
@@ -153,7 +151,7 @@ async function main() {
         for (const model of models) {
           dirTotalCounts[model] += result.tokenCounts[model];
         }
-        
+
         // Accumulate global totals
         globalTotalBytes += result.bytes;
         for (const model of models) {

@@ -1,4 +1,3 @@
-
 export function getDrizzleOrmExamples() {
   return `
 // Example of inserting a new record:

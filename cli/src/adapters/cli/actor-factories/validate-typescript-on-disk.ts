@@ -1,7 +1,4 @@
-import {
-  type ErrorInfo,
-  validateTypeScriptOnDisk,
-} from "@/typechecking";
+import { type ErrorInfo, validateTypeScriptOnDisk } from "@/typechecking";
 import type { PackageManager } from "@/utils/package-manager";
 import { fromPromise } from "xstate";
 

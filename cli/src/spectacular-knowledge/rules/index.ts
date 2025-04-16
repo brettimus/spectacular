@@ -232,4 +232,8 @@ export const drizzleQueryRules = [
 ];
 
 // Combined array of all rules
-export const allRules = [...drizzleSchemaRules, ...honoRules, ...drizzleQueryRules];
+export const allRules = [
+  ...drizzleSchemaRules,
+  ...honoRules,
+  ...drizzleQueryRules,
+];
