@@ -23,7 +23,7 @@ const GenerateApiSchema = z.object({
 
 // Keep prompts and examples within this module
 const TEMPLATE_EXAMPLE = `
-import { instrument } from "@fiberplane/hono-otel";
+import { createFiberplane, createOpenAPISpec } from "@fiberplane/hono";
 import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
 import * as schema from "./db/schema";
@@ -55,6 +55,30 @@ app.post("/api/user", async (c) => {
 
   return c.json({ user: newUser });
 });
+
+/**
+ * Serve a simplified api specification for your API
+ * As of writing, this is just the list of routes and their methods.
+ */
+app.get("/openapi.json", c => {
+  return c.json(createOpenAPISpec(app, {
+    info: {
+      title: "Honc D1 App",
+      version: "1.0.0",
+    },
+  }))
+});
+
+/**
+ * Mount the Fiberplane api explorer to be able to make requests against your API.
+ *
+ * Visit the explorer at \`/fp\`
+ */
+app.use("/fp/*", createFiberplane({
+  app,
+  openapi: { url: "/openapi.json" }
+}));
+
 
 export default app;
 `;

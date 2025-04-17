@@ -79,14 +79,30 @@ A few tips:
 - All import paths are correct, so don't modify import paths
 - Add new imports from the Drizzle ORM if you need new sql helper functions (like { sql }, { gte }, etc)
 
-IMPORTANT
 
-The response should be in JSON like this:
+1. Keep the imports and routes for Fiberplane (from the template)
+
+\`\`\`typescript
+// KEEP THIS!
+import { createFiberplane, createOpenAPISpec } from "@fiberplane/hono";
+
+//...
+
+// KEEP THIS ROUTE!
+app.get("/openapi.json", // ...
+
+// KEEP THIS ROUTE!
+app.use("/fp/*", createFiberplane({ // ...
+\`\`\`
+
+2. DO NOT wrap the indexTs file in \`\`\`typescript tags!
+
+3. The response should be in JSON like this:
 
 {
   "reasoning": "<reasoning>",
   "indexTs": "<index.ts file content>"
 }
 
-DO NOT wrap the indexTs file in \`\`\`typescript tags!`;
+You MUST respond in JSON.`;
 }
