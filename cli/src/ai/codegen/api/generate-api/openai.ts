@@ -88,7 +88,5 @@ The response should be in JSON like this:
   "indexTs": "<index.ts file content>"
 }
 
-DO NOT wrap the indexTs file in \`\`\`typescript tags!
-
-You MUST respond in JSON. I AM TALKING TO YOU CLAUDE!!!!!!! DO NOT FUCK THIS UP.`;
+DO NOT wrap the indexTs file in \`\`\`typescript tags!`;
 }
