@@ -22,10 +22,10 @@ const GenerateApiSchema = z.object({
   explanation: z
     .string()
     .describe("Your step by step thought process for designing the api"),
-  indexTs: z
+  apiCode: z
     .string()
     .describe(
-      "The generated api routes file `index.ts`, in typescript, THIS IS REQUIRED",
+      "The generated api routes file `index.ts`, in typescript (not markdown), THIS IS REQUIRED",
     ),
 });
 
@@ -88,12 +88,12 @@ export async function generateApi(
     });
 
     log("info", "API generation complete", {
-      codeLength: result.object.indexTs.length,
-      explanationLength: result.object.explanation.length,
+      codeLength: result.object.apiCode.length,
+      explanation: result.object.explanation,
     });
 
     return {
-      indexTs: result.object.indexTs,
+      apiCode: result.object.apiCode,
       explanation: result.object.explanation,
     };
   } catch (error) {

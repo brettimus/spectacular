@@ -115,7 +115,7 @@ export const apiCodegenMachine = setup({
         onDone: {
           target: "SavingApiIndex",
           actions: assign({
-            apiCode: ({ event }) => event.output?.indexTs || "",
+            apiCode: ({ event }) => event.output?.apiCode || "",
             explanation: ({ event }) => event.output?.explanation || "",
           }),
         },
