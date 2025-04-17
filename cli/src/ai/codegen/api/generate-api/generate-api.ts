@@ -77,7 +77,12 @@ export async function generateApi(
       model,
       schema: GenerateApiSchema,
       system: SYSTEM_PROMPT,
-      prompt: createUserPrompt({ dbSchema, apiPlan }),
+      messages: [
+        {
+          role: "user",
+          content: createUserPrompt({ dbSchema, apiPlan }),
+        },
+      ],
       temperature,
       abortSignal: signal,
     });

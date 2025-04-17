@@ -102,6 +102,7 @@ export async function autoSpectacular({
       input: {
         apiKey,
         aiProvider,
+        aiGatewayUrl,
         spec,
         dbSchemaTs: schemaGenOutput.dbSchemaTs,
       },
