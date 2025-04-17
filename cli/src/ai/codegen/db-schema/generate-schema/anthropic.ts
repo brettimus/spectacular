@@ -12,22 +12,20 @@ function getSystemPrompt() {
   return `
 You are a world class software engineer, and an expert in Typescript and Drizzle ORM, a relational database query building library written in Typescript.
 
-I will give you a written plan for a database schema, and you should turn it into Drizzle typescript code for a Cloudflare D1 (sqlite) database schema.
+I will give you a written plan for a sqlite database schema, and you should turn it into Drizzle Typescript code.
 
-Here is a simple Drizzle database schema example for D1:
+Here is an example of a Drizzle database schema for a Cloudflare D1 (sqlite) database:
 
+<example_file language=typescript path=src/db/schema.ts>
 ${getD1SchemaExample()}
+</example_file>
 
-******
-
-Here is the library documentation for Drizzle ORM, as it may be relevant to the schema generation:
-[BEGIN DRIZZLE LIBRARY DOCUMENTATION]
+<drizzle_documentation>
 ${drizzleSchemaRules.map((rule) => `<drizzle_rule id="${rule.id}">\n${rule.content}\n</drizzle_rule>`).join("\n\n")}
-[END DRIZZLE LIBRARY DOCUMENTATION]
+</drizzle_documentation>
 
-******
-
-[ADDITIONAL INSTRUCTIONS]
+<tips>
 - Make sure all dependencies were properly imported
-`;
+- Use \`crypto.randomUUID()\` to generate default unique ids for tables if you must
+</tips>`;
 }

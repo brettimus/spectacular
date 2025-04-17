@@ -11,6 +11,11 @@ import {
 } from "../../../../spectacular-knowledge/rules";
 import { TEMPLATE_EXAMPLE } from "./examples";
 
+export type GenerateApiOptions = {
+  spec: string;
+  schema: string;
+};
+
 export type GenerateApiResult = z.infer<typeof GenerateApiSchema>;
 
 const GenerateApiSchema = z.object({
@@ -21,11 +26,6 @@ const GenerateApiSchema = z.object({
     .string()
     .describe("The generated api routes file, in typescript, THIS IS REQUIRED"),
 });
-
-export type GenerateApiOptions = {
-  spec: string;
-  schema: string;
-};
 
 /**
  * Generate API code using AI
@@ -100,6 +100,19 @@ export async function generateApi(
   }
 }
 
+const createUserPrompt = ({
+  dbSchema,
+  apiPlan,
+}: { dbSchema: string; apiPlan: string }) => `
+I have a Drizzle schema for my database, which is already correctly imported in the template api routes file:
+
+<file language=typescript path=src/db/schema.ts>
+${dbSchema}
+</file>
+
+Please generate api routes in an index.ts file for me, according to the following specification:\n\n${apiPlan}
+`;
+
 function getStrategyForProvider(aiProvider: FpModelProvider) {
   switch (aiProvider) {
     case "openai":
@@ -139,16 +152,3 @@ function fromModelProvider(
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
 }
-
-const createUserPrompt = ({
-  dbSchema,
-  apiPlan,
-}: { dbSchema: string; apiPlan: string }) => `
-I have a Drizzle schema for my database, which is already correctly imported in the template api routes file:
-
-<file language=typescript path=src/db/schema.ts>
-${dbSchema}
-</file>
-
-Please generate api routes in an index.ts file for me, according to the following specification:\n\n${apiPlan}
-`;

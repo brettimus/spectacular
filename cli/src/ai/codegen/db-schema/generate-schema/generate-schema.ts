@@ -10,10 +10,16 @@ export type GenerateSchemaOptions = {
   schemaSpecification: string;
 };
 
-export type GenerateSchemaResult = {
-  explanation: string;
-  dbSchemaTs: string;
-};
+export type GenerateSchemaResult = z.infer<typeof GenerateSchemaSchema>;
+
+const GenerateSchemaSchema = z.object({
+  explanation: z
+    .string()
+    .describe("Explanation of your schema design decisions"),
+  dbSchemaTs: z
+    .string()
+    .describe("The generated Drizzle typescript schema definition."),
+});
 
 /**
  * Generate Drizzle ORM schema using AI
@@ -24,42 +30,24 @@ export async function generateSchema(
   signal?: AbortSignal,
 ): Promise<GenerateSchemaResult> {
   try {
+    const { schemaSpecification } = options;
     const { apiKey, aiProvider, aiGatewayUrl } = aiConfig;
     const model = fromModelProvider(aiProvider, apiKey, aiGatewayUrl);
     const { getSystemPrompt, temperature } = getStrategyForProvider(aiProvider);
 
-    log("debug", "Generating schema", {
-      specLength: options.schemaSpecification.length,
+    log("debug", "Generating schema for db spec", {
+      specLength: schemaSpecification.length,
     });
 
     const result = await generateObject({
       model,
-      schema: z.object({
-        explanation: z
-          .string()
-          .describe("Explanation of your schema design decisions"),
-        dbSchemaTs: z
-          .string()
-          .describe("The generated Drizzle typescript schema definition."),
-      }),
+      schema: GenerateSchemaSchema,
       messages: [
         {
           role: "user",
-          content: `Generate Drizzle ORM schema code for the following tables:
- 
-[BEGIN DATA]
-************
-[specification]:
-${options.schemaSpecification}
-************
-[Additional context]:
-
-************
-[END DATA]
-
-Use the additional context to help you generate the schema.
-
-This is important to my career.`,
+          content: createUserPrompt({
+            schemaSpecification,
+          }),
         },
       ],
       system: getSystemPrompt(),
@@ -68,8 +56,7 @@ This is important to my career.`,
     });
 
     log("info", "Schema generation complete", {
-      explanationLength: result.object.explanation.length,
-      schemaLength: result.object.dbSchemaTs.length,
+      explanation: result.object.explanation,
     });
 
     return {
@@ -103,6 +90,18 @@ function getStrategyForProvider(aiProvider: FpModelProvider) {
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
 }
+
+const createUserPrompt = ({
+  schemaSpecification,
+}: { schemaSpecification: string }) => `<context>
+${schemaSpecification}
+</context>
+
+<task>
+Generate a Drizzle ORM schema definition for the database tables described in the context.
+This is important to my career.
+</task>
+`;
 
 function fromModelProvider(
   aiProvider: FpModelProvider,

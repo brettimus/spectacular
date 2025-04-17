@@ -29,5 +29,6 @@ ${drizzleSchemaRules.map((rule) => rule.content).join("\n\n")}
 
 [ADDITIONAL INSTRUCTIONS]
 - Make sure all dependencies were properly imported
+- Use \`crypto.randomUUID()\` to generate default unique ids for tables if you must
 `;
 }
