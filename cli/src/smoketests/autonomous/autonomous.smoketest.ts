@@ -123,6 +123,7 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     await autoSpectacular({
       apiKey: AI_CONFIG.apiKey,
       aiProvider: AI_CONFIG.aiProvider,
+      aiGatewayUrl: AI_CONFIG.aiGatewayUrl,
       spec: specDetails.spec,
       projectDir,
       logsDir,

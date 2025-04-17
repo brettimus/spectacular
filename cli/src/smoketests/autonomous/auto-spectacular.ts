@@ -11,6 +11,7 @@ import { createLogger } from "./logger";
 export interface SpectacularOptions {
   apiKey: string;
   aiProvider: FpModelProvider;
+  aiGatewayUrl?: string;
   spec: string;
   projectDir: string;
   logsDir: string;
@@ -19,6 +20,7 @@ export interface SpectacularOptions {
 export async function autoSpectacular({
   apiKey,
   aiProvider,
+  aiGatewayUrl,
   spec,
   projectDir,
   logsDir,
@@ -37,6 +39,7 @@ export async function autoSpectacular({
       input: {
         apiKey,
         aiProvider,
+        aiGatewayUrl,
         spec,
       },
     },
