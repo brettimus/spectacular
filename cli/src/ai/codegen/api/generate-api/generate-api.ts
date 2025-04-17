@@ -9,6 +9,7 @@ import {
   drizzleQueryRules,
   honoRules,
 } from "../../../../spectacular-knowledge/rules";
+import { TEMPLATE_EXAMPLE } from "./examples";
 
 export type GenerateApiResult = z.infer<typeof GenerateApiSchema>;
 
@@ -20,81 +21,6 @@ const GenerateApiSchema = z.object({
     .string()
     .describe("The generated api routes file, in typescript, THIS IS REQUIRED"),
 });
-
-const createUserPrompt = ({
-  dbSchema,
-  apiPlan,
-}: { dbSchema: string; apiPlan: string }) => `
-I have a Drizzle schema for my database, which is already correctly imported in the template api routes file:
-
-<file language=typescript path=src/db/schema.ts>
-${dbSchema}
-</file>
-
-Please generate api routes in an index.ts file for me, according to the following specification:\n\n${apiPlan}
-`;
-
-// Keep prompts and examples within this module
-const TEMPLATE_EXAMPLE = `
-import { createFiberplane, createOpenAPISpec } from "@fiberplane/hono";
-import { drizzle } from "drizzle-orm/d1";
-import { Hono } from "hono";
-import * as schema from "./db/schema";
-
-type Bindings = {
-  DB: D1Database;
-};
-
-const app = new Hono<{ Bindings: Bindings }>();
-
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
-
-app.get("/api/users", async (c) => {
-  const db = drizzle(c.env.DB);
-  const users = await db.select().from(schema.users);
-  return c.json({ users });
-});
-
-app.post("/api/user", async (c) => {
-  const db = drizzle(c.env.DB);
-  const { name, email } = await c.req.json();
-
-  const [newUser] = await db.insert(schema.users).values({
-    name: name,
-    email: email,
-  }).returning();
-
-  return c.json({ user: newUser });
-});
-
-/**
- * Serve a simplified api specification for your API
- * As of writing, this is just the list of routes and their methods.
- */
-app.get("/openapi.json", c => {
-  return c.json(createOpenAPISpec(app, {
-    info: {
-      title: "Honc D1 App",
-      version: "1.0.0",
-    },
-  }))
-});
-
-/**
- * Mount the Fiberplane api explorer to be able to make requests against your API.
- *
- * Visit the explorer at \`/fp\`
- */
-app.use("/fp/*", createFiberplane({
-  app,
-  openapi: { url: "/openapi.json" }
-}));
-
-
-export default app;
-`;
 
 export type GenerateApiOptions = {
   spec: string;
@@ -213,3 +139,16 @@ function fromModelProvider(
       throw new Error(`Unsupported AI provider: ${aiProvider}`);
   }
 }
+
+const createUserPrompt = ({
+  dbSchema,
+  apiPlan,
+}: { dbSchema: string; apiPlan: string }) => `
+I have a Drizzle schema for my database, which is already correctly imported in the template api routes file:
+
+<file language=typescript path=src/db/schema.ts>
+${dbSchema}
+</file>
+
+Please generate api routes in an index.ts file for me, according to the following specification:\n\n${apiPlan}
+`;
