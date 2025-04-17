@@ -1,7 +1,4 @@
-import {
-  getD1AdditionalTips,
-  getD1SchemaExample,
-} from "./examples--deprecated";
+import { getD1SchemaExample } from "./examples--deprecated";
 import { drizzleSchemaRules } from "../../../../spectacular-knowledge/rules";
 
 export const OPENAI_STRATEGY = {

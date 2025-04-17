@@ -21,6 +21,19 @@ const GenerateApiSchema = z.object({
     .describe("The generated api routes file, in typescript, THIS IS REQUIRED"),
 });
 
+const createUserPrompt = ({
+  dbSchema,
+  apiPlan,
+}: { dbSchema: string; apiPlan: string }) => `
+I have a Drizzle schema for my database, which is already correctly imported in the template api routes file:
+
+<file language=typescript path=src/db/schema.ts>
+${dbSchema}
+</file>
+
+Please generate api routes in an index.ts file for me, according to the following specification:\n\n${apiPlan}
+`;
+
 // Keep prompts and examples within this module
 const TEMPLATE_EXAMPLE = `
 import { createFiberplane, createOpenAPISpec } from "@fiberplane/hono";
@@ -122,19 +135,21 @@ export async function generateApi(
     const templateExample = TEMPLATE_EXAMPLE;
 
     const SYSTEM_PROMPT = getSystemPrompt(
-      dbSchema,
       templateExample,
       drizzleOrmExamples,
       honoApiRules,
     );
 
-    log("debug", "Generating API with reasoning", { apiPlan, dbSchema });
+    log("debug", "Generating API with following plan and schema:", {
+      apiPlan,
+      dbSchema,
+    });
 
     const result = await generateObject({
       model,
       schema: GenerateApiSchema,
       system: SYSTEM_PROMPT,
-      prompt: `Please generate the api routes file for me, according to the following plan:\n\n${apiPlan}`,
+      prompt: createUserPrompt({ dbSchema, apiPlan }),
       temperature,
       abortSignal: signal,
     });
