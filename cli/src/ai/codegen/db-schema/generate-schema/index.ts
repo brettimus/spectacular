@@ -3,8 +3,4 @@ export type {
   GenerateSchemaOptions,
   GenerateSchemaResult,
 } from "./generate-schema";
-export {
-  getD1SchemaExample,
-  getDrizzleSchemaExamples,
-  getD1AdditionalTips,
-} from "./examples--deprecated";
+export { getD1SchemaExample } from "./examples";
