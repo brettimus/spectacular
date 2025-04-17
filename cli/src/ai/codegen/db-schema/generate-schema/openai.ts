@@ -2,7 +2,7 @@ import { getD1SchemaExample } from "./examples";
 import { drizzleSchemaRules } from "../../../../spectacular-knowledge/rules";
 
 export const OPENAI_STRATEGY = {
-  modelName: "gpt-4o",
+  modelName: "gpt-4.1",
   modelProvider: "openai",
   temperature: 0.2,
   getSystemPrompt,

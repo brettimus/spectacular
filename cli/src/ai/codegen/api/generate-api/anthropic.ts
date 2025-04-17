@@ -1,5 +1,4 @@
 export const ANTHROPIC_STRATEGY = {
-  // NOTE - Might need to use 3.5 because 3.7 does not respect the json schema!
   modelName: "claude-3-7-sonnet-20250219",
   modelProvider: "anthropic",
   temperature: 0,

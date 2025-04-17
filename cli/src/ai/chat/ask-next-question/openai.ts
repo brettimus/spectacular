@@ -1,5 +1,5 @@
 export const OPENAI_STRATEGY = {
-  modelName: "gpt-4o",
+  modelName: "gpt-4.1",
   modelProvider: "openai",
   temperature: 0.7,
   getSystemPrompt,

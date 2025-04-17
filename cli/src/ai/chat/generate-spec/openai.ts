@@ -1,5 +1,5 @@
 export const OPENAI_STRATEGY = {
-  modelName: "o3-mini",
+  modelName: "o4-mini",
   modelProvider: "openai",
   temperature: 0.35,
   getSystemPrompt,

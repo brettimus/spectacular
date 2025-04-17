@@ -1,6 +1,6 @@
 export const OPENAI_STRATEGY = {
-  // NOTE - I was using gpt-4o-mini, but it was getting confused about the user's intent a lot
-  modelName: "gpt-4o",
+  // NOTE - gpt-4o-mini was getting confused about the user's intent a lot, we'll see how gpt-4.1-mini fares
+  modelName: "gpt-4.1-mini",
   modelProvider: "openai",
   temperature: 0.2,
   getSystemPrompt,

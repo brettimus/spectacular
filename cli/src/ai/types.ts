@@ -1,4 +1,10 @@
-export type OpenAiModelName = "gpt-4o" | "gpt-4o-mini" | "o3-mini";
+export type OpenAiModelName =
+  | "gpt-4.1"
+  | "gpt-4.1-mini"
+  | "gpt-4o"
+  | "gpt-4o-mini"
+  | "o4-mini"
+  | "o3-mini";
 
 export type AnthropicModelName =
   | "claude-3-7-sonnet-20250219"

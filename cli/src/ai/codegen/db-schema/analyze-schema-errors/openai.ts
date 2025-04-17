@@ -1,7 +1,7 @@
 import { createOpenAI } from "@ai-sdk/openai";
 
 export const OPENAI_STRATEGY = {
-  modelName: "gpt-4o",
+  modelName: "gpt-4.1",
   modelProvider: "openai",
   responsesApi: true,
   temperature: 0.5,

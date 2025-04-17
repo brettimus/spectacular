@@ -6,9 +6,8 @@
 
 ```typescript
 import { text, sqliteTable } from "drizzle-orm/sqlite-core";
-import { createId } from '@paralleldrive/cuid2';
 
 const table = sqliteTable('table', {
-  id: text().$defaultFn(() => createId()),
+  uuid: text().$defaultFn(() => crypto.randomUUID()),
 });
 ``` 

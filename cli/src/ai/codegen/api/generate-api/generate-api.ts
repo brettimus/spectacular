@@ -77,6 +77,8 @@ export async function generateApi(
       model,
       schema: GenerateApiSchema,
       system: SYSTEM_PROMPT,
+      // NOTE - Max tokens is 64_000 for Claude 3.7, 100_000 for OpenAI o4-mini
+      maxTokens: 64_000,
       messages: [
         {
           role: "user",

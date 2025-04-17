@@ -51,6 +51,7 @@ export async function generateSchema(
         },
       ],
       system: getSystemPrompt(),
+      maxTokens: 32_000,
       temperature,
       abortSignal: signal,
     });

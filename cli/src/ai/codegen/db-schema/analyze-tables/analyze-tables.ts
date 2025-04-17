@@ -59,6 +59,7 @@ export async function analyzeTables(
 ${options.specContent}`,
         },
       ],
+      maxTokens: 12_000,
       system: getSystemPrompt(),
       temperature,
       abortSignal: signal,

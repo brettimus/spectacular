@@ -102,7 +102,8 @@ export async function autoSpectacular({
       input: {
         apiKey,
         aiProvider,
-        aiGatewayUrl,
+        // NOTE - Cloudflare AI Gateway might be timing out after 100s
+        // aiGatewayUrl,
         spec,
         dbSchemaTs: schemaGenOutput.dbSchemaTs,
       },

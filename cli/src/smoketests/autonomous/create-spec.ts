@@ -16,13 +16,12 @@ if (!testSpec) {
 }
 
 const OPENAI_STRATEGY = {
-  modelName: "gpt-4o",
+  modelName: "gpt-4.1",
   modelProvider: "openai",
 } as const;
 
-// NOTE - Might need to use 3.5 because 3.7 does not respect the json schema!
 const ANTHROPIC_STRATEGY = {
-  modelName: "claude-3-5-sonnet-20241022",
+  modelName: "claude-3-7-sonnet-20250219",
   modelProvider: "anthropic",
 } as const;
 
