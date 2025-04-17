@@ -1,5 +1,5 @@
 export const ANTHROPIC_STRATEGY = {
-  modelName: "claude-3-5-haiku-20241022",
+  modelName: "claude-3-7-sonnet-20250219",
   modelProvider: "anthropic",
   temperature: 0.2,
   getSystemPrompt,

@@ -20,7 +20,7 @@ const OPENAI_STRATEGY = {
   modelProvider: "openai",
 } as const;
 
-// NOTE - Needed to use 3.5 because 3.7 would not respect the json schema!
+// NOTE - Might need to use 3.5 because 3.7 does not respect the json schema!
 const ANTHROPIC_STRATEGY = {
   modelName: "claude-3-5-sonnet-20241022",
   modelProvider: "anthropic",
