@@ -19,12 +19,14 @@ export type GenerateApiOptions = {
 export type GenerateApiResult = z.infer<typeof GenerateApiSchema>;
 
 const GenerateApiSchema = z.object({
-  reasoning: z
+  explanation: z
     .string()
     .describe("Your step by step thought process for designing the api"),
   indexTs: z
     .string()
-    .describe("The generated api routes file, in typescript, THIS IS REQUIRED"),
+    .describe(
+      "The generated api routes file `index.ts`, in typescript, THIS IS REQUIRED",
+    ),
 });
 
 /**
@@ -82,12 +84,12 @@ export async function generateApi(
 
     log("info", "API generation complete", {
       codeLength: result.object.indexTs.length,
-      reasoningLength: result.object.reasoning.length,
+      explanationLength: result.object.explanation.length,
     });
 
     return {
       indexTs: result.object.indexTs,
-      reasoning: "", // result.object.reasoning,
+      explanation: result.object.explanation,
     };
   } catch (error) {
     log(

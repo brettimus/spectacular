@@ -8,7 +8,7 @@ import { log } from "../../../../utils/logging";
 
 // Schema definition for the output object
 const AnalyzeTablesOutputSchema = z.object({
-  reasoning: z
+  explanation: z
     .string()
     .describe(
       "Your analysis of the specification and why you chose these tables.",
@@ -65,12 +65,12 @@ ${options.specContent}`,
     });
 
     log("info", "Table analysis complete", {
-      reasoningLength: result.object.reasoning.length,
+      explanationLength: result.object.explanation.length,
       specificationLength: result.object.schemaSpecification.length,
     });
 
     return {
-      reasoning: result.object.reasoning,
+      explanation: result.object.explanation,
       schemaSpecification: result.object.schemaSpecification,
     };
   } catch (error) {

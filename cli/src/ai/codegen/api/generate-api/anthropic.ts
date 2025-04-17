@@ -73,7 +73,7 @@ ${templateExample}
   app.use("/fp/*", createFiberplane({ // ...
   \`\`\`
 
-  2. DO NOT wrap the indexTs file in \`\`\`typescript tags!
+  2. The indexTs file is in typescript, not markdown! So do NOT wrap the code in triple backticks.
 
   3. For realtime apis, write as much as you can, then add a TODO comment with a link to the following documentation:
 
@@ -84,7 +84,7 @@ ${templateExample}
   4. The response should be in JSON like this:
 
   {
-    "reasoning": "<reasoning>",
+    "explanation": "<explanation>",
     "indexTs": "<index.ts file content>"
   }
 

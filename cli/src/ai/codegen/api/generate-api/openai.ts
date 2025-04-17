@@ -81,7 +81,7 @@ app.use("/fp/*", createFiberplane({ // ...
 3. The response should be in JSON like this:
 
 {
-  "reasoning": "<reasoning>",
+  "explanation": "<explanation>",
   "indexTs": "<index.ts file content>"
 }
 

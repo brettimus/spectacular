@@ -19,7 +19,7 @@ const mockRouterToGenerateSpecActor = fromPromise<
 >(async () => {
   return {
     nextStep: "generate_implementation_plan",
-    reasoning: "Mock reasoning for testing",
+    explanation: "Mock explanation for testing",
   };
 });
 

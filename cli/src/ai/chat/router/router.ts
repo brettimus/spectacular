@@ -6,9 +6,9 @@ import { ANTHROPIC_STRATEGY } from "./anthropic";
 import { OPENAI_STRATEGY } from "./openai";
 
 const RouteRequestResponseSchema = z.object({
-  reasoning: z
+  explanation: z
     .string()
-    .describe("A brief explanation of your reasoning for the classification."),
+    .describe("A brief explanation of your choice of next step."),
   nextStep: z.enum(["ask_follow_up_question", "generate_implementation_plan"]),
 });
 
@@ -38,7 +38,7 @@ export async function routeRequest(
 
   return {
     nextStep: classification.nextStep,
-    reasoning: classification.reasoning,
+    explanation: classification.explanation,
   };
 }
 

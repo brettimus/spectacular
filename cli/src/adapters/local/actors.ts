@@ -34,7 +34,7 @@ export const routeRequestLocalActor = fromPromise<
     console.error("Invalid response from router:", nextStep);
     nextStep = "ask_follow_up_question";
   }
-  return { nextStep, reasoning: "NA" };
+  return { nextStep, explanation: "NA" };
 });
 
 // This is tricky, we will need to stream the response
@@ -76,7 +76,7 @@ export const analyzeTablesLocalActor = fromPromise<
   //
   await new Promise((r) => setTimeout(r, 3000));
   return {
-    reasoning: "idk",
+    explanation: "idk",
     schemaSpecification: "# a database\n ...wait what was i doing?",
   };
 });

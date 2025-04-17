@@ -31,7 +31,7 @@ interface ApiCodegenMachineContext {
   spec: string;
   apiCode: string;
 
-  reasoning: string;
+  explanation: string;
   errors: ErrorInfo[];
   errorAnalysis: AnalyzeApiErrorsResult | null;
   fixedApiCode: string | null;
@@ -41,7 +41,7 @@ interface ApiCodegenMachineContext {
 
 interface ApiCodegenMachineOutput {
   apiCode: string;
-  reasoning: string;
+  explanation: string;
   errors: ErrorInfo[];
   errorAnalysis: AnalyzeApiErrorsResult | null;
   fixedApiCode: string | null;
@@ -81,7 +81,7 @@ export const apiCodegenMachine = setup({
       "Create a simple REST API with CRUD operations for all tables in the schema.",
     apiCode: "",
 
-    reasoning: "",
+    explanation: "",
     errors: [],
     errorAnalysis: null,
     fixedApiCode: null,
@@ -116,7 +116,7 @@ export const apiCodegenMachine = setup({
           target: "SavingApiIndex",
           actions: assign({
             apiCode: ({ event }) => event.output?.indexTs || "",
-            reasoning: ({ event }) => event.output?.reasoning || "",
+            explanation: ({ event }) => event.output?.explanation || "",
           }),
         },
         onError: {
@@ -288,7 +288,7 @@ export const apiCodegenMachine = setup({
   },
   output: ({ context }) => ({
     apiCode: context.apiCode,
-    reasoning: context.reasoning,
+    explanation: context.explanation,
     errors: context.errors,
     errorAnalysis: context.errorAnalysis,
     fixedApiCode: context.fixedApiCode,
