@@ -1,4 +1,4 @@
-import { generateObject } from "ai";
+import { streamObject } from "ai";
 import { z } from "zod";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
@@ -73,7 +73,7 @@ export async function generateApi(
       dbSchema,
     });
 
-    const result = await generateObject({
+    const result = streamObject({
       model,
       schema: GenerateApiSchema,
       system: SYSTEM_PROMPT,
@@ -89,14 +89,13 @@ export async function generateApi(
       abortSignal: signal,
     });
 
-    log("info", "API generation complete", {
-      codeLength: result.object.apiCode.length,
-      explanation: result.object.explanation,
-    });
+    log("info", "API generation complete");
+
+    const object = await result.object;
 
     return {
-      apiCode: result.object.apiCode,
-      explanation: result.object.explanation,
+      apiCode: object.apiCode,
+      explanation: object.explanation,
     };
   } catch (error) {
     log(
