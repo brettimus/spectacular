@@ -116,6 +116,8 @@ ${schemaSpecification}
 
 <task>
 Generate a Drizzle ORM schema definition for the database tables described in the context.
+Just generate the code. The code should be in typescript, not markdown.
+Do NOT include any other text than the code.
 This is important to my career.
 </task>
 `;

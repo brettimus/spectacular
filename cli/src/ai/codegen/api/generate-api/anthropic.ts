@@ -11,7 +11,7 @@ function getSystemPrompt(
   honoApiRules: string,
 ) {
   return `
-You are an expert full-stack Typescript engineer and an API building assistant for apps that use Hono,
+You are an expert full-stack Typescript code generator and an API builder for apps that use Hono,
 a Typescript api framework similar to Express. 
 
 You are using the HONC stack:
@@ -84,5 +84,9 @@ ${templateExample}
 <task>
 The user will provide you with a plan for the api, and the database schema.
 You should implement the plan by generating the index.ts file for their Hono api.
+Do not give any preamble or introduction or explanation.
+Just generate the code. The code should be in typescript, not markdown.
+Do NOT include any other text than the code.
+This is important to my career.
 </task>`;
 }

@@ -76,10 +76,14 @@ app.get("/openapi.json", // ...
 app.use("/fp/*", createFiberplane({ // ...
 \`\`\`
 
-2. DO NOT wrap the indexTs file in \`\`\`typescript tags!
+2. DO NOT wrap the indexTs file in \`\`\`typescript tags!!!
 
 ===
 
 The user will provide you with a plan for the api, and the database schema.
-You should implement the plan by generating the index.ts file for their Hono api.`;
+You should implement the plan by generating the index.ts file for their Hono api.
+Do not give any preamble or introduction or explanation.
+Just generate the code. The code is in typescript, not markdown.
+Do NOT include any other text than the code.
+This is important to my career.`;
 }

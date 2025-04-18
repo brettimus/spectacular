@@ -132,7 +132,18 @@ I have a Drizzle schema for my database, which is already correctly imported in 
 ${dbSchema}
 </file>
 
-Please generate api routes in an index.ts file for me, according to the following specification:\n\n${apiPlan}
+Please generate api routes in an index.ts file for me, according to the following specification:
+
+<api_plan>
+${apiPlan}
+</api_plan>
+
+<task>
+Just generate the Typescript code for the api routes.
+The code should be in typescript, not embedded in markdown.
+Do NOT include any other text than the code and code comments.
+This is important to my career.
+</task>
 `;
 
 function getStrategyForProvider(aiProvider: FpModelProvider) {
