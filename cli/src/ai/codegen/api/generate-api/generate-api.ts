@@ -1,5 +1,4 @@
-import { streamObject } from "ai";
-import { z } from "zod";
+import { streamText } from "ai";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
@@ -16,18 +15,9 @@ export type GenerateApiOptions = {
   schema: string;
 };
 
-export type GenerateApiResult = z.infer<typeof GenerateApiSchema>;
-
-const GenerateApiSchema = z.object({
-  explanation: z
-    .string()
-    .describe("Your step by step thought process for designing the api"),
-  apiCode: z
-    .string()
-    .describe(
-      "The generated api routes file `index.ts`, in typescript (not markdown), THIS IS REQUIRED",
-    ),
-});
+export type GenerateApiResult = {
+  apiCode: string;
+};
 
 /**
  * Generate API code using AI
@@ -73,9 +63,8 @@ export async function generateApi(
       dbSchema,
     });
 
-    const result = streamObject({
+    const result = streamText({
       model,
-      schema: GenerateApiSchema,
       system: SYSTEM_PROMPT,
       // NOTE - Max tokens is 64_000 for Claude 3.7, 100_000 for OpenAI o4-mini
       maxTokens: 64_000,
@@ -89,13 +78,19 @@ export async function generateApi(
       abortSignal: signal,
     });
 
+    log("info", "API generation stream started");
+
+    // Consume the stream so we can trigger the resolution to the promise
+    for await (const _partial of result.textStream) {
+      // You can process partial updates here if needed
+    }
+
+    const apiCode = await result.text;
+
     log("info", "API generation complete");
 
-    const object = await result.object;
-
     return {
-      apiCode: object.apiCode,
-      explanation: object.explanation,
+      apiCode,
     };
   } catch (error) {
     log(

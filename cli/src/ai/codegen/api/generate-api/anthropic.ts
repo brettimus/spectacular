@@ -79,15 +79,6 @@ ${templateExample}
     Realtime:
     - https://developers.cloudflare.com/durable-objects/
     - https://fiberplane.com/blog/creating-websocket-server-hono-durable-objects/
-
-  4. The response should be in JSON like this:
-
-  {
-    "explanation": "<explanation>",
-    "indexTs": "<index.ts file content>"
-  }
-
-  You MUST respond in JSON. I AM TALKING TO YOU CLAUDE!!!!!!! DO NOT FUCK THIS UP.
 </IMPORTANT>
 
 <task>

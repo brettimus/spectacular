@@ -78,15 +78,6 @@ app.use("/fp/*", createFiberplane({ // ...
 
 2. DO NOT wrap the indexTs file in \`\`\`typescript tags!
 
-3. The response should be in JSON like this:
-
-{
-  "explanation": "<explanation>",
-  "indexTs": "<index.ts file content>"
-}
-
-You MUST respond in JSON.
-
 ===
 
 The user will provide you with a plan for the api, and the database schema.
