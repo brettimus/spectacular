@@ -80,9 +80,28 @@ export async function generateApi(
 
     log("info", "API generation stream started");
 
-    // Consume the stream so we can trigger the resolution to the promise
-    for await (const _partial of result.textStream) {
-      // You can process partial updates here if needed
+    let hasError = false;
+    let errorDetails: null | unknown = null;
+
+    // Process the fullStream to catch any errors
+    // NOTE - We also need to consume the stream to trigger the resolution to the promise `result.text`
+    for await (const part of result.fullStream) {
+      if (part.type === "error") {
+        log(
+          "error",
+          "API generation encountered an error in the response stream",
+          {
+            error: part.error,
+          },
+        );
+        hasError = true;
+        errorDetails = part.error;
+        break;
+      }
+    }
+
+    if (hasError) {
+      throw errorDetails;
     }
 
     const apiCode = await result.text;
