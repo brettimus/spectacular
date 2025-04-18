@@ -92,6 +92,7 @@ export async function createSpec({
     prompt: "Create a spec",
     schema: GeneratedSpecSchema,
     temperature: 0.55,
+    maxTokens: 10_000,
   });
 
   return result.object;
