@@ -1,6 +1,5 @@
 import { log } from "../../../../utils/logging/logger";
-import { generateObject } from "ai";
-import { z } from "zod";
+import { streamText } from "ai";
 import { aiModelFactory } from "../../../ai-model-factory";
 import type { FpAiConfig, FpModelProvider } from "../../../types";
 import { ANTHROPIC_STRATEGY } from "./anthropic";
@@ -10,16 +9,9 @@ export type GenerateSchemaOptions = {
   schemaSpecification: string;
 };
 
-export type GenerateSchemaResult = z.infer<typeof GenerateSchemaSchema>;
-
-const GenerateSchemaSchema = z.object({
-  explanation: z
-    .string()
-    .describe("Explanation of your schema design decisions"),
-  dbSchemaTs: z
-    .string()
-    .describe("The generated Drizzle typescript schema definition."),
-});
+export type GenerateSchemaResult = {
+  dbSchemaTs: string;
+};
 
 /**
  * Generate Drizzle ORM schema using AI
@@ -39,9 +31,8 @@ export async function generateSchema(
       specLength: schemaSpecification.length,
     });
 
-    const result = await generateObject({
+    const result = await streamText({
       model,
-      schema: GenerateSchemaSchema,
       messages: [
         {
           role: "user",
@@ -51,18 +42,24 @@ export async function generateSchema(
         },
       ],
       system: getSystemPrompt(),
-      maxTokens: 32_000,
+      maxTokens: 16_000,
       temperature,
       abortSignal: signal,
     });
 
-    log("info", "Schema generation complete", {
-      explanation: result.object.explanation,
-    });
+    log("info", "DB Schema generation stream started");
+
+    // Consume the stream so we can trigger the resolution to the promise
+    for await (const _partial of result.textStream) {
+      // You can process partial updates here if needed
+    }
+
+    const dbSchemaTs = await result.text;
+
+    log("info", "DB Schema generation complete");
 
     return {
-      explanation: result.object.explanation,
-      dbSchemaTs: result.object.dbSchemaTs,
+      dbSchemaTs,
     };
   } catch (error) {
     log(

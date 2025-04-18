@@ -65,6 +65,7 @@ Return only the fixed code. It should be valid TypeScript code. DO NOT INCLUDE A
       ],
       temperature,
       // TODO - Only use this for openai
+      // TODO - Use text editing tool for anthropic
       providerOptions: {
         openai: {
           prediction: {
