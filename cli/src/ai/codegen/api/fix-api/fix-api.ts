@@ -63,6 +63,7 @@ Return only the fixed code. It should be valid TypeScript code. DO NOT INCLUDE A
           content: userPrompt,
         },
       ],
+      maxTokens: 16_000,
       temperature,
       // TODO - Only use this for openai
       // TODO - Use text editing tool for anthropic

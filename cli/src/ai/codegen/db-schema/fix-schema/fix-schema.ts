@@ -51,6 +51,7 @@ Return only the fixed schema code. It should be valid TypeScript code. DO NOT IN
 `,
         },
       ],
+      maxTokens: 16_000,
       temperature,
       abortSignal: signal,
     });

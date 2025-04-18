@@ -39,7 +39,7 @@ type DbSchemaCodegenMachineContext = {
   aiConfig: FpAiConfig;
   /** The api specification document (spec.md) */
   spec: string;
-  /** Whatever error stopped teh machine */
+  /** Whatever error stopped the machine */
   error: unknown;
   /** The natural language description of the schema */
   schemaSpecification: string;
